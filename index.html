@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kinnow Mandi, Ledger & Payment Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #printable-slip, #printable-slip * { visibility: visible; }
+      #printable-slip { position: absolute; left: 0; top: 0; width: 100%; border: none; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans pb-16">
+
+  <!-- 1. LOGIN SCREEN -->
+  <div id="login-view" class="flex min-h-screen items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
+      <h2 class="text-2xl font-bold text-center text-emerald-700">Mandi Slip & Accounting</h2>
+      <p class="text-xs text-center text-gray-500 mb-6">Staff & Admin Login</p>
+      
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold mb-1">Username</label>
+          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-sm outline-emerald-600" placeholder="admin" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1">Password</label>
+          <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-sm outline-emerald-600" placeholder="••••••••" />
+        </div>
+        <p class="text-xs text-gray-400">Default: <b>admin</b> / <b>1234</b></p>
+        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 rounded-lg transition shadow">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. MAIN APP -->
+  <div id="app-view" class="hidden min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-emerald-800 text-white px-4 md:px-6 py-3 shadow flex justify-between items-center no-print sticky top-0 z-40">
+      <div>
+        <h1 class="font-bold text-base md:text-lg">Kinnow Mandi & Accounts Ledger</h1>
+        <p class="text-xs text-emerald-200">Abohar Hub • Farmer & Customer Statements</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="user-display" class="text-xs bg-emerald-900 px-2.5 py-1 rounded-full"></span>
+        <button onclick="logout()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-medium">
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-6xl mx-auto w-full p-4 no-print">
+      <div class="grid grid-cols-3 md:grid-cols-6 border-b border-gray-300 gap-1 mb-6 text-center text-xs font-semibold">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2.5 border-b-2 border-emerald-700 text-emerald-800">
+          📊 Dashboard
+        </button>
+        <button onclick="switchTab('customer-ledger')" id="tab-customer-ledger" class="py-2.5 text-gray-500 hover:text-emerald-700">
+          👤 Customer Ledger
+        </button>
+        <button onclick="switchTab('orchards')" id="tab-orchards" class="py-2.5 text-gray-500 hover:text-emerald-700">
+          🌳 Farmer Ledger
+        </button>
+        <button onclick="switchTab('farmer')" id="tab-farmer" class="py-2.5 text-gray-500 hover:text-emerald-700">
+          1. New Deal
+        </button>
+        <button onclick="switchTab('daily')" id="tab-daily" class="py-2.5 text-gray-500 hover:text-emerald-700">
+          2. Inward
+        </button>
+        <button onclick="switchTab('customer')" id="tab-customer" class="py-2.5 text-gray-500 hover:text-emerald-700">
+          3. Dispatch
+        </button>
+      </div>
+
+      <!-- TAB 0: DASHBOARD -->
+      <div id="dashboard-section" class="space-y-6">
+        <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase text-gray-500">Date View:</span>
+            <input type="date" id="dash-date-filter" class="border rounded-lg p-1.5 text-xs font-medium" onchange="renderDashboard()" />
+            <button onclick="resetToToday()" class="bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg text-xs font-semibold text-gray-700">Today</button>
+          </div>
+          <button onclick="clearAllData()" class="text-xs text-red-500 hover:underline">
+            Reset All Records
+          </button>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-900 mb-3" id="dash-period-title">Today's Performance</h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <p class="text-xs text-gray-500 font-medium">Kinnow Inward (Net Wt)</p>
+              <h3 class="text-xl font-bold text-gray-800 mt-1" id="stat-daily-weight">0 Kg</h3>
+              <p class="text-[11px] text-gray-400 mt-1" id="stat-daily-cut">0 Kg Cut (1kg/Qtl)</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <p class="text-xs text-gray-500 font-medium">Dispatched Boxes</p>
+              <h3 class="text-xl font-bold text-emerald-700 mt-1" id="stat-daily-boxes">0 Boxes</h3>
+              <p class="text-[11px] text-gray-400 mt-1" id="stat-daily-trips">0 Dispatches</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <p class="text-xs text-gray-500 font-medium">Customer Collections</p>
+              <h3 class="text-xl font-bold text-emerald-800 mt-1" id="stat-daily-cust-recv">₹0</h3>
+              <p class="text-[11px] text-gray-400 mt-1">Bank receipts today</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <p class="text-xs text-gray-500 font-medium">Paid to Farmers</p>
+              <h3 class="text-xl font-bold text-red-700 mt-1" id="stat-daily-farmer-paid">₹0</h3>
+              <p class="text-[11px] text-gray-400 mt-1">Payments made today</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Season Grand Totals -->
+        <div class="bg-gradient-to-br from-emerald-900 to-emerald-800 text-white p-5 rounded-2xl shadow-md">
+          <div class="flex justify-between items-center mb-4">
+            <h4 class="text-sm font-bold uppercase tracking-wider text-emerald-200">Full Season Overview</h4>
+            <span class="text-xs bg-emerald-700 px-3 py-1 rounded-full font-medium">Season 2026</span>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div class="border-r border-emerald-700/60 pr-2">
+              <span class="text-xs text-emerald-200">Total Billed Sales</span>
+              <p class="text-xl font-extrabold mt-1 text-yellow-300" id="season-total-sales">₹0</p>
+              <span class="text-[10px] text-emerald-300" id="season-cust-pending">₹0 Uncollected</span>
+            </div>
+            <div class="border-r border-emerald-700/60 pr-2">
+              <span class="text-xs text-emerald-200">Total Payments Recv</span>
+              <p class="text-xl font-extrabold mt-1 text-emerald-300" id="season-total-received">₹0</p>
+              <span class="text-[10px] text-emerald-300">In Bank Accounts</span>
+            </div>
+            <div class="border-r border-emerald-700/60 pr-2">
+              <span class="text-xs text-emerald-200">Total Farmer Dues</span>
+              <p class="text-xl font-extrabold mt-1 text-orange-300" id="season-farmer-dues">₹0</p>
+              <span class="text-[10px] text-emerald-300" id="season-farmer-pending">₹0 Pending to Pay</span>
+            </div>
+            <div>
+              <span class="text-xs text-emerald-200">Crates Outside</span>
+              <p class="text-xl font-extrabold mt-1 text-red-300" id="season-crates-unreturned">0</p>
+              <span class="text-[10px] text-emerald-300">Pending with Orchards</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kinnow Size Distribution -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600 mb-3">Season Size Breakdown (Boxes Packed & Sold)</h4>
+          <div class="grid grid-cols-3 md:grid-cols-9 gap-2 text-center" id="season-size-distribution"></div>
+        </div>
+      </div>
+
+      <!-- TAB 1: CUSTOMER MASTER LEDGER & RECEIPT ENTRY -->
+      <div id="customer-ledger-section" class="hidden space-y-6">
+        <!-- Add Payment Entry Form -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">💳 Record Customer Payment Received (ਗ੍ਰਾਹਕ ਤੋਂ ਰਕਮ ਜਮ੍ਹਾਂ)</h3>
+          <form onsubmit="recordCustomerPayment(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+            <div>
+              <label class="block font-semibold mb-1">Select Customer</label>
+              <select id="pay-cust-select" required class="w-full border rounded-lg p-2 bg-emerald-50 text-emerald-900 font-medium">
+                <option value="">-- Choose Customer --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Amount Received ₹</label>
+              <input type="number" id="pay-cust-amount" required class="w-full border rounded-lg p-2" placeholder="e.g. 150000" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Bank Name / Cash</label>
+              <input type="text" id="pay-cust-bank" required class="w-full border rounded-lg p-2" placeholder="e.g. HDFC Bank / SBI / Cash" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Payment Mode / UTR</label>
+              <input type="text" id="pay-cust-ref" class="w-full border rounded-lg p-2" placeholder="NEFT / Cheque / Ref No." />
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2 rounded-lg">
+                + Add Payment
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Ledger Viewer Card -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+          <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
+            <div>
+              <h3 class="text-base font-bold text-gray-800">Customer Statement & Balance</h3>
+              <p class="text-xs text-gray-500">Select customer to view entire invoice & payment timeline</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="view-cust-select" class="border rounded-lg p-2 text-xs font-semibold bg-emerald-50 text-emerald-900 outline-none" onchange="renderCustomerLedger()">
+                <option value="">-- Select Customer to View Statement --</option>
+              </select>
+              <button onclick="shareCustomerLedgerWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-medium flex items-center gap-1">
+                💬 WhatsApp Statement
+              </button>
+            </div>
+          </div>
+
+          <div id="cust-kpi-container" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="p-3.5 bg-gray-50 rounded-xl border">
+              <span class="text-xs text-gray-500 font-medium">Total Invoiced (Sales)</span>
+              <h4 class="text-lg font-bold text-gray-800 mt-1" id="cust-kpi-invoiced">₹0</h4>
+              <p class="text-[11px] text-gray-400" id="cust-kpi-boxes">0 Total Boxes</p>
+            </div>
+            <div class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200">
+              <span class="text-xs text-emerald-700 font-medium">Total Paid (Bank/Cash)</span>
+              <h4 class="text-lg font-bold text-emerald-800 mt-1" id="cust-kpi-paid">₹0</h4>
+              <p class="text-[11px] text-emerald-600" id="cust-kpi-paycount">0 Transactions</p>
+            </div>
+            <div class="p-3.5 bg-red-50 rounded-xl border border-red-200">
+              <span class="text-xs text-red-600 font-medium">Net Pending Balance</span>
+              <h4 class="text-xl font-black text-red-700 mt-1" id="cust-kpi-balance">₹0</h4>
+              <p class="text-[11px] text-red-500">Balance Receivable</p>
+            </div>
+          </div>
+
+          <div id="cust-ledger-table-wrap" class="hidden overflow-x-auto border rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-100 border-b text-gray-700 font-bold">
+                <tr>
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Entry Type</th>
+                  <th class="p-2.5">Description / Bank</th>
+                  <th class="p-2.5 text-right">Debit (Billed ₹)</th>
+                  <th class="p-2.5 text-right">Credit (Paid ₹)</th>
+                  <th class="p-2.5 text-right">Running Balance ₹</th>
+                </tr>
+              </thead>
+              <tbody id="cust-ledger-tbody"></tbody>
+            </table>
+          </div>
+
+          <div id="no-cust-placeholder" class="text-center py-8 text-gray-400 text-xs">
+            Select a customer from the dropdown above to inspect their statement.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: FARMER MASTER LEDGER & PAYMENT RECORD -->
+      <div id="orchards-section" class="hidden space-y-6">
+        <!-- Record Farmer Payment Form -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">💸 Record Payment Made to Farmer (ਕਿਸਾਨ ਨੂੰ ਅਦਾਇਗੀ)</h3>
+          <form onsubmit="recordFarmerPayment(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+            <div>
+              <label class="block font-semibold mb-1">Select Orchard / Farmer</label>
+              <select id="pay-farmer-select" required class="w-full border rounded-lg p-2 bg-emerald-50 text-emerald-900 font-medium">
+                <option value="">-- Choose Orchard --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Amount Paid ₹</label>
+              <input type="number" id="pay-farmer-amount" required class="w-full border rounded-lg p-2" placeholder="e.g. 50000" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Bank Account / Cash</label>
+              <input type="text" id="pay-farmer-bank" required class="w-full border rounded-lg p-2" placeholder="e.g. HDFC / SBI / Cash" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Payment Mode / Notes</label>
+              <input type="text" id="pay-farmer-ref" class="w-full border rounded-lg p-2" placeholder="NEFT / UTR / Token" />
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2 rounded-lg">
+                + Record Payment
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Farmer Statement Card -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+          <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
+            <div>
+              <h3 class="text-base font-bold text-gray-800">Orchard Master Ledger & Crates Balance</h3>
+              <p class="text-xs text-gray-500">Track total fruit inward, advance & bank payments, and crate count</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="orchard-ledger-select" class="border rounded-lg p-2 text-xs font-semibold bg-emerald-50 text-emerald-900 outline-none" onchange="renderSingleOrchardSummary()">
+                <option value="">-- Choose an Orchard to view --</option>
+              </select>
+              <button onclick="shareFarmerLedgerWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-medium flex items-center gap-1">
+                💬 WhatsApp Ledger
+              </button>
+            </div>
+          </div>
+
+          <div id="orchard-summary-card" class="hidden space-y-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <span class="text-xs text-gray-500 font-medium">Orchard / Farmer</span>
+                <h4 class="text-base font-bold text-gray-800 mt-1" id="orch-kpi-name">-</h4>
+                <p class="text-[11px] text-gray-400" id="orch-kpi-village">-</p>
+              </div>
+              <div class="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <span class="text-xs text-gray-500 font-medium">Pending Crates Balance</span>
+                <h4 class="text-xl font-black text-red-600 mt-1" id="orch-kpi-crates">0</h4>
+                <p class="text-[11px] text-gray-500" id="orch-kpi-crates-breakdown">Sent: 0 | Recv: 0</p>
+              </div>
+              <div class="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <span class="text-xs text-gray-500 font-medium">Fruit Picked (Chargeable)</span>
+                <h4 class="text-base font-bold text-emerald-800 mt-1" id="orch-kpi-weight">0 Kg</h4>
+                <p class="text-[11px] text-gray-500" id="orch-kpi-trips">0 Trips / Loads</p>
+              </div>
+              <div class="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <span class="text-xs text-gray-500 font-medium">Balance Payable</span>
+                <h4 class="text-lg font-bold text-red-600 mt-1" id="orch-kpi-financials">₹0</h4>
+                <p class="text-[11px] text-gray-500" id="orch-kpi-paid-info">Paid: ₹0</p>
+              </div>
+            </div>
+
+            <!-- Ledger Table -->
+            <div>
+              <h4 class="text-xs font-bold uppercase text-gray-600 mb-2">Combined Inward & Payment History</h4>
+              <div class="overflow-x-auto border rounded-xl">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-gray-100 border-b text-gray-700 font-bold">
+                    <tr>
+                      <th class="p-2.5">Date</th>
+                      <th class="p-2.5">Type</th>
+                      <th class="p-2.5">Details / Ref</th>
+                      <th class="p-2.5 text-right">Trip Amount ₹</th>
+                      <th class="p-2.5 text-right">Payment Paid ₹</th>
+                      <th class="p-2.5 text-right">Crates In/Out</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orchard-trips-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <div id="no-orchard-placeholder" class="text-center py-8 text-gray-400 text-xs">
+            Select an orchard from the dropdown to view its full statement.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: NEW ORCHARD AGREEMENT -->
+      <div id="farmer-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Orchard Purchase Agreement (ਬਾਗ਼ ਖ਼ਰੀਦ ਇਕਰਾਰਨਾਮਾ)</h3>
+        <form onsubmit="generateFarmerSlip(event)" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name (ਕਿਸਾਨ ਦਾ ਨਾਮ)</label>
+              <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Jaswinder Singh" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Mobile / WhatsApp</label>
+              <input type="tel" id="f-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm" placeholder="10-digit mobile" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Village / Orchard Location</label>
+              <input type="text" id="f-village" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Seed Farm, Abohar" />
+            </div>
+          </div>
+
+          <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+            <label class="block text-xs font-semibold mb-2">Deal Type (ਸੌਦੇ ਦੀ ਕਿਸਮ)</label>
+            <div class="flex gap-4">
+              <label class="flex items-center text-sm gap-2">
+                <input type="radio" name="p-type" value="lump_sum" checked onchange="togglePurchaseType()" /> Full Orchard / Lump Sum (ਮੁੱਕਤਾ)
+              </label>
+              <label class="flex items-center text-sm gap-2">
+                <input type="radio" name="p-type" value="per_kg" onchange="togglePurchaseType()" /> Per Kg Basis (ਪ੍ਰਤੀ ਕਿੱਲੋ)
+              </label>
+            </div>
+          </div>
+
+          <div id="lump-sum-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Total Agreement Value ₹</label>
+              <input type="number" id="f-lumpsum" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 500000" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Advance Token Paid ₹</label>
+              <input type="number" id="f-advance" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 100000" />
+            </div>
+          </div>
+
+          <div id="per-kg-fields" class="hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold mb-1">Agreed Rate per Kg ₹</label>
+                <input type="number" id="f-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 26" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold mb-1">Advance Token Paid ₹</label>
+                <input type="number" id="f-kg-advance" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1">Bank Name / Cash (For Advance)</label>
+            <input type="text" id="f-adv-bank" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. HDFC Bank / Cash" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1">Agreement Terms / Notes</label>
+            <input type="text" id="f-notes" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Cutting starts next Monday" />
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 rounded-lg">
+            Save Orchard Deal & Generate Slip
+          </button>
+        </form>
+      </div>
+
+      <!-- TAB 4: DAILY INWARD SLIP -->
+      <div id="daily-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex justify-between items-center border-b pb-2 mb-4">
+          <h3 class="text-base font-bold text-gray-800">Daily Orchard Inward (ਤੁੜਾਈ ਤੇ ਆਮਦ)</h3>
+          <span class="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold">
+            ⚡ Quick Auto-Fill
+          </span>
+        </div>
+
+        <div class="mb-5 bg-emerald-50 p-3.5 rounded-xl border border-emerald-200">
+          <label class="block text-xs font-bold text-emerald-900 mb-1">Select Saved Orchard (ਸੇਵ ਕੀਤਾ ਬਾਗ਼ ਚੁਣੋ)</label>
+          <select id="inward-orchard-select" class="w-full border border-emerald-300 rounded-lg p-2 text-sm bg-white font-medium outline-emerald-700" onchange="autoFillOrchardDetails()">
+            <option value="">-- Choose saved orchard to auto-fill details --</option>
+          </select>
+        </div>
+
+        <form onsubmit="generateDailyInwardSlip(event)" class="space-y-4">
+          <input type="hidden" id="d-orchard-id" value="" />
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name</label>
+              <input type="text" id="d-farmer" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Jaswinder Singh" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Farmer WhatsApp No.</label>
+              <input type="tel" id="d-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm" placeholder="10-digit mobile" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Vehicle / Tractor-Trolley No.</label>
+              <input type="text" id="d-vehicle" required class="w-full border rounded-lg p-2 text-sm" placeholder="PB 15 XX XXXX" />
+            </div>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg border grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Gross Weight (Kg)</label>
+              <input type="number" id="d-gross-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 4200" oninput="calculateDailyWeight()" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Tare/Empty Weight (Kg)</label>
+              <input type="number" id="d-tare-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 1200" oninput="calculateDailyWeight()" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Rate per Kg ₹</label>
+              <input type="number" id="d-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm" placeholder="0" oninput="calculateDailyWeight()" />
+            </div>
+          </div>
+
+          <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-xs flex justify-between flex-wrap gap-2">
+            <span>Net Weight: <b id="disp-net-wt">0</b> Kg</span>
+            <span>1 Kg/Quintal Cut: <b id="disp-cut-wt">0</b> Kg</span>
+            <span>Final Chargeable Weight: <b id="disp-final-wt" class="text-emerald-800 font-bold">0</b> Kg</span>
+          </div>
+
+          <div class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Empty Crates Sent to Orchard</label>
+              <input type="number" id="d-crates-sent" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Filled Crates Received</label>
+              <input type="number" id="d-crates-recv" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 rounded-lg">
+            Record Trip & Generate Inward Slip
+          </button>
+        </form>
+      </div>
+
+      <!-- TAB 5: CUSTOMER DISPATCH -->
+      <div id="customer-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Kinnow Dispatch Invoice (ਗ੍ਰਾਹਕ ਨਿਕਾਸੀ)</h3>
+        <form onsubmit="generateCustomerSlip(event)" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Customer / Buyer Name</label>
+              <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Azadpur Co., Delhi" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Phone Number (WhatsApp)</label>
+              <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm" placeholder="10-digit mobile" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Vehicle / Truck No</label>
+              <input type="text" id="c-vehicle" required class="w-full border rounded-lg p-2 text-sm" placeholder="PB 15 XX XXXX" />
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <h4 class="text-xs font-bold uppercase text-gray-500 mb-2">Kinnow Size Breakdown (Boxes & Rates)</h4>
+            <div class="grid grid-cols-3 md:grid-cols-5 gap-2" id="kinnow-size-grid"></div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-3">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Freight / Loading Charges ₹</label>
+              <input type="number" id="c-freight" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 rounded-lg mt-2">
+            Save & Generate Dispatch Slip
+          </button>
+        </form>
+      </div>
+
+      <!-- Printable Slip Modal -->
+      <div id="slip-modal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 overflow-y-auto max-h-[90vh]">
+          <div id="printable-slip"></div>
+          <div class="flex gap-2 mt-6 no-print">
+            <button onclick="window.print()" class="flex-1 bg-gray-800 hover:bg-gray-900 text-white py-2 rounded-lg font-medium text-xs">
+              🖨️ Print / Save PDF
+            </button>
+            <button id="whatsapp-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-medium text-xs">
+              💬 Send on WhatsApp
+            </button>
+            <button onclick="closeModal()" class="px-4 py-2 border rounded-lg text-xs">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const KINNOW_SIZES = ["36", "42", "45", "54", "60", "72", "84", "96", "108"];
+
+    let APP_DATA = JSON.parse(localStorage.getItem('KINNOW_PORTAL_DATA_V3')) || {
+      agreements: [],
+      inwards: [],
+      dispatches: [],
+      customerPayments: [],
+      farmerPayments: []
+    };
+
+    function saveData() {
+      localStorage.setItem('KINNOW_PORTAL_DATA_V3', JSON.stringify(APP_DATA));
+      populateDropdowns();
+      renderDashboard();
+    }
+
+    window.onload = function() {
+      const grid = document.getElementById('kinnow-size-grid');
+      grid.innerHTML = "";
+      KINNOW_SIZES.forEach(size => {
+        grid.innerHTML += `
+          <div class="border rounded-lg p-2 bg-gray-50 text-center">
+            <div class="text-xs font-bold text-emerald-800">Size ${size}</div>
+            <input type="number" id="size-qty-${size}" placeholder="Boxes" class="w-full border rounded p-1 text-xs mt-1" />
+            <input type="number" id="size-rate-${size}" placeholder="Rate ₹" class="w-full border rounded p-1 text-xs mt-1" />
+          </div>
+        `;
+      });
+      resetToToday();
+      populateDropdowns();
+    };
+
+    function populateDropdowns() {
+      // Inward Orchard Select
+      const inwardSelect = document.getElementById('inward-orchard-select');
+      const orchLedgerSelect = document.getElementById('orchard-ledger-select');
+      const payFarmerSelect = document.getElementById('pay-farmer-select');
+
+      inwardSelect.innerHTML = `<option value="">-- Choose saved orchard to auto-fill details --</option>`;
+      orchLedgerSelect.innerHTML = `<option value="">-- Choose an Orchard to view --</option>`;
+      payFarmerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
+
+      APP_DATA.agreements.forEach((orch) => {
+        const opt = `<option value="${orch.id}">${orch.name} (${orch.village})</option>`;
+        inwardSelect.innerHTML += opt;
+        orchLedgerSelect.innerHTML += opt;
+        payFarmerSelect.innerHTML += opt;
+      });
+
+      // Customer Selects (Extract unique customer names from dispatches)
+      const uniqueCusts = [...new Set(APP_DATA.dispatches.map(d => d.name.trim()))];
+      const payCustSelect = document.getElementById('pay-cust-select');
+      const viewCustSelect = document.getElementById('view-cust-select');
+
+      payCustSelect.innerHTML = `<option value="">-- Choose Customer --</option>`;
+      viewCustSelect.innerHTML = `<option value="">-- Select Customer to View Statement --</option>`;
+
+      uniqueCusts.forEach(c => {
+        const opt = `<option value="${c}">${c}</option>`;
+        payCustSelect.innerHTML += opt;
+        viewCustSelect.innerHTML += opt;
+      });
+    }
+
+    function autoFillOrchardDetails() {
+      const selId = document.getElementById('inward-orchard-select').value;
+      if (!selId) {
+        document.getElementById('d-orchard-id').value = "";
+        document.getElementById('d-farmer').value = "";
+        document.getElementById('d-phone').value = "";
+        document.getElementById('d-rate').value = "";
+        return;
+      }
+
+      const orch = APP_DATA.agreements.find(a => a.id === selId);
+      if (orch) {
+        document.getElementById('d-orchard-id').value = orch.id;
+        document.getElementById('d-farmer').value = orch.name;
+        document.getElementById('d-phone').value = orch.phone;
+        document.getElementById('d-rate').value = orch.rate || 0;
+        calculateDailyWeight();
+      }
+    }
+
+    function resetToToday() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      document.getElementById('dash-date-filter').value = todayStr;
+      renderDashboard();
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-user').value;
+      const p = document.getElementById('login-pass').value;
+      if(u === "admin" && p === "1234") {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('app-view').classList.remove('hidden');
+        document.getElementById('user-display').innerText = `Staff: ${u}`;
+        renderDashboard();
+      } else {
+        alert("Invalid login. Use admin / 1234");
+      }
+    }
+
+    function logout() {
+      document.getElementById('app-view').classList.add('hidden');
+      document.getElementById('login-view').classList.remove('hidden');
+    }
+
+    function switchTab(tab) {
+      ['dashboard', 'customer-ledger', 'orchards', 'farmer', 'daily', 'customer'].forEach(t => {
+        document.getElementById(`${t}-section`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).className = "py-2.5 text-gray-500 hover:text-emerald-700";
+      });
+
+      document.getElementById(`${tab}-section`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).className = "py-2.5 border-b-2 border-emerald-700 text-emerald-800 font-bold";
+
+      if(tab === 'dashboard') renderDashboard();
+      if(tab === 'customer-ledger') renderCustomerLedger();
+      if(tab === 'orchards') renderSingleOrchardSummary();
+    }
+
+    function togglePurchaseType() {
+      const isPerKg = document.querySelector('input[name="p-type"]:checked').value === 'per_kg';
+      document.getElementById('per-kg-fields').classList.toggle('hidden', !isPerKg);
+      document.getElementById('lump-sum-fields').classList.toggle('hidden', isPerKg);
+    }
+
+    function calculateDailyWeight() {
+      const gross = Number(document.getElementById('d-gross-wt').value || 0);
+      const tare = Number(document.getElementById('d-tare-wt').value || 0);
+      const net = Math.max(0, gross - tare);
+      const deduction = net > 0 ? (net / 100) * 1 : 0;
+      const finalWt = net - deduction;
+
+      document.getElementById('disp-net-wt').innerText = net.toFixed(1);
+      document.getElementById('disp-cut-wt').innerText = deduction.toFixed(1);
+      document.getElementById('disp-final-wt').innerText = finalWt.toFixed(1);
+    }
+
+    // --- 1. RECORD PAYMENTS ---
+    function recordCustomerPayment(e) {
+      e.preventDefault();
+      const customer = document.getElementById('pay-cust-select').value;
+      const amount = Number(document.getElementById('pay-cust-amount').value || 0);
+      const bank = document.getElementById('pay-cust-bank').value;
+      const ref = document.getElementById('pay-cust-ref').value || "Direct";
+      const dateStr = new Date().toISOString().split('T')[0];
+
+      APP_DATA.customerPayments.push({
+        id: 'cpay_' + Date.now(),
+        date: dateStr,
+        customer,
+        amount,
+        bank,
+        ref
+      });
+      saveData();
+      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment from ${customer} into ${bank}`);
+      e.target.reset();
+      renderCustomerLedger();
+    }
+
+    function recordFarmerPayment(e) {
+      e.preventDefault();
+      const orchardId = document.getElementById('pay-farmer-select').value;
+      const amount = Number(document.getElementById('pay-farmer-amount').value || 0);
+      const bank = document.getElementById('pay-farmer-bank').value;
+      const ref = document.getElementById('pay-farmer-ref').value || "Installment";
+      const dateStr = new Date().toISOString().split('T')[0];
+
+      const orch = APP_DATA.agreements.find(a => a.id === orchardId);
+
+      APP_DATA.farmerPayments.push({
+        id: 'fpay_' + Date.now(),
+        date: dateStr,
+        orchardId,
+        farmerName: orch ? orch.name : "Farmer",
+        amount,
+        bank,
+        ref
+      });
+      saveData();
+      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment to ${orch ? orch.name : 'Farmer'} from ${bank}`);
+      e.target.reset();
+      renderSingleOrchardSummary();
+    }
+
+    // --- 2. CUSTOMER LEDGER VIEW ---
+    function renderCustomerLedger() {
+      const custName = document.getElementById('view-cust-select').value;
+      const kpi = document.getElementById('cust-kpi-container');
+      const tableWrap = document.getElementById('cust-ledger-table-wrap');
+      const placeholder = document.getElementById('no-cust-placeholder');
+      const tbody = document.getElementById('cust-ledger-tbody');
+
+      if (!custName) {
+        kpi.classList.add('hidden');
+        tableWrap.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        return;
+      }
+
+      placeholder.classList.add('hidden');
+      kpi.classList.remove('hidden');
+      tableWrap.classList.remove('hidden');
+
+      const invoices = APP_DATA.dispatches.filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
+      const payments = APP_DATA.customerPayments.filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
+
+      const totalBilled = invoices.reduce((a, b) => a + b.grandTotal, 0);
+      const totalBoxes = invoices.reduce((a, b) => a + b.totalBoxes, 0);
+      const totalPaid = payments.reduce((a, b) => a + b.amount, 0);
+      const balanceDue = totalBilled - totalPaid;
+
+      document.getElementById('cust-kpi-invoiced').innerText = `₹${totalBilled.toLocaleString('en-IN')}`;
+      document.getElementById('cust-kpi-boxes').innerText = `${totalBoxes} Boxes Dispatched`;
+      document.getElementById('cust-kpi-paid').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
+      document.getElementById('cust-kpi-paycount').innerText = `${payments.length} Payments Received`;
+      document.getElementById('cust-kpi-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
+
+      // Combined Chronological Ledger
+      const combined = [
+        ...invoices.map(i => ({ date: i.date, type: 'INVOICE', desc: `Dispatch (${i.vehicle}) - ${i.totalBoxes} Boxes`, debit: i.grandTotal, credit: 0 })),
+        ...payments.map(p => ({ date: p.date, type: 'PAYMENT', desc: `Bank Deposit: ${p.bank} (${p.ref})`, debit: 0, credit: p.amount }))
+      ].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      let running = 0;
+      tbody.innerHTML = combined.map(row => {
+        running += (row.debit - row.credit);
+        return `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2.5">${row.date}</td>
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.type === 'INVOICE' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${row.type}</span></td>
+            <td class="p-2.5 font-medium">${row.desc}</td>
+            <td class="p-2.5 text-right font-semibold text-gray-800">${row.debit > 0 ? '₹' + row.debit.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right font-semibold text-emerald-700">${row.credit > 0 ? '₹' + row.credit.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right font-bold ${running > 0 ? 'text-red-600' : 'text-emerald-700'}">₹${running.toLocaleString('en-IN')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function shareCustomerLedgerWA() {
+      const custName = document.getElementById('view-cust-select').value;
+      if(!custName) return alert("Select a customer first");
+
+      const invoices = APP_DATA.dispatches.filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
+      const payments = APP_DATA.customerPayments.filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
+      const totalBilled = invoices.reduce((a, b) => a + b.grandTotal, 0);
+      const totalPaid = payments.reduce((a, b) => a + b.amount, 0);
+      const balanceDue = totalBilled - totalPaid;
+
+      const custPhone = invoices.length > 0 ? invoices[0].phone : "";
+
+      const waMsg = `*ACCOUNT STATEMENT / LEDGER*%0ACustomer: *${custName}*%0A---------------------------%0ATotal Billed Sales: Rs. ${totalBilled.toLocaleString('en-IN')}%0ATotal Paid / Received: Rs. ${totalPaid.toLocaleString('en-IN')}%0A*Current Balance Due: Rs. ${balanceDue.toLocaleString('en-IN')}*%0A---------------------------%0A_Please clear pending balance at earliest._`;
+      window.open(`https://wa.me/91${custPhone}?text=${waMsg}`, '_blank');
+    }
+
+    // --- 3. FARMER / ORCHARD LEDGER VIEW ---
+    function renderSingleOrchardSummary() {
+      const orchId = document.getElementById('orchard-ledger-select').value;
+      const card = document.getElementById('orchard-summary-card');
+      const placeholder = document.getElementById('no-orchard-placeholder');
+
+      if (!orchId) {
+        card.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        return;
+      }
+
+      const orch = APP_DATA.agreements.find(a => a.id === orchId);
+      if (!orch) return;
+
+      placeholder.classList.add('hidden');
+      card.classList.remove('hidden');
+
+      const trips = APP_DATA.inwards.filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
+      const payments = APP_DATA.farmerPayments.filter(p => p.orchardId === orchId);
+
+      const totNetWt = trips.reduce((a, b) => a + b.net, 0);
+      const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
+      const totSentCrates = trips.reduce((a, b) => a + b.sentCrates, 0);
+      const totRecvCrates = trips.reduce((a, b) => a + b.recvCrates, 0);
+      const pendingCrates = totSentCrates - totRecvCrates;
+
+      // Payments: advance token + subsequent installments
+      const totPaid = (orch.advance || 0) + payments.reduce((a, b) => a + b.amount, 0);
+
+      let totalGrossOrchardVal = 0;
+      if (orch.type === 'lump_sum') {
+        totalGrossOrchardVal = orch.total;
+      } else {
+        totalGrossOrchardVal = totChargeable * orch.rate;
+      }
+
+      const balDue = totalGrossOrchardVal - totPaid;
+
+      document.getElementById('orch-kpi-name').innerText = orch.name;
+      document.getElementById('orch-kpi-village').innerText = orch.village;
+      document.getElementById('orch-kpi-crates').innerText = `${pendingCrates} Pending`;
+      document.getElementById('orch-kpi-crates-breakdown').innerText = `Sent: ${totSentCrates} | Recv: ${totRecvCrates}`;
+      document.getElementById('orch-kpi-weight').innerText = `${totChargeable.toFixed(1)} Kg`;
+      document.getElementById('orch-kpi-trips').innerText = `${trips.length} Inward Loads`;
+
+      document.getElementById('orch-kpi-financials').innerText = `₹${balDue.toLocaleString('en-IN')} Balance`;
+      document.getElementById('orch-kpi-paid-info').innerText = `Total Paid: ₹${totPaid.toLocaleString('en-IN')} (Adv: ₹${orch.advance || 0})`;
+
+      // Combined History Table
+      const history = [
+        ...(orch.advance > 0 ? [{ date: orch.date, type: 'ADVANCE TOKEN', desc: `Advance token paid at agreement (${orch.advBank || 'Bank/Cash'})`, inwardAmt: 0, paidAmt: orch.advance, crates: '-' }] : []),
+        ...trips.map(t => ({ date: t.date, type: 'INWARD HARVEST', desc: `Vehicle: ${t.vehicle} (${t.chargeable.toFixed(1)} Kg @ ₹${t.rate})`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
+        ...payments.map(p => ({ date: p.date, type: 'BANK PAYMENT', desc: `Paid from: ${p.bank} (${p.ref})`, inwardAmt: 0, paidAmt: p.amount, crates: '-' }))
+      ].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const tbody = document.getElementById('orchard-trips-tbody');
+      tbody.innerHTML = history.map(h => `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-2.5">${h.date}</td>
+          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${h.type.includes('PAYMENT') || h.type.includes('ADVANCE') ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${h.type}</span></td>
+          <td class="p-2.5 font-medium">${h.desc}</td>
+          <td class="p-2.5 text-right font-semibold text-gray-800">${h.inwardAmt > 0 ? '₹' + h.inwardAmt.toLocaleString('en-IN') : '-'}</td>
+          <td class="p-2.5 text-right font-semibold text-emerald-700">${h.paidAmt > 0 ? '₹' + h.paidAmt.toLocaleString('en-IN') : '-'}</td>
+          <td class="p-2.5 text-right font-medium">${h.crates}</td>
+        </tr>
+      `).join('');
+    }
+
+    function shareFarmerLedgerWA() {
+      const orchId = document.getElementById('orchard-ledger-select').value;
+      if(!orchId) return alert("Select an orchard first");
+
+      const orch = APP_DATA.agreements.find(a => a.id === orchId);
+      const trips = APP_DATA.inwards.filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
+      const payments = APP_DATA.farmerPayments.filter(p => p.orchardId === orchId);
+
+      const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
+      const totSentCrates = trips.reduce((a, b) => a + b.sentCrates, 0);
+      const totRecvCrates = trips.reduce((a, b) => a + b.recvCrates, 0);
+      const pendingCrates = totSentCrates - totRecvCrates;
+      const totPaid = (orch.advance || 0) + payments.reduce((a, b) => a + b.amount, 0);
+      const totalVal = orch.type === 'lump_sum' ? orch.total : (totChargeable * orch.rate);
+      const balDue = totalVal - totPaid;
+
+      const waMsg = `*ORCHARD HARVEST & ACCOUNT STATEMENT*%0AFarmer: *${orch.name}* (${orch.village})%0A---------------------------%0ATotal Picked Weight: ${totChargeable.toFixed(1)} Kg%0ATotal Deal/Fruit Value: Rs. ${totalVal.toLocaleString('en-IN')}%0ATotal Amount Paid: Rs. ${totPaid.toLocaleString('en-IN')}%0A*Net Balance Payable: Rs. ${balDue.toLocaleString('en-IN')}*%0A*Pending Crates at Orchard: ${pendingCrates}*%0A---------------------------%0A_Abohar Mandi Portal_`;
+      window.open(`https://wa.me/91${orch.phone}?text=${waMsg}`, '_blank');
+    }
+
+    // --- 4. FORM GENERATORS ---
+    function generateFarmerSlip(e) {
+      e.preventDefault();
+      const name = document.getElementById('f-name').value;
+      const phone = document.getElementById('f-phone').value;
+      const village = document.getElementById('f-village').value;
+      const notes = document.getElementById('f-notes').value || "None";
+      const advBank = document.getElementById('f-adv-bank').value || "Cash/Bank";
+      const type = document.querySelector('input[name="p-type"]:checked').value;
+      const dateStr = new Date().toISOString().split('T')[0];
+      const orchId = 'orch_' + Date.now();
+
+      let dealData = { id: orchId, type, name, phone, village, notes, advBank, date: dateStr };
+      let dealSummary = "";
+      let waDeal = "";
+
+      if(type === 'lump_sum') {
+        const total = Number(document.getElementById('f-lumpsum').value || 0);
+        const adv = Number(document.getElementById('f-advance').value || 0);
+        dealData.total = total;
+        dealData.advance = adv;
+        dealSummary = `
+          <div class="flex justify-between"><span>Deal:</span><b>Full Orchard (ਮੁੱਕਤਾ)</b></div>
+          <div class="flex justify-between"><span>Agreed Value:</span><span>₹${total.toLocaleString('en-IN')}</span></div>
+          <div class="flex justify-between text-emerald-800 font-semibold"><span>Advance Paid:</span><span>₹${adv.toLocaleString('en-IN')} (${advBank})</span></div>
+          <div class="flex justify-between text-red-600 font-bold border-t pt-1"><span>Balance:</span><span>₹${(total - adv).toLocaleString('en-IN')}</span></div>
+        `;
+        waDeal = `Deal: *Full Orchard*%0AAmount: Rs. ${total.toLocaleString('en-IN')}%0AAdvance: Rs. ${adv.toLocaleString('en-IN')}`;
+      } else {
+        const rate = Number(document.getElementById('f-rate').value || 0);
+        const adv = Number(document.getElementById('f-kg-advance').value || 0);
+        dealData.rate = rate;
+        dealData.advance = adv;
+        dealSummary = `
+          <div class="flex justify-between"><span>Deal:</span><b>Per Kg Basis</b></div>
+          <div class="flex justify-between"><span>Agreed Rate:</span><b>₹${rate} / Kg</b></div>
+          <div class="flex justify-between text-amber-800"><span>Cut:</span><span>1 Kg per Quintal</span></div>
+          <div class="flex justify-between text-emerald-800 font-semibold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')} (${advBank})</span></div>
+        `;
+        waDeal = `Deal: *Per Kg*%0ARate: Rs. ${rate}/Kg (1kg/Qtl cut)%0AAdvance: Rs. ${adv.toLocaleString('en-IN')}`;
+      }
+
+      APP_DATA.agreements.push(dealData);
+      saveData();
+
+      const slipHTML = `
+        <div class="border-2 border-emerald-800 p-5 rounded-lg text-xs md:text-sm bg-white">
+          <div class="text-center pb-3 border-b">
+            <h2 class="text-lg font-bold uppercase text-emerald-900">Orchard Purchase Agreement</h2>
+            <p class="text-xs text-gray-500">Date: ${new Date().toLocaleDateString('en-IN')}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 my-3">
+            <div><b>Farmer:</b> ${name}</div>
+            <div><b>Mobile:</b> ${phone}</div>
+            <div><b>Location:</b> ${village}</div>
+          </div>
+          <div class="bg-gray-50 p-3 rounded my-2 space-y-1">${dealSummary}</div>
+          <div class="text-xs border-t pt-2 mt-2 text-gray-600"><b>Terms:</b> ${notes}</div>
+        </div>
+      `;
+
+      showSlip(slipHTML, phone, `*ORCHARD AGREEMENT*%0AFarmer: ${name}%0A${waDeal}`);
+      e.target.reset();
+    }
+
+    function generateDailyInwardSlip(e) {
+      e.preventDefault();
+      const orchId = document.getElementById('d-orchard-id').value;
+      const name = document.getElementById('d-farmer').value;
+      const phone = document.getElementById('d-phone').value;
+      const vehicle = document.getElementById('d-vehicle').value;
+      const gross = Number(document.getElementById('d-gross-wt').value || 0);
+      const tare = Number(document.getElementById('d-tare-wt').value || 0);
+      const rate = Number(document.getElementById('d-rate').value || 0);
+      const sentCrates = Number(document.getElementById('d-crates-sent').value || 0);
+      const recvCrates = Number(document.getElementById('d-crates-recv').value || 0);
+      const dateStr = new Date().toISOString().split('T')[0];
+
+      const net = Math.max(0, gross - tare);
+      const cut = (net / 100) * 1;
+      const chargeable = net - cut;
+      const totalTripAmt = rate > 0 ? (chargeable * rate) : 0;
+
+      APP_DATA.inwards.push({
+        id: 'inw_' + Date.now(),
+        orchardId: orchId,
+        date: dateStr,
+        name,
+        phone,
+        vehicle,
+        gross,
+        tare,
+        net,
+        cut,
+        chargeable,
+        rate,
+        totalTripAmt,
+        sentCrates,
+        recvCrates
+      });
+      saveData();
+
+      const slipHTML = `
+        <div class="border-2 border-emerald-800 p-5 rounded-lg text-xs md:text-sm bg-white">
+          <div class="text-center pb-3 border-b">
+            <h2 class="text-lg font-bold uppercase text-emerald-900">Daily Inward & Harvesting Slip</h2>
+            <p class="text-xs text-gray-500">Date: ${new Date().toLocaleDateString('en-IN')}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 my-3">
+            <div><b>Farmer:</b> ${name}</div>
+            <div><b>Vehicle:</b> ${vehicle}</div>
+          </div>
+          <div class="bg-gray-50 p-3 rounded my-2 space-y-1">
+            <div class="flex justify-between"><span>Net Weight:</span><span>${net.toFixed(1)} Kg</span></div>
+            <div class="flex justify-between text-red-600"><span>1 Kg/Qtl Cut:</span><span>- ${cut.toFixed(1)} Kg</span></div>
+            <div class="flex justify-between font-bold text-emerald-900"><span>Chargeable Weight:</span><span>${chargeable.toFixed(1)} Kg</span></div>
+            ${rate > 0 ? `<div class="flex justify-between font-bold text-emerald-800 pt-1"><span>Trip Amount (@₹${rate}):</span><span>₹${totalTripAmt.toLocaleString('en-IN')}</span></div>` : ''}
+          </div>
+          <div class="border-t pt-2 text-xs">
+            <b>Crates:</b> Sent: ${sentCrates} | Received: ${recvCrates}
+          </div>
+        </div>
+      `;
+
+      showSlip(slipHTML, phone, `*DAILY HARVEST SLIP*%0AFarmer: ${name}%0AVehicle: ${vehicle}%0ANet Wt: ${net.toFixed(1)} Kg%0A*Chargeable: ${chargeable.toFixed(1)} Kg*${rate > 0 ? `%0AAmount: Rs. ${totalTripAmt}` : ''}%0ACrates: Sent ${sentCrates} / Recv ${recvCrates}`);
+      e.target.reset();
+      document.getElementById('inward-orchard-select').value = "";
+      calculateDailyWeight();
+    }
+
+    function generateCustomerSlip(e) {
+      e.preventDefault();
+      const name = document.getElementById('c-name').value;
+      const phone = document.getElementById('c-phone').value;
+      const vehicle = document.getElementById('c-vehicle').value;
+      const freight = Number(document.getElementById('c-freight').value || 0);
+      const dateStr = new Date().toISOString().split('T')[0];
+
+      let totalBoxes = 0;
+      let totalAmount = 0;
+      let rowsHTML = "";
+      let waLines = "";
+      let sizesBreakdown = {};
+
+      KINNOW_SIZES.forEach(size => {
+        const qty = Number(document.getElementById(`size-qty-${size}`).value || 0);
+        const rate = Number(document.getElementById(`size-rate-${size}`).value || 0);
+        if(qty > 0) {
+          const sub = qty * rate;
+          totalBoxes += qty;
+          totalAmount += sub;
+          sizesBreakdown[size] = qty;
+          rowsHTML += `<tr class="border-b"><td class="py-1">Size ${size}</td><td class="text-center">${qty}</td><td class="text-right">₹${rate}</td><td class="text-right font-medium">₹${sub.toLocaleString('en-IN')}</td></tr>`;
+          waLines += `%0ASize ${size}: ${qty} boxes @ Rs.${rate}`;
+        }
+      });
+
+      const grandTotal = totalAmount + freight;
+
+      APP_DATA.dispatches.push({
+        id: 'disp_' + Date.now(),
+        date: dateStr,
+        name,
+        phone,
+        vehicle,
+        freight,
+        totalBoxes,
+        grandTotal,
+        sizesBreakdown
+      });
+      saveData();
+
+      const slipHTML = `
+        <div class="border-2 border-emerald-800 p-5 rounded-lg text-xs md:text-sm bg-white">
+          <div class="text-center pb-3 border-b">
+            <h2 class="text-lg font-bold uppercase text-emerald-900">Kinnow Dispatch Invoice</h2>
+            <p class="text-xs text-gray-500">Date: ${new Date().toLocaleDateString('en-IN')}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 my-3">
+            <div><b>Customer:</b> ${name}</div>
+            <div><b>Vehicle:</b> ${vehicle}</div>
+          </div>
+          <table class="w-full text-xs my-2">
+            <thead><tr class="border-b"><th class="py-1 text-left">Size</th><th class="text-center">Boxes</th><th class="text-right">Rate</th><th class="text-right">Total</th></tr></thead>
+            <tbody>${rowsHTML}</tbody>
+          </table>
+          <div class="border-t pt-2 space-y-1 text-xs">
+            <div class="flex justify-between"><span>Total Boxes:</span><b>${totalBoxes}</b></div>
+            <div class="flex justify-between"><span>Freight:</span><span>₹${freight.toLocaleString('en-IN')}</span></div>
+            <div class="flex justify-between text-base font-bold text-emerald-900 border-t pt-1"><span>Grand Total:</span><span>₹${grandTotal.toLocaleString('en-IN')}</span></div>
+          </div>
+        </div>
+      `;
+
+      showSlip(slipHTML, phone, `*KINNOW DISPATCH*%0ACustomer: ${name}%0AVehicle: ${vehicle}%0A${waLines}%0ATotal Boxes: *${totalBoxes}*%0AGrand Total: *Rs. ${grandTotal.toLocaleString('en-IN')}*`);
+      e.target.reset();
+    }
+
+    // --- 5. DASHBOARD CALCULATIONS ---
+    function renderDashboard() {
+      const filterDate = document.getElementById('dash-date-filter').value;
+      const isToday = filterDate === new Date().toISOString().split('T')[0];
+      document.getElementById('dash-period-title').innerText = isToday ? "Today's Performance" : `Performance on ${filterDate}`;
+
+      const dayInwards = APP_DATA.inwards.filter(i => i.date === filterDate);
+      const dayDispatches = APP_DATA.dispatches.filter(d => d.date === filterDate);
+      const dayCustPay = APP_DATA.customerPayments.filter(p => p.date === filterDate);
+      const dayFarmerPay = APP_DATA.farmerPayments.filter(p => p.date === filterDate);
+
+      const dailyNetWt = dayInwards.reduce((acc, curr) => acc + curr.net, 0);
+      const dailyCutWt = dayInwards.reduce((acc, curr) => acc + curr.cut, 0);
+      const dailyBoxes = dayDispatches.reduce((acc, curr) => acc + curr.totalBoxes, 0);
+      const dailyCustRecv = dayCustPay.reduce((acc, curr) => acc + curr.amount, 0);
+      const dailyFarmerPaid = dayFarmerPay.reduce((acc, curr) => acc + curr.amount, 0);
+
+      document.getElementById('stat-daily-weight').innerText = `${dailyNetWt.toLocaleString('en-IN')} Kg`;
+      document.getElementById('stat-daily-cut').innerText = `${dailyCutWt.toFixed(1)} Kg Cut (1kg/Qtl)`;
+      document.getElementById('stat-daily-boxes').innerText = `${dailyBoxes.toLocaleString('en-IN')} Boxes`;
+      document.getElementById('stat-daily-trips').innerText = `${dayDispatches.length} Outward Trucks`;
+      document.getElementById('stat-daily-cust-recv').innerText = `₹${dailyCustRecv.toLocaleString('en-IN')}`;
+      document.getElementById('stat-daily-farmer-paid').innerText = `₹${dailyFarmerPaid.toLocaleString('en-IN')}`;
+
+      // Season Totals
+      const seasonSales = APP_DATA.dispatches.reduce((acc, curr) => acc + curr.grandTotal, 0);
+      const seasonCustRecv = APP_DATA.customerPayments.reduce((acc, curr) => acc + curr.amount, 0);
+      const seasonCustPending = seasonSales - seasonCustRecv;
+
+      let seasonFarmerGross = 0;
+      APP_DATA.agreements.forEach(a => {
+        if(a.type === 'lump_sum') {
+          seasonFarmerGross += a.total;
+        } else {
+          const inws = APP_DATA.inwards.filter(i => i.orchardId === a.id);
+          const chWt = inws.reduce((x, y) => x + y.chargeable, 0);
+          seasonFarmerGross += (chWt * a.rate);
+        }
+      });
+
+      const seasonFarmerPaid = APP_DATA.agreements.reduce((x, y) => x + (y.advance || 0), 0) + APP_DATA.farmerPayments.reduce((x, y) => x + y.amount, 0);
+      const seasonFarmerPending = seasonFarmerGross - seasonFarmerPaid;
+
+      const seasonSentCrates = APP_DATA.inwards.reduce((acc, curr) => acc + curr.sentCrates, 0);
+      const seasonRecvCrates = APP_DATA.inwards.reduce((acc, curr) => acc + curr.recvCrates, 0);
+
+      document.getElementById('season-total-sales').innerText = `₹${seasonSales.toLocaleString('en-IN')}`;
+      document.getElementById('season-cust-pending').innerText = `₹${seasonCustPending.toLocaleString('en-IN')} Uncollected`;
+      document.getElementById('season-total-received').innerText = `₹${seasonCustRecv.toLocaleString('en-IN')}`;
+      document.getElementById('season-farmer-dues').innerText = `₹${seasonFarmerGross.toLocaleString('en-IN')}`;
+      document.getElementById('season-farmer-pending').innerText = `₹${seasonFarmerPending.toLocaleString('en-IN')} Pending to Pay`;
+      document.getElementById('season-crates-unreturned').innerText = `${seasonSentCrates - seasonRecvCrates} Crates`;
+
+      // Size Distribution
+      const sizeGrid = document.getElementById('season-size-distribution');
+      sizeGrid.innerHTML = "";
+      KINNOW_SIZES.forEach(size => {
+        let count = 0;
+        APP_DATA.dispatches.forEach(d => {
+          if (d.sizesBreakdown && d.sizesBreakdown[size]) count += d.sizesBreakdown[size];
+        });
+        sizeGrid.innerHTML += `
+          <div class="border rounded-lg p-2 bg-gray-50">
+            <div class="text-[10px] text-gray-500 font-bold">Size ${size}</div>
+            <div class="text-sm font-extrabold text-emerald-800 mt-1">${count}</div>
+          </div>
+        `;
+      });
+    }
+
+    function showSlip(html, phone, waText) {
+      document.getElementById('printable-slip').innerHTML = html;
+      document.getElementById('whatsapp-btn').onclick = () => window.open(`https://wa.me/91${phone}?text=${waText}`, '_blank');
+      document.getElementById('slip-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('slip-modal').classList.add('hidden');
+    }
+
+    function clearAllData() {
+      if(confirm("Are you sure you want to reset all data?")) {
+        APP_DATA = { agreements: [], inwards: [], dispatches: [], customerPayments: [], farmerPayments: [] };
+        saveData();
+      }
+    }
+  </script>
+</body>
+</html>
