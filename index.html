@@ -52,7 +52,7 @@
       <p class="text-[11px] text-gray-500 mb-2 font-medium">Kinnow Mandi & Party Portal</p>
       
       <div id="cloud-status-badge" class="mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
-        Connecting to Private Cloud...
+        Connecting to Cloud Database...
       </div>
 
       <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
@@ -622,7 +622,7 @@
               <div class="p-3 bg-gray-50 rounded-xl border">
                 <span class="text-xs text-gray-500 font-medium">Fruit Picked (Chargeable)</span>
                 <h4 class="text-base font-bold text-emerald-800 mt-1" id="orch-kpi-weight">0 Kg</h4>
-                <p class="text-[11px] text-gray-500" id="orch-kpi-trips">0 Loads</p>
+                <p class="text-[11px] text-gray-400" id="orch-kpi-trips">0 Loads</p>
               </div>
               <div class="p-3 bg-gray-50 rounded-xl border">
                 <span class="text-xs text-gray-500 font-medium">Balance Payable</span>
@@ -638,7 +638,7 @@
                   <thead class="bg-gray-100 border-b text-gray-700 font-bold">
                     <tr>
                       <th class="p-2.5">Date</th>
-                      <th class="p-2.5">Type</th>
+                      <th class="p-2.5">Token</th>
                       <th class="p-2.5">Details</th>
                       <th class="p-2.5 text-right">Inward Amt ₹</th>
                       <th class="p-2.5 text-right">Paid Amt ₹</th>
@@ -915,7 +915,6 @@
       blockedUsers: []
     };
 
-    // --- SEQUENTIAL TOKEN GENERATION HELPER ---
     function generatePartyToken(type, name, locationOrSecondName = "") {
       const cleanName = (name || "").trim();
       const cleanLoc = (locationOrSecondName || "").trim();
@@ -926,14 +925,12 @@
         const p2 = cleanLoc ? cleanLoc.charAt(0).toUpperCase() : (cleanName.length > 1 ? cleanName.charAt(1).toUpperCase() : 'O');
         prefix = `${p1}${p2}`;
 
-        // Count previous slips for this farmer
-        const pastCount = APP_DATA.inwards.filter(i => 
+        const pastCount = (APP_DATA.inwards || []).filter(i => 
           (i.name && i.name.trim().toLowerCase() === cleanName.toLowerCase())
         ).length;
 
         return `${prefix}-${pastCount + 1}`;
       } else {
-        // Customer Dispatch Token
         const words = cleanName.split(/\s+/).filter(Boolean);
         if (words.length >= 2) {
           prefix = (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
@@ -943,7 +940,7 @@
           prefix = (cleanName.charAt(0) || "C").toUpperCase() + "P";
         }
 
-        const pastCount = APP_DATA.dispatches.filter(d => 
+        const pastCount = (APP_DATA.dispatches || []).filter(d => 
           (d.name && d.name.trim().toLowerCase() === cleanName.toLowerCase())
         ).length;
 
@@ -954,10 +951,27 @@
     function setupCloudListeners() {
       const badge = document.getElementById('cloud-status-badge');
       if (badge) {
-        badge.innerText = "🔒 Private Firebase Cloud Connected";
+        badge.innerText = "☁️ Firebase Cloud Sync Active";
         badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
       }
 
+      // 1. Direct one-time fetch to guarantee fresh load on cold start
+      db.collection("plant_data").doc("main_state").get().then((doc) => {
+        if (doc.exists) {
+          const cloudData = doc.data();
+          delete cloudData.secretKey;
+          APP_DATA = cloudData;
+          localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
+          populateDropdowns();
+          renderDashboard();
+          renderAttendanceTable();
+          renderStaffTable();
+          renderPartyAccountsTable();
+          if (currentPartySession) renderPartyPortalView();
+        }
+      }).catch(err => console.error("Initial fetch error:", err));
+
+      // 2. Realtime listener for live updates
       db.collection("plant_data").doc("main_state").onSnapshot((doc) => {
         if (doc.exists) {
           const cloudData = doc.data();
@@ -970,8 +984,6 @@
           renderStaffTable();
           renderPartyAccountsTable();
           if (currentPartySession) renderPartyPortalView();
-        } else {
-          saveData();
         }
       }, (err) => {
         console.error("Firestore sync error:", err);
@@ -982,7 +994,7 @@
       localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
       const payload = Object.assign({}, APP_DATA, { secretKey: APP_SECRET_KEY });
       db.collection("plant_data").doc("main_state").set(payload)
-        .catch(err => console.error("Private Cloud write failed:", err));
+        .catch(err => console.error("Cloud write failed:", err));
 
       populateDropdowns();
       renderDashboard();
@@ -1052,7 +1064,7 @@
         return;
       }
 
-      const staff = APP_DATA.staffUsers.find(s => (s.username || "").toLowerCase() === u && s.password === p);
+      const staff = (APP_DATA.staffUsers || []).find(s => (s.username || "").toLowerCase() === u && s.password === p);
       if(staff) {
         if(isUserBlocked(staff.username)) {
           return alert("Your staff account is blocked. Contact Master Admin.");
@@ -1062,7 +1074,7 @@
         return;
       }
 
-      const farmer = APP_DATA.agreements.find(a => (a.phone || "").toString().trim() === u);
+      const farmer = (APP_DATA.agreements || []).find(a => (a.phone || "").toString().trim() === u);
       if(farmer && p === u) {
         if(isUserBlocked(u)) {
           return alert("Your farmer portal access is blocked. Contact Admin.");
@@ -1072,7 +1084,7 @@
         return;
       }
 
-      const customer = APP_DATA.dispatches.find(d => (d.phone || "").toString().trim() === u);
+      const customer = (APP_DATA.dispatches || []).find(d => (d.phone || "").toString().trim() === u);
       if(customer && p === u) {
         if(isUserBlocked(u)) {
           return alert("Your customer portal access is blocked. Contact Admin.");
@@ -1136,10 +1148,10 @@
       const tbody = document.getElementById('party-table-body');
 
       if(role === 'farmer') {
-        const orchards = APP_DATA.agreements.filter(a => (a.phone || "").toString().trim() === phone);
+        const orchards = (APP_DATA.agreements || []).filter(a => (a.phone || "").toString().trim() === phone);
         const orchIds = orchards.map(o => o.id);
-        const trips = APP_DATA.inwards.filter(i => orchIds.includes(i.orchardId) || (i.phone || "").toString().trim() === phone);
-        const payments = APP_DATA.farmerPayments.filter(p => orchIds.includes(p.orchardId));
+        const trips = (APP_DATA.inwards || []).filter(i => orchIds.includes(i.orchardId) || (i.phone || "").toString().trim() === phone);
+        const payments = (APP_DATA.farmerPayments || []).filter(p => orchIds.includes(p.orchardId));
 
         const totChargeable = trips.reduce((a,b) => a + b.chargeable, 0);
         const totSent = trips.reduce((a,b) => a + b.sentCrates, 0);
@@ -1212,8 +1224,8 @@
         `).join('');
 
       } else {
-        const dispatches = APP_DATA.dispatches.filter(d => (d.phone || "").toString().trim() === phone || d.name.toLowerCase() === name.toLowerCase());
-        const payments = APP_DATA.customerPayments.filter(p => p.customer.toLowerCase() === name.toLowerCase());
+        const dispatches = (APP_DATA.dispatches || []).filter(d => (d.phone || "").toString().trim() === phone || d.name.toLowerCase() === name.toLowerCase());
+        const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.toLowerCase() === name.toLowerCase());
 
         const totalBilled = dispatches.reduce((a,b) => a + b.grandTotal, 0);
         const totalBoxes = dispatches.reduce((a,b) => a + b.totalBoxes, 0);
@@ -1274,7 +1286,7 @@
     function renderStaffTable() {
       const tbody = document.getElementById('staff-table-body');
       if(!tbody) return;
-      if(APP_DATA.staffUsers.length === 0) {
+      if((APP_DATA.staffUsers || []).length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No staff accounts created yet.</td></tr>`;
         return;
       }
@@ -1307,12 +1319,12 @@
 
       const partyRows = [];
 
-      APP_DATA.agreements.forEach(a => {
+      (APP_DATA.agreements || []).forEach(a => {
         partyRows.push({ type: 'Farmer', name: a.name, phone: (a.phone || "").toString().trim() });
       });
 
       const custMap = new Map();
-      APP_DATA.dispatches.forEach(d => {
+      (APP_DATA.dispatches || []).forEach(d => {
         const ph = (d.phone || "").toString().trim();
         if(!custMap.has(ph)) {
           custMap.set(ph, { type: 'Customer', name: d.name, phone: ph });
@@ -1408,10 +1420,11 @@
       const name = document.getElementById('reg-staff-name').value.trim();
       const role = document.getElementById('reg-staff-role').value.trim() || 'Staff';
 
-      if(APP_DATA.staffDirectory.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+      if((APP_DATA.staffDirectory || []).some(s => s.name.toLowerCase() === name.toLowerCase())) {
         return alert("Staff member already registered!");
       }
 
+      if(!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
       APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role });
       saveData();
       alert(`Staff member ${name} added to directory!`);
@@ -1429,7 +1442,7 @@
       payFarmerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
       staffDatalist.innerHTML = "";
 
-      APP_DATA.agreements.forEach((orch) => {
+      (APP_DATA.agreements || []).forEach((orch) => {
         const opt = `<option value="${orch.id}">${orch.name} (${orch.village})</option>`;
         inwardSelect.innerHTML += opt;
         orchLedgerSelect.innerHTML += opt;
@@ -1437,15 +1450,15 @@
       });
 
       const allStaffNames = new Set([
-        ...APP_DATA.staffUsers.map(u => u.name),
-        ...APP_DATA.staffDirectory.map(d => d.name)
+        ...(APP_DATA.staffUsers || []).map(u => u.name),
+        ...(APP_DATA.staffDirectory || []).map(d => d.name)
       ]);
 
       allStaffNames.forEach(name => {
         staffDatalist.innerHTML += `<option value="${name}"></option>`;
       });
 
-      const uniqueCusts = [...new Set(APP_DATA.dispatches.map(d => d.name.trim()))];
+      const uniqueCusts = [...new Set((APP_DATA.dispatches || []).map(d => d.name.trim()))];
       const payCustSelect = document.getElementById('pay-cust-select');
       const viewCustSelect = document.getElementById('view-cust-select');
 
@@ -1490,10 +1503,11 @@
       const username = document.getElementById('staff-user').value.trim().toLowerCase();
       const password = document.getElementById('staff-pass').value.trim();
 
-      if(APP_DATA.staffUsers.some(u => u.username === username) || username === 'admin') {
+      if((APP_DATA.staffUsers || []).some(u => u.username === username) || username === 'admin') {
         return alert("Username already taken. Pick another.");
       }
 
+      if(!APP_DATA.staffUsers) APP_DATA.staffUsers = [];
       APP_DATA.staffUsers.push({ id: 'staff_' + Date.now(), name, username, password, role: 'staff' });
       saveData();
       alert(`Staff account for ${name} (@${username}) created successfully!`);
@@ -1514,6 +1528,7 @@
       const wage = Number(document.getElementById('att-staff-wage').value || 0);
       const date = document.getElementById('att-staff-date').value;
 
+      if(!APP_DATA.staffAttendance) APP_DATA.staffAttendance = [];
       APP_DATA.staffAttendance.push({ id: 'att_' + Date.now(), type: 'Single Staff', name: staffName, status, wage, date });
       saveData();
       alert(`Recorded attendance for ${staffName}: ${status}`);
@@ -1537,6 +1552,7 @@
       const date = document.getElementById('att-group-date').value;
       const totalPayable = count * rate;
 
+      if(!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
       APP_DATA.groupLabourAttendance.push({ id: 'grp_' + Date.now(), type: 'Orchard Contractor Group', head, count, rate, orchard, date, totalPayable });
       saveData();
       alert(`Recorded ${count} persons under ${head}. Total: ₹${totalPayable.toLocaleString('en-IN')}`);
@@ -1551,7 +1567,7 @@
       document.getElementById('edit-att-type').value = cat;
 
       if(cat === 'Single Staff') {
-        const item = APP_DATA.staffAttendance.find(x => x.id === id);
+        const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
         if(!item) return;
         document.getElementById('edit-modal-title').innerText = `Edit Staff: ${item.name}`;
         document.getElementById('edit-att-date').value = item.date;
@@ -1562,7 +1578,7 @@
         document.getElementById('edit-staff-fields').classList.remove('hidden');
         document.getElementById('edit-group-fields').classList.add('hidden');
       } else {
-        const item = APP_DATA.groupLabourAttendance.find(x => x.id === id);
+        const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
         if(!item) return;
         document.getElementById('edit-modal-title').innerText = `Edit Group: ${item.head}`;
         document.getElementById('edit-att-date').value = item.date;
@@ -1589,7 +1605,7 @@
       const date = document.getElementById('edit-att-date').value;
 
       if(cat === 'Single Staff') {
-        const item = APP_DATA.staffAttendance.find(x => x.id === id);
+        const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
         if(item) {
           item.date = date;
           item.name = document.getElementById('edit-att-name').value;
@@ -1597,7 +1613,7 @@
           item.wage = Number(document.getElementById('edit-att-wage').value || 0);
         }
       } else {
-        const item = APP_DATA.groupLabourAttendance.find(x => x.id === id);
+        const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
         if(item) {
           item.date = date;
           item.head = document.getElementById('edit-att-head').value;
@@ -1629,8 +1645,8 @@
       if(!tbody) return;
 
       const combined = [
-        ...APP_DATA.staffAttendance.map(s => ({ id: s.id, date: s.date, cat: 'Single Staff', title: s.name, countOrStatus: s.status, detail: s.wage ? `₹${s.wage}/day` : '-', total: s.wage || 0 })),
-        ...APP_DATA.groupLabourAttendance.map(g => ({ id: g.id, date: g.date, cat: 'Contractor Group', title: `${g.head} (${g.orchard})`, countOrStatus: `${g.count} Persons`, detail: `@₹${g.rate}/head`, total: g.totalPayable }))
+        ...(APP_DATA.staffAttendance || []).map(s => ({ id: s.id, date: s.date, cat: 'Single Staff', title: s.name, countOrStatus: s.status, detail: s.wage ? `₹${s.wage}/day` : '-', total: s.wage || 0 })),
+        ...(APP_DATA.groupLabourAttendance || []).map(g => ({ id: g.id, date: g.date, cat: 'Contractor Group', title: `${g.head} (${g.orchard})`, countOrStatus: `${g.count} Persons`, detail: `@₹${g.rate}/head`, total: g.totalPayable }))
       ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
       if(combined.length === 0) {
@@ -1664,7 +1680,7 @@
         document.getElementById('d-village').value = "";
         return;
       }
-      const orch = APP_DATA.agreements.find(a => a.id === selId);
+      const orch = (APP_DATA.agreements || []).find(a => a.id === selId);
       if (orch) {
         document.getElementById('d-orchard-id').value = orch.id;
         document.getElementById('d-farmer').value = orch.name;
@@ -1707,6 +1723,7 @@
       const ref = document.getElementById('pay-cust-ref').value || "Direct";
       const dateStr = new Date().toISOString().split('T')[0];
 
+      if(!APP_DATA.customerPayments) APP_DATA.customerPayments = [];
       APP_DATA.customerPayments.push({ id: 'cpay_' + Date.now(), date: dateStr, customer, amount, bank, ref });
       saveData();
       alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment from ${customer}`);
@@ -1722,7 +1739,8 @@
       const ref = document.getElementById('pay-farmer-ref').value || "Installment";
       const dateStr = new Date().toISOString().split('T')[0];
 
-      const orch = APP_DATA.agreements.find(a => a.id === orchardId);
+      const orch = (APP_DATA.agreements || []).find(a => a.id === orchardId);
+      if(!APP_DATA.farmerPayments) APP_DATA.farmerPayments = [];
       APP_DATA.farmerPayments.push({ id: 'fpay_' + Date.now(), date: dateStr, orchardId, farmerName: orch ? orch.name : "Farmer", amount, bank, ref });
       saveData();
       alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment to ${orch ? orch.name : 'Farmer'}`);
@@ -1740,7 +1758,6 @@
       const type = document.querySelector('input[name="p-type"]:checked').value;
       const dateStr = new Date().toISOString().split('T')[0];
       
-      // Sequential Agreement Token
       const tokenNo = generatePartyToken('farmer', name, village);
       const orchId = 'orch_' + Date.now();
 
@@ -1774,6 +1791,7 @@
         waDeal = `Deal: *Per Kg*%0ARate: Rs. ${rate}/Kg (1kg/Qtl cut)%0AAdvance: Rs. ${adv.toLocaleString('en-IN')}`;
       }
 
+      if(!APP_DATA.agreements) APP_DATA.agreements = [];
       APP_DATA.agreements.push(dealData);
       saveData();
 
@@ -1840,7 +1858,6 @@
       const recvCrates = Number(document.getElementById('d-crates-recv').value || 0);
       const dateStr = new Date().toISOString().split('T')[0];
 
-      // Sequential Inward Token based on Farmer & Orchard Location
       const tokenNo = generatePartyToken('farmer', name, village);
 
       const net = Math.max(0, gross - tare);
@@ -1848,6 +1865,7 @@
       const chargeable = net - cut;
       const totalTripAmt = rate > 0 ? (chargeable * rate) : 0;
 
+      if(!APP_DATA.inwards) APP_DATA.inwards = [];
       APP_DATA.inwards.push({ id: 'inw_' + Date.now(), orchardId: orchId, date: dateStr, tokenNo, name, phone, vehicle, loader, gross, tare, net, cut, chargeable, rate, totalTripAmt, sentCrates, recvCrates });
       saveData();
 
@@ -1908,7 +1926,6 @@
       const packaging = Number(document.getElementById('c-pack-charge').value || 0);
       const misc = Number(document.getElementById('c-misc').value || 0);
 
-      // Sequential Customer Dispatch Token
       const tokenNo = generatePartyToken('customer', name);
       const dateStr = new Date().toISOString().split('T')[0];
 
@@ -1955,6 +1972,7 @@
       const miscSum = freight + labour + packaging + misc;
       const grandTotal = totalAmount + miscSum;
 
+      if(!APP_DATA.dispatches) APP_DATA.dispatches = [];
       APP_DATA.dispatches.push({ id: 'disp_' + Date.now(), tokenNo, date: dateStr, name, phone, vehicle, lotNo, freight, labour, packaging, misc, totalBoxes, grandTotal, sizesBreakdown });
       saveData();
 
@@ -2031,8 +2049,8 @@
       kpi.classList.remove('hidden');
       tableWrap.classList.remove('hidden');
 
-      const invoices = APP_DATA.dispatches.filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
-      const payments = APP_DATA.customerPayments.filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
+      const invoices = (APP_DATA.dispatches || []).filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
+      const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
 
       const totalBilled = invoices.reduce((a, b) => a + b.grandTotal, 0);
       const totalBoxes = invoices.reduce((a, b) => a + b.totalBoxes, 0);
@@ -2069,8 +2087,8 @@
     function shareCustomerLedgerWA() {
       const custName = document.getElementById('view-cust-select').value;
       if(!custName) return alert("Select customer first");
-      const invoices = APP_DATA.dispatches.filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
-      const payments = APP_DATA.customerPayments.filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
+      const invoices = (APP_DATA.dispatches || []).filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
+      const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
       const totalBilled = invoices.reduce((a, b) => a + b.grandTotal, 0);
       const totalPaid = payments.reduce((a, b) => a + b.amount, 0);
       const balanceDue = totalBilled - totalPaid;
@@ -2090,14 +2108,14 @@
         placeholder.classList.remove('hidden');
         return;
       }
-      const orch = APP_DATA.agreements.find(a => a.id === orchId);
+      const orch = (APP_DATA.agreements || []).find(a => a.id === orchId);
       if (!orch) return;
 
       placeholder.classList.add('hidden');
       card.classList.remove('hidden');
 
-      const trips = APP_DATA.inwards.filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
-      const payments = APP_DATA.farmerPayments.filter(p => p.orchardId === orchId);
+      const trips = (APP_DATA.inwards || []).filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
+      const payments = (APP_DATA.farmerPayments || []).filter(p => p.orchardId === orchId);
 
       const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
       const totSent = trips.reduce((a, b) => a + b.sentCrates, 0);
@@ -2139,9 +2157,9 @@
     function shareFarmerLedgerWA() {
       const orchId = document.getElementById('orchard-ledger-select').value;
       if(!orchId) return alert("Select orchard first");
-      const orch = APP_DATA.agreements.find(a => a.id === orchId);
-      const trips = APP_DATA.inwards.filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
-      const payments = APP_DATA.farmerPayments.filter(p => p.orchardId === orchId);
+      const orch = (APP_DATA.agreements || []).find(a => a.id === orchId);
+      const trips = (APP_DATA.inwards || []).filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
+      const payments = (APP_DATA.farmerPayments || []).filter(p => p.orchardId === orchId);
       const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
       const totSent = trips.reduce((a, b) => a + b.sentCrates, 0);
       const totRecv = trips.reduce((a, b) => a + b.recvCrates, 0);
@@ -2159,10 +2177,10 @@
       const isToday = filterDate === new Date().toISOString().split('T')[0];
       document.getElementById('dash-period-title').innerText = isToday ? "Today's Performance" : `Summary on ${filterDate}`;
 
-      const dayInwards = APP_DATA.inwards.filter(i => i.date === filterDate);
-      const dayDispatches = APP_DATA.dispatches.filter(d => d.date === filterDate);
-      const dayCustPay = APP_DATA.customerPayments.filter(p => p.date === filterDate);
-      const dayFarmerPay = APP_DATA.farmerPayments.filter(p => p.date === filterDate);
+      const dayInwards = (APP_DATA.inwards || []).filter(i => i.date === filterDate);
+      const dayDispatches = (APP_DATA.dispatches || []).filter(d => d.date === filterDate);
+      const dayCustPay = (APP_DATA.customerPayments || []).filter(p => p.date === filterDate);
+      const dayFarmerPay = (APP_DATA.farmerPayments || []).filter(p => p.date === filterDate);
 
       const dailyNetWt = dayInwards.reduce((acc, curr) => acc + curr.net, 0);
       const dailyCutWt = dayInwards.reduce((acc, curr) => acc + curr.cut, 0);
@@ -2177,26 +2195,26 @@
       document.getElementById('stat-daily-cust-recv').innerText = `₹${dailyCustRecv.toLocaleString('en-IN')}`;
       document.getElementById('stat-daily-farmer-paid').innerText = `₹${dailyFarmerPaid.toLocaleString('en-IN')}`;
 
-      const seasonSales = APP_DATA.dispatches.reduce((acc, curr) => acc + curr.grandTotal, 0);
-      const seasonCustRecv = APP_DATA.customerPayments.reduce((acc, curr) => acc + curr.amount, 0);
+      const seasonSales = (APP_DATA.dispatches || []).reduce((acc, curr) => acc + curr.grandTotal, 0);
+      const seasonCustRecv = (APP_DATA.customerPayments || []).reduce((acc, curr) => acc + curr.amount, 0);
       const seasonCustPending = seasonSales - seasonCustRecv;
 
       let seasonFarmerGross = 0;
-      APP_DATA.agreements.forEach(a => {
+      (APP_DATA.agreements || []).forEach(a => {
         if(a.type === 'lump_sum') {
           seasonFarmerGross += a.total;
         } else {
-          const inws = APP_DATA.inwards.filter(i => i.orchardId === a.id);
+          const inws = (APP_DATA.inwards || []).filter(i => i.orchardId === a.id);
           const chWt = inws.reduce((x, y) => x + y.chargeable, 0);
           seasonFarmerGross += (chWt * a.rate);
         }
       });
 
-      const seasonFarmerPaid = APP_DATA.agreements.reduce((x, y) => x + (y.advance || 0), 0) + APP_DATA.farmerPayments.reduce((x, y) => x + y.amount, 0);
+      const seasonFarmerPaid = (APP_DATA.agreements || []).reduce((x, y) => x + (y.advance || 0), 0) + (APP_DATA.farmerPayments || []).reduce((x, y) => x + y.amount, 0);
       const seasonFarmerPending = seasonFarmerGross - seasonFarmerPaid;
 
-      const seasonSentCrates = APP_DATA.inwards.reduce((acc, curr) => acc + curr.sentCrates, 0);
-      const seasonRecvCrates = APP_DATA.inwards.reduce((acc, curr) => acc + curr.recvCrates, 0);
+      const seasonSentCrates = (APP_DATA.inwards || []).reduce((acc, curr) => acc + curr.sentCrates, 0);
+      const seasonRecvCrates = (APP_DATA.inwards || []).reduce((acc, curr) => acc + curr.recvCrates, 0);
 
       document.getElementById('season-total-sales').innerText = `₹${seasonSales.toLocaleString('en-IN')}`;
       document.getElementById('season-cust-pending').innerText = `₹${seasonCustPending.toLocaleString('en-IN')} Pending`;
@@ -2208,13 +2226,13 @@
       const sizeGrid = document.getElementById('season-size-distribution');
       sizeGrid.innerHTML = "";
       const allSizesFound = new Set(KINNOW_SIZES);
-      APP_DATA.dispatches.forEach(d => {
+      (APP_DATA.dispatches || []).forEach(d => {
         if(d.sizesBreakdown) Object.keys(d.sizesBreakdown).forEach(k => allSizesFound.add(k));
       });
 
       allSizesFound.forEach(size => {
         let count = 0;
-        APP_DATA.dispatches.forEach(d => {
+        (APP_DATA.dispatches || []).forEach(d => {
           if (d.sizesBreakdown && d.sizesBreakdown[size]) count += d.sizesBreakdown[size];
         });
         sizeGrid.innerHTML += `
