@@ -25,7 +25,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const APP_SECRET_KEY = 'SETIA_WAXING_PLANT_SECURE_2026';
   </script>
 
   <!-- SVG EMBLEM LOGO -->
@@ -52,7 +51,7 @@
       <p class="text-[11px] text-gray-500 mb-2 font-medium">Kinnow Mandi & Party Portal</p>
       
       <div id="cloud-status-badge" class="mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
-        Connecting to Cloud Database...
+        Connecting to Cloud...
       </div>
 
       <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
@@ -65,7 +64,7 @@
           <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="••••••••" />
         </div>
 
-        <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition text-xs shadow">
+        <button type="submit" id="btn-login-submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition text-xs shadow">
           Sign In
         </button>
       </form>
@@ -164,9 +163,14 @@
       <!-- TAB: MASTER ADMIN PANEL -->
       <div id="admin-panel-section" class="hidden space-y-6">
         <div class="bg-amber-50 border-2 border-amber-400 p-5 rounded-xl shadow-sm space-y-5">
-          <div>
-            <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
-            <p class="text-xs text-amber-800">Manage user access permissions, add staff, and directly block or unblock accounts.</p>
+          <div class="flex flex-wrap justify-between items-center gap-3">
+            <div>
+              <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
+              <p class="text-xs text-amber-800">Manage user access permissions, add staff, and directly block or unblock accounts.</p>
+            </div>
+            <button onclick="forceSyncToCloud()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow">
+              ☁️ Force Push All Records to Cloud
+            </button>
           </div>
 
           <form onsubmit="createStaffAccount(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-white p-4 rounded-xl border border-amber-300">
@@ -627,7 +631,7 @@
               <div class="p-3 bg-gray-50 rounded-xl border">
                 <span class="text-xs text-gray-500 font-medium">Balance Payable</span>
                 <h4 class="text-lg font-bold text-red-600 mt-1" id="orch-kpi-financials">₹0</h4>
-                <p class="text-[11px] text-gray-500" id="orch-kpi-paid-info">Paid: ₹0</p>
+                <p class="text-[11px] text-gray-400" id="orch-kpi-paid-info">Paid: ₹0</p>
               </div>
             </div>
 
@@ -955,28 +959,9 @@
         badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
       }
 
-      // 1. Direct one-time fetch to guarantee fresh load on cold start
-      db.collection("plant_data").doc("main_state").get().then((doc) => {
-        if (doc.exists) {
-          const cloudData = doc.data();
-          delete cloudData.secretKey;
-          APP_DATA = cloudData;
-          localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-          populateDropdowns();
-          renderDashboard();
-          renderAttendanceTable();
-          renderStaffTable();
-          renderPartyAccountsTable();
-          if (currentPartySession) renderPartyPortalView();
-        }
-      }).catch(err => console.error("Initial fetch error:", err));
-
-      // 2. Realtime listener for live updates
       db.collection("plant_data").doc("main_state").onSnapshot((doc) => {
         if (doc.exists) {
-          const cloudData = doc.data();
-          delete cloudData.secretKey;
-          APP_DATA = cloudData;
+          APP_DATA = doc.data();
           localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
           populateDropdowns();
           renderDashboard();
@@ -984,6 +969,9 @@
           renderStaffTable();
           renderPartyAccountsTable();
           if (currentPartySession) renderPartyPortalView();
+        } else {
+          // If Firestore is completely fresh and empty, push local state
+          saveData();
         }
       }, (err) => {
         console.error("Firestore sync error:", err);
@@ -992,8 +980,7 @@
 
     function saveData() {
       localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-      const payload = Object.assign({}, APP_DATA, { secretKey: APP_SECRET_KEY });
-      db.collection("plant_data").doc("main_state").set(payload)
+      db.collection("plant_data").doc("main_state").set(APP_DATA)
         .catch(err => console.error("Cloud write failed:", err));
 
       populateDropdowns();
@@ -1001,6 +988,11 @@
       renderAttendanceTable();
       renderStaffTable();
       renderPartyAccountsTable();
+    }
+
+    function forceSyncToCloud() {
+      saveData();
+      alert("All local plant records successfully uploaded to Firebase Cloud Firestore!");
     }
 
     window.onload = function() {
@@ -1049,10 +1041,28 @@
       saveData();
     }
 
-    function handleUniversalLogin(e) {
+    async function handleUniversalLogin(e) {
       e.preventDefault();
       const u = (document.getElementById('login-user').value || "").trim().toLowerCase();
       const p = (document.getElementById('login-pass').value || "").trim();
+
+      const btn = document.getElementById('btn-login-submit');
+      btn.innerText = "Verifying...";
+      btn.disabled = true;
+
+      try {
+        // Guarantee latest data straight from Cloud before checking credentials
+        const snap = await db.collection("plant_data").doc("main_state").get();
+        if (snap.exists) {
+          APP_DATA = snap.data();
+          localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
+        }
+      } catch (err) {
+        console.warn("Live fetch failed, using local cached data", err);
+      } finally {
+        btn.innerText = "Sign In";
+        btn.disabled = false;
+      }
 
       if(isUserBlocked(u)) {
         return alert("Your account has been deactivated/blocked by Admin. Please contact Setia Waxing Plant.");
