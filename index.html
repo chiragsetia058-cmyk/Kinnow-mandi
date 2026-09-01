@@ -25,6 +25,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const APP_SECRET_KEY = 'SETIA_WAXING_PLANT_SECURE_2026';
   </script>
 
   <!-- SVG EMBLEM LOGO -->
@@ -51,7 +52,7 @@
       <p class="text-[11px] text-gray-500 mb-2 font-medium">Kinnow Mandi & Party Portal</p>
       
       <div id="cloud-status-badge" class="mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
-        Connecting to Cloud Database...
+        Connecting to Private Cloud...
       </div>
 
       <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
@@ -663,7 +664,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name</label>
-              <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Sunil Kumar" />
+              <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Jatin" />
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Registered Mobile Number</label>
@@ -671,7 +672,7 @@
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Village / Location</label>
-              <input type="text" id="f-village" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Seed Farm, Abohar" />
+              <input type="text" id="f-village" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Khuian" />
             </div>
           </div>
 
@@ -746,11 +747,12 @@
 
         <form onsubmit="generateDailyInwardSlip(event)" class="space-y-4">
           <input type="hidden" id="d-orchard-id" value="" />
+          <input type="hidden" id="d-village" value="" />
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name</label>
-              <input type="text" id="d-farmer" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Sunil Kumar" />
+              <input type="text" id="d-farmer" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Jatin" />
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Farmer WhatsApp No.</label>
@@ -913,16 +915,54 @@
       blockedUsers: []
     };
 
+    // --- SEQUENTIAL TOKEN GENERATION HELPER ---
+    function generatePartyToken(type, name, locationOrSecondName = "") {
+      const cleanName = (name || "").trim();
+      const cleanLoc = (locationOrSecondName || "").trim();
+      let prefix = "";
+
+      if (type === 'farmer') {
+        const p1 = cleanName ? cleanName.charAt(0).toUpperCase() : 'F';
+        const p2 = cleanLoc ? cleanLoc.charAt(0).toUpperCase() : (cleanName.length > 1 ? cleanName.charAt(1).toUpperCase() : 'O');
+        prefix = `${p1}${p2}`;
+
+        // Count previous slips for this farmer
+        const pastCount = APP_DATA.inwards.filter(i => 
+          (i.name && i.name.trim().toLowerCase() === cleanName.toLowerCase())
+        ).length;
+
+        return `${prefix}-${pastCount + 1}`;
+      } else {
+        // Customer Dispatch Token
+        const words = cleanName.split(/\s+/).filter(Boolean);
+        if (words.length >= 2) {
+          prefix = (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+        } else if (cleanName.length >= 2) {
+          prefix = cleanName.substring(0, 2).toUpperCase();
+        } else {
+          prefix = (cleanName.charAt(0) || "C").toUpperCase() + "P";
+        }
+
+        const pastCount = APP_DATA.dispatches.filter(d => 
+          (d.name && d.name.trim().toLowerCase() === cleanName.toLowerCase())
+        ).length;
+
+        return `${prefix}-${pastCount + 1}`;
+      }
+    }
+
     function setupCloudListeners() {
       const badge = document.getElementById('cloud-status-badge');
       if (badge) {
-        badge.innerText = "☁️ Firebase Realtime Cloud Connected";
+        badge.innerText = "🔒 Private Firebase Cloud Connected";
         badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
       }
 
       db.collection("plant_data").doc("main_state").onSnapshot((doc) => {
         if (doc.exists) {
-          APP_DATA = doc.data();
+          const cloudData = doc.data();
+          delete cloudData.secretKey;
+          APP_DATA = cloudData;
           localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
           populateDropdowns();
           renderDashboard();
@@ -940,8 +980,9 @@
 
     function saveData() {
       localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-      db.collection("plant_data").doc("main_state").set(APP_DATA)
-        .catch(err => console.error("Cloud write failed:", err));
+      const payload = Object.assign({}, APP_DATA, { secretKey: APP_SECRET_KEY });
+      db.collection("plant_data").doc("main_state").set(payload)
+        .catch(err => console.error("Private Cloud write failed:", err));
 
       populateDropdowns();
       renderDashboard();
@@ -991,7 +1032,7 @@
         alert(`Account for ${displayName} (${idOrPhone}) has been UNBLOCKED.`);
       } else {
         APP_DATA.blockedUsers.push(clean);
-        alert(`Account for ${displayName} (${idOrPhone}) has been BLOCKED. They will not be able to sign in.`);
+        alert(`Account for ${displayName} (${idOrPhone}) has been BLOCKED.`);
       }
       saveData();
     }
@@ -1144,7 +1185,7 @@
         thead.innerHTML = `
           <tr>
             <th class="p-2.5">Date</th>
-            <th class="p-2.5">Type</th>
+            <th class="p-2.5">Token</th>
             <th class="p-2.5">Particulars</th>
             <th class="p-2.5 text-right">Net Wt</th>
             <th class="p-2.5 text-right">Chargeable Wt</th>
@@ -1154,14 +1195,14 @@
         `;
 
         const history = [
-          ...trips.map(t => ({ date: t.date, type: 'INWARD TRIP', desc: `Token ${t.tokenNo} (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
-          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
+          ...trips.map(t => ({ date: t.date, type: 'INWARD TRIP', token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
+          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2.5">${h.date}</td>
-            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${h.type === 'PAYMENT' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${h.type}</span></td>
+            <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
             <td class="p-2.5 font-medium">${h.desc}</td>
             <td class="p-2.5 text-right">${h.net > 0 ? h.net.toFixed(1) + ' Kg' : '-'}</td>
             <td class="p-2.5 text-right font-bold text-slate-900">${h.chg > 0 ? h.chg.toFixed(1) + ' Kg' : '-'}</td>
@@ -1204,7 +1245,7 @@
         thead.innerHTML = `
           <tr>
             <th class="p-2.5">Date</th>
-            <th class="p-2.5">Type</th>
+            <th class="p-2.5">Token</th>
             <th class="p-2.5">Dispatch / Details</th>
             <th class="p-2.5 text-center">Boxes</th>
             <th class="p-2.5 text-right">Debit (Billed ₹)</th>
@@ -1213,14 +1254,14 @@
         `;
 
         const history = [
-          ...dispatches.map(d => ({ date: d.date, type: 'DISPATCH', desc: `Token ${d.tokenNo} (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
-          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
+          ...dispatches.map(d => ({ date: d.date, type: 'DISPATCH', token: d.tokenNo, desc: `Dispatch (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
+          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2.5">${h.date}</td>
-            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${h.type === 'DISPATCH' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${h.type}</span></td>
+            <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
             <td class="p-2.5 font-medium">${h.desc}</td>
             <td class="p-2.5 text-center font-bold">${h.boxes}</td>
             <td class="p-2.5 text-right font-bold text-slate-900">${h.debit > 0 ? '₹' + h.debit.toLocaleString('en-IN') : '-'}</td>
@@ -1620,6 +1661,7 @@
         document.getElementById('d-farmer').value = "";
         document.getElementById('d-phone').value = "";
         document.getElementById('d-rate').value = "";
+        document.getElementById('d-village').value = "";
         return;
       }
       const orch = APP_DATA.agreements.find(a => a.id === selId);
@@ -1628,6 +1670,7 @@
         document.getElementById('d-farmer').value = orch.name;
         document.getElementById('d-phone').value = (orch.phone || "").toString().trim();
         document.getElementById('d-rate').value = orch.rate || 0;
+        document.getElementById('d-village').value = orch.village || "";
         calculateDailyWeight();
       }
     }
@@ -1696,7 +1739,9 @@
       const advBank = document.getElementById('f-adv-bank').value || "Cash/Bank";
       const type = document.querySelector('input[name="p-type"]:checked').value;
       const dateStr = new Date().toISOString().split('T')[0];
-      const tokenNo = 'C-' + Math.floor(10 + Math.random() * 90);
+      
+      // Sequential Agreement Token
+      const tokenNo = generatePartyToken('farmer', name, village);
       const orchId = 'orch_' + Date.now();
 
       let dealData = { id: orchId, tokenNo, type, name, phone, village, supervisor, advBank, date: dateStr };
@@ -1749,7 +1794,7 @@
           <div class="grid grid-cols-2 border border-black mb-2 text-center">
             <div class="p-1.5 border-r border-black font-bold">
               <span class="text-[10px] block text-gray-600">Token No.</span>
-              <span class="text-sm font-black">${tokenNo}</span>
+              <span class="text-base font-black text-amber-900">${tokenNo}</span>
             </div>
             <div class="p-1.5 font-bold">
               <span class="text-[10px] block text-gray-600">Farmer Name</span>
@@ -1786,6 +1831,7 @@
       const name = document.getElementById('d-farmer').value.trim();
       const phone = (document.getElementById('d-phone').value || "").toString().trim();
       const vehicle = document.getElementById('d-vehicle').value.trim();
+      const village = document.getElementById('d-village').value.trim();
       const loader = document.getElementById('d-loader').value || "Mandi Incharge";
       const gross = Number(document.getElementById('d-gross-wt').value || 0);
       const tare = Number(document.getElementById('d-tare-wt').value || 0);
@@ -1793,7 +1839,9 @@
       const sentCrates = Number(document.getElementById('d-crates-sent').value || 0);
       const recvCrates = Number(document.getElementById('d-crates-recv').value || 0);
       const dateStr = new Date().toISOString().split('T')[0];
-      const tokenNo = 'T-' + Math.floor(100 + Math.random() * 900);
+
+      // Sequential Inward Token based on Farmer & Orchard Location
+      const tokenNo = generatePartyToken('farmer', name, village);
 
       const net = Math.max(0, gross - tare);
       const cut = (net / 100) * 1;
@@ -1818,7 +1866,7 @@
             </div>
           </div>
           <div class="grid grid-cols-2 border border-black mb-2 text-center">
-            <div class="p-1 border-r border-black font-bold"><span class="text-[10px] block text-gray-600">Token No.</span><span class="text-sm font-black">${tokenNo}</span></div>
+            <div class="p-1 border-r border-black font-bold"><span class="text-[10px] block text-gray-600">Token No.</span><span class="text-base font-black text-amber-900">${tokenNo}</span></div>
             <div class="p-1 font-bold"><span class="text-[10px] block text-gray-600">Farmer / Orchard</span><span class="text-sm font-black">${name}</span></div>
           </div>
           <table class="w-full border border-black text-center mb-2">
@@ -1860,7 +1908,8 @@
       const packaging = Number(document.getElementById('c-pack-charge').value || 0);
       const misc = Number(document.getElementById('c-misc').value || 0);
 
-      const tokenNo = 'C-' + Math.floor(10 + Math.random() * 90);
+      // Sequential Customer Dispatch Token
+      const tokenNo = generatePartyToken('customer', name);
       const dateStr = new Date().toISOString().split('T')[0];
 
       let totalBoxes = 0;
@@ -1924,7 +1973,7 @@
             </div>
           </div>
           <div class="grid grid-cols-2 border border-black mb-2 text-center">
-            <div class="p-1 border-r border-black font-bold"><span class="text-[10px] block text-gray-600">Token No.</span><span class="text-sm font-black">${tokenNo}</span></div>
+            <div class="p-1 border-r border-black font-bold"><span class="text-[10px] block text-gray-600">Token No.</span><span class="text-base font-black text-amber-900">${tokenNo}</span></div>
             <div class="p-1 font-bold"><span class="text-[10px] block text-gray-600">Customer Name</span><span class="text-sm font-black">${name}</span></div>
           </div>
           <div class="overflow-x-auto mb-2">
@@ -2069,7 +2118,7 @@
       document.getElementById('orch-kpi-paid-info').innerText = `Paid: ₹${totPaid.toLocaleString('en-IN')}`;
 
       const history = [
-        ...(orch.advance > 0 ? [{ date: orch.date, type: 'ADVANCE TOKEN', desc: `Token paid (${orch.advBank || 'Bank/Cash'})`, inwardAmt: 0, paidAmt: orch.advance, crates: '-' }] : []),
+        ...(orch.advance > 0 ? [{ date: orch.date, type: 'ADVANCE TOKEN', desc: `Token ${orch.tokenNo} (${orch.advBank || 'Bank/Cash'})`, inwardAmt: 0, paidAmt: orch.advance, crates: '-' }] : []),
         ...trips.map(t => ({ date: t.date, type: 'INWARD TRIP', desc: `Token ${t.tokenNo} (${t.vehicle}) - ${t.chargeable.toFixed(1)} Kg`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
         ...payments.map(p => ({ date: p.date, type: 'BANK PAYMENT', desc: `Paid: ${p.bank} (${p.ref})`, inwardAmt: 0, paidAmt: p.amount, crates: '-' }))
       ].sort((a, b) => new Date(a.date) - new Date(b.date));
