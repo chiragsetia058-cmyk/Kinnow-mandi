@@ -5,25 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SETIA WAXING PLANT - Mandi, Accounts & Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @media print {
-      body * { visibility: hidden !important; }
-      #print-wrapper, #print-wrapper * { visibility: visible !important; }
-      #print-wrapper {
-        position: fixed !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 10px !important;
-        background: #fff !important;
-        display: block !important;
-        z-index: 999999 !important;
-      }
-      .no-print { display: none !important; }
-      @page { size: auto; margin: 8mm; }
-    }
-  </style>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800 font-sans pb-16">
 
@@ -62,7 +43,7 @@
         
         <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-900 space-y-1">
           <div>👑 <b>Admin:</b> <code>admin</code> / <code>admin123</code></div>
-          <div>👨‍🌾 <b>Farmers & Customers:</b> Username & Password are both your <b>registered 10-digit mobile number</b>.</div>
+          <div>👨‍🌾 <b>Farmers & Customers:</b> Username & Password are your <b>registered 10-digit mobile number</b>.</div>
         </div>
 
         <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition text-xs shadow">
@@ -88,7 +69,6 @@
     </header>
 
     <div class="max-w-4xl mx-auto w-full p-4 space-y-5">
-      <!-- Party Summary Banner -->
       <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
         <div class="flex justify-between items-center border-b pb-3">
           <div>
@@ -101,11 +81,9 @@
             <h3 class="text-xl font-black" id="party-portal-balance">₹0</h3>
           </div>
         </div>
-
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center" id="party-portal-kpi-grid"></div>
       </div>
 
-      <!-- Party Transaction Ledger -->
       <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700" id="party-table-title">Your Statement & History</h3>
         <div class="overflow-x-auto border rounded-xl">
@@ -162,7 +140,7 @@
           👥 Attendance
         </button>
         <button onclick="switchTab('admin-panel')" id="tab-admin-panel" class="py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black hidden">
-          👑 Master Admin & Accounts Control
+          👑 Master Admin Control
         </button>
       </div>
 
@@ -171,7 +149,7 @@
         <div class="bg-amber-50 border-2 border-amber-400 p-5 rounded-xl shadow-sm space-y-5">
           <div>
             <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
-            <p class="text-xs text-amber-800">Create staff logins and review auto-generated farmer & customer access accounts.</p>
+            <p class="text-xs text-amber-800">Manage user access permissions, add staff, and directly block or unblock accounts.</p>
           </div>
 
           <!-- Add Staff Form -->
@@ -195,9 +173,9 @@
             </div>
           </form>
 
-          <!-- Staff Accounts Table -->
+          <!-- Staff Accounts Table with Block/Unblock -->
           <div>
-            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Active Staff Users</h4>
+            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Staff Access Accounts</h4>
             <div class="overflow-x-auto bg-white rounded-xl border">
               <table class="w-full text-left text-xs">
                 <thead class="bg-gray-100 border-b font-bold text-gray-700">
@@ -205,8 +183,8 @@
                     <th class="p-2.5">Staff Name</th>
                     <th class="p-2.5">Username</th>
                     <th class="p-2.5">Password</th>
-                    <th class="p-2.5">Role</th>
-                    <th class="p-2.5 text-right">Action</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Access Control</th>
                   </tr>
                 </thead>
                 <tbody id="staff-table-body"></tbody>
@@ -214,18 +192,18 @@
             </div>
           </div>
 
-          <!-- Registered Auto-Generated Party Logins -->
+          <!-- Registered Party Logins with Block/Unblock -->
           <div>
-            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Auto-Generated Party Access List (Farmers & Customers)</h4>
+            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Farmer & Customer Registered Access Accounts</h4>
             <div class="overflow-x-auto bg-white rounded-xl border">
               <table class="w-full text-left text-xs">
                 <thead class="bg-gray-100 border-b font-bold text-gray-700">
                   <tr>
                     <th class="p-2.5">Party Type</th>
                     <th class="p-2.5">Party Name</th>
-                    <th class="p-2.5">Login Username (Phone)</th>
-                    <th class="p-2.5">Password</th>
-                    <th class="p-2.5 text-right">Registered Date</th>
+                    <th class="p-2.5">Login Phone / Password</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Access Control</th>
                   </tr>
                 </thead>
                 <tbody id="party-accounts-table-body"></tbody>
@@ -235,10 +213,10 @@
         </div>
       </div>
 
-      <!-- TAB: ATTENDANCE & LABOUR MANAGEMENT -->
+      <!-- TAB: ATTENDANCE & LABOUR -->
       <div id="attendance-section" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-800 mb-2 pb-2 border-b">📋 Register New Staff Member (ਸਟਾਫ਼ ਸ਼ਾਮਲ ਕਰੋ)</h3>
+          <h3 class="text-base font-bold text-slate-800 mb-2 pb-2 border-b">📋 Register New Staff Member</h3>
           <form onsubmit="registerQuickStaff(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Staff Member Name</label>
@@ -257,7 +235,7 @@
         </div>
 
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b">1. Staff Daily Attendance (ਰੋਜ਼ਾਨਾ ਹਾਜ਼ਰੀ)</h3>
+          <h3 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b">1. Staff Daily Attendance</h3>
           <form onsubmit="recordStaffAttendance(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Staff Name</label>
@@ -289,11 +267,10 @@
           </form>
         </div>
 
-        <!-- Group / Rani Model Labour -->
         <div class="bg-amber-50/70 p-5 rounded-xl border-2 border-amber-300 shadow-sm">
           <div class="flex justify-between items-center mb-3 pb-2 border-b border-amber-200">
             <div>
-              <h3 class="text-base font-black text-slate-900">2. Contractor Group Labour Attendance (e.g. Rani Model)</h3>
+              <h3 class="text-base font-black text-slate-900">2. Contractor Group Labour Attendance (Rani Model)</h3>
               <p class="text-xs text-amber-900">Enter number of labourers working under contractor</p>
             </div>
           </div>
@@ -631,12 +608,12 @@
               <div class="p-3 bg-gray-50 rounded-xl border">
                 <span class="text-xs text-gray-500 font-medium">Fruit Picked (Chargeable)</span>
                 <h4 class="text-base font-bold text-emerald-800 mt-1" id="orch-kpi-weight">0 Kg</h4>
-                <p class="text-[11px] text-gray-500" id="orch-kpi-trips">0 Loads</p>
+                <p class="text-[11px] text-gray-400" id="orch-kpi-trips">0 Loads</p>
               </div>
               <div class="p-3 bg-gray-50 rounded-xl border">
                 <span class="text-xs text-gray-500 font-medium">Balance Payable</span>
                 <h4 class="text-lg font-bold text-red-600 mt-1" id="orch-kpi-financials">₹0</h4>
-                <p class="text-[11px] text-gray-500" id="orch-kpi-paid-info">Paid: ₹0</p>
+                <p class="text-[11px] text-gray-400" id="orch-kpi-paid-info">Paid: ₹0</p>
               </div>
             </div>
 
@@ -676,7 +653,7 @@
               <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Sunil Kumar" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">Registered Mobile Number (Username & Password)</label>
+              <label class="block text-xs font-semibold mb-1">Registered Mobile Number (Login ID & Password)</label>
               <input type="tel" id="f-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
             </div>
             <div>
@@ -824,7 +801,7 @@
               <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Chifu Agritech" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">Registered Mobile Number (Username & Password)</label>
+              <label class="block text-xs font-semibold mb-1">Registered Mobile Number (Login ID & Password)</label>
               <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
             </div>
             <div>
@@ -886,9 +863,7 @@
       <!-- MODAL & SLIP VIEWER -->
       <div id="slip-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-3 md:p-6 z-50 overflow-y-auto">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-4 md:p-6 overflow-y-auto max-h-[92vh]">
-          <div id="print-wrapper">
-            <div id="printable-slip"></div>
-          </div>
+          <div id="printable-slip"></div>
           <div class="flex gap-2 mt-6 no-print border-t pt-4">
             <button onclick="triggerDirectPrint()" class="flex-1 bg-slate-900 hover:bg-black text-amber-400 py-2.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1">
               🖨️ Print Slip / PDF
@@ -912,7 +887,7 @@
     let currentUser = null;
     let currentPartySession = null;
 
-    let APP_DATA = JSON.parse(localStorage.getItem('SETIA_WAXING_PORTAL_V8')) || {
+    let APP_DATA = JSON.parse(localStorage.getItem('SETIA_WAXING_PORTAL_V10')) || {
       staffUsers: [],
       staffDirectory: [],
       staffAttendance: [],
@@ -921,11 +896,12 @@
       inwards: [],
       dispatches: [],
       customerPayments: [],
-      farmerPayments: []
+      farmerPayments: [],
+      blockedUsers: [] // List of blocked usernames or phone numbers
     };
 
     function saveData() {
-      localStorage.setItem('SETIA_WAXING_PORTAL_V8', JSON.stringify(APP_DATA));
+      localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
       populateDropdowns();
       renderDashboard();
       renderAttendanceTable();
@@ -959,11 +935,36 @@
       populateDropdowns();
     };
 
-    // --- UNIVERSAL AUTHENTICATION (NO OTP) ---
+    // --- USER ACCESS STATUS / BLOCK MANAGEMENT ---
+    function isUserBlocked(idOrPhone) {
+      const clean = (idOrPhone || "").toString().trim().toLowerCase();
+      return (APP_DATA.blockedUsers || []).includes(clean);
+    }
+
+    function toggleUserBlockStatus(idOrPhone, displayName) {
+      const clean = (idOrPhone || "").toString().trim().toLowerCase();
+      if (!APP_DATA.blockedUsers) APP_DATA.blockedUsers = [];
+
+      if (isUserBlocked(clean)) {
+        APP_DATA.blockedUsers = APP_DATA.blockedUsers.filter(u => u !== clean);
+        alert(`Account for ${displayName} (${idOrPhone}) has been UNBLOCKED.`);
+      } else {
+        APP_DATA.blockedUsers.push(clean);
+        alert(`Account for ${displayName} (${idOrPhone}) has been BLOCKED. They will not be able to sign in.`);
+      }
+      saveData();
+    }
+
+    // --- UNIVERSAL AUTHENTICATION ---
     function handleUniversalLogin(e) {
       e.preventDefault();
-      const u = document.getElementById('login-user').value.trim();
-      const p = document.getElementById('login-pass').value.trim();
+      const u = (document.getElementById('login-user').value || "").trim().toLowerCase();
+      const p = (document.getElementById('login-pass').value || "").trim();
+
+      // Check block state
+      if(isUserBlocked(u)) {
+        return alert("Your account has been deactivated/blocked by Admin. Please contact Setia Waxing Plant.");
+      }
 
       // 1. Admin Login
       if(u === "admin" && p === "admin123") {
@@ -973,24 +974,33 @@
       }
 
       // 2. Staff Login
-      const staff = APP_DATA.staffUsers.find(s => s.username === u && s.password === p);
+      const staff = APP_DATA.staffUsers.find(s => (s.username || "").toLowerCase() === u && s.password === p);
       if(staff) {
+        if(isUserBlocked(staff.username)) {
+          return alert("Your staff account is blocked. Contact Master Admin.");
+        }
         currentUser = { name: staff.name, username: staff.username, role: "staff" };
         launchStaffPortal();
         return;
       }
 
       // 3. Farmer Auto Login (Username = Phone, Password = Phone)
-      const farmer = APP_DATA.agreements.find(a => a.phone === u);
+      const farmer = APP_DATA.agreements.find(a => (a.phone || "").toString().trim() === u);
       if(farmer && p === u) {
+        if(isUserBlocked(u)) {
+          return alert("Your farmer portal access is blocked. Contact Admin.");
+        }
         currentPartySession = { role: 'farmer', name: farmer.name, phone: u, data: farmer };
         launchPartyPortal();
         return;
       }
 
       // 4. Customer Auto Login (Username = Phone, Password = Phone)
-      const customer = APP_DATA.dispatches.find(d => d.phone === u);
+      const customer = APP_DATA.dispatches.find(d => (d.phone || "").toString().trim() === u);
       if(customer && p === u) {
+        if(isUserBlocked(u)) {
+          return alert("Your customer portal access is blocked. Contact Admin.");
+        }
         currentPartySession = { role: 'customer', name: customer.name, phone: u, data: customer };
         launchPartyPortal();
         return;
@@ -1050,9 +1060,9 @@
       const tbody = document.getElementById('party-table-body');
 
       if(role === 'farmer') {
-        const orchards = APP_DATA.agreements.filter(a => a.phone === phone);
+        const orchards = APP_DATA.agreements.filter(a => (a.phone || "").toString().trim() === phone);
         const orchIds = orchards.map(o => o.id);
-        const trips = APP_DATA.inwards.filter(i => orchIds.includes(i.orchardId) || i.phone === phone);
+        const trips = APP_DATA.inwards.filter(i => orchIds.includes(i.orchardId) || (i.phone || "").toString().trim() === phone);
         const payments = APP_DATA.farmerPayments.filter(p => orchIds.includes(p.orchardId));
 
         const totChargeable = trips.reduce((a,b) => a + b.chargeable, 0);
@@ -1126,7 +1136,7 @@
         `).join('');
 
       } else {
-        const dispatches = APP_DATA.dispatches.filter(d => d.phone === phone || d.name.toLowerCase() === name.toLowerCase());
+        const dispatches = APP_DATA.dispatches.filter(d => (d.phone || "").toString().trim() === phone || d.name.toLowerCase() === name.toLowerCase());
         const payments = APP_DATA.customerPayments.filter(p => p.customer.toLowerCase() === name.toLowerCase());
 
         const totalBilled = dispatches.reduce((a,b) => a + b.grandTotal, 0);
@@ -1185,6 +1195,36 @@
       }
     }
 
+    function renderStaffTable() {
+      const tbody = document.getElementById('staff-table-body');
+      if(!tbody) return;
+      if(APP_DATA.staffUsers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No staff accounts created yet.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = APP_DATA.staffUsers.map(s => {
+        const blocked = isUserBlocked(s.username);
+        return `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2.5 font-bold text-slate-800">${s.name}</td>
+            <td class="p-2.5 font-mono text-amber-900">@${s.username}</td>
+            <td class="p-2.5 font-mono text-gray-500">${s.password}</td>
+            <td class="p-2.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">
+                ${blocked ? 'Blocked' : 'Active'}
+              </span>
+            </td>
+            <td class="p-2.5 text-right space-x-2">
+              <button onclick="toggleUserBlockStatus('${s.username}', '${s.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">
+                ${blocked ? '✅ Unblock' : '🚫 Block'}
+              </button>
+              <button onclick="deleteStaffUser('${s.id}')" class="text-red-600 font-bold text-[11px] hover:underline">Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
     function renderPartyAccountsTable() {
       const tbody = document.getElementById('party-accounts-table-body');
       if(!tbody) return;
@@ -1192,34 +1232,84 @@
       const partyRows = [];
 
       APP_DATA.agreements.forEach(a => {
-        partyRows.push({ type: 'Farmer', name: a.name, phone: a.phone, date: a.date });
+        partyRows.push({ type: 'Farmer', name: a.name, phone: (a.phone || "").toString().trim() });
       });
 
       const custMap = new Map();
       APP_DATA.dispatches.forEach(d => {
-        if(!custMap.has(d.phone)) {
-          custMap.set(d.phone, { type: 'Customer', name: d.name, phone: d.phone, date: d.date });
+        const ph = (d.phone || "").toString().trim();
+        if(!custMap.has(ph)) {
+          custMap.set(ph, { type: 'Customer', name: d.name, phone: ph });
         }
       });
       custMap.forEach(v => partyRows.push(v));
 
       if(partyRows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No parties registered yet. Create a deal or dispatch slip to auto-generate party logins.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No parties registered yet.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = partyRows.map(p => `
-        <tr class="border-b hover:bg-gray-50">
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.type === 'Farmer' ? 'bg-emerald-100 text-emerald-900' : 'bg-blue-100 text-blue-900'}">${p.type}</span></td>
-          <td class="p-2.5 font-bold text-slate-800">${p.name}</td>
-          <td class="p-2.5 font-mono font-bold text-amber-900">${p.phone}</td>
-          <td class="p-2.5 font-mono text-gray-500">${p.phone}</td>
-          <td class="p-2.5 text-right text-gray-500">${p.date}</td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = partyRows.map(p => {
+        const blocked = isUserBlocked(p.phone);
+        return `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.type === 'Farmer' ? 'bg-emerald-100 text-emerald-900' : 'bg-blue-100 text-blue-900'}">${p.type}</span></td>
+            <td class="p-2.5 font-bold text-slate-800">${p.name}</td>
+            <td class="p-2.5 font-mono font-bold text-amber-900">${p.phone}</td>
+            <td class="p-2.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">
+                ${blocked ? 'Blocked' : 'Active'}
+              </span>
+            </td>
+            <td class="p-2.5 text-right">
+              <button onclick="toggleUserBlockStatus('${p.phone}', '${p.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">
+                ${blocked ? '✅ Unblock Access' : '🚫 Block Access'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    // --- OTHER CORE ACTIONS ---
+    // --- DIRECT PRINT FIX (ISOLATED WINDOW POPUP PRINTING) ---
+    function triggerDirectPrint() {
+      const slipContent = document.getElementById('printable-slip').innerHTML;
+      if (!slipContent) return alert("No slip content to print");
+
+      const printWin = window.open('', '_blank', 'width=800,height=900');
+      if (!printWin) {
+        return alert("Please allow popups in Safari to print.");
+      }
+
+      printWin.document.open();
+      printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Setia Waxing Plant - Slip Print</title>
+            <script src="https://cdn.tailwindcss.com"><\/script>
+            <style>
+              @page { size: auto; margin: 10mm; }
+              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; color: #000; padding: 10px; }
+            </style>
+          </head>
+          <body>
+            ${slipContent}
+            <script>
+              window.onload = function() {
+                setTimeout(function() {
+                  window.focus();
+                  window.print();
+                }, 350);
+              };
+            <\/script>
+          </body>
+        </html>
+      `);
+      printWin.document.close();
+    }
+
+    // --- UTILITIES & APP LOGIC ---
     function addCustomSizeRow() {
       customSizeIndex++;
       const container = document.getElementById('custom-sizes-container');
@@ -1341,24 +1431,6 @@
         APP_DATA.staffUsers = APP_DATA.staffUsers.filter(u => u.id !== id);
         saveData();
       }
-    }
-
-    function renderStaffTable() {
-      const tbody = document.getElementById('staff-table-body');
-      if(!tbody) return;
-      if(APP_DATA.staffUsers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No staff accounts created yet.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = APP_DATA.staffUsers.map(s => `
-        <tr class="border-b hover:bg-gray-50">
-          <td class="p-2.5 font-bold text-slate-800">${s.name}</td>
-          <td class="p-2.5 font-mono text-amber-900">@${s.username}</td>
-          <td class="p-2.5 font-mono text-gray-500">${s.password}</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Staff</span></td>
-          <td class="p-2.5 text-right"><button onclick="deleteStaffUser('${s.id}')" class="text-red-600 font-bold hover:underline">Delete</button></td>
-        </tr>
-      `).join('');
     }
 
     function recordStaffAttendance(e) {
@@ -1521,7 +1593,7 @@
       if (orch) {
         document.getElementById('d-orchard-id').value = orch.id;
         document.getElementById('d-farmer').value = orch.name;
-        document.getElementById('d-phone').value = orch.phone;
+        document.getElementById('d-phone').value = (orch.phone || "").toString().trim();
         document.getElementById('d-rate').value = orch.rate || 0;
         calculateDailyWeight();
       }
@@ -1549,10 +1621,6 @@
       document.getElementById('disp-net-wt').innerText = net.toFixed(1);
       document.getElementById('disp-cut-wt').innerText = deduction.toFixed(1);
       document.getElementById('disp-final-wt').innerText = finalWt.toFixed(1);
-    }
-
-    function triggerDirectPrint() {
-      window.print();
     }
 
     function recordCustomerPayment(e) {
@@ -1588,9 +1656,9 @@
 
     function generateFarmerSlip(e) {
       e.preventDefault();
-      const name = document.getElementById('f-name').value;
-      const phone = document.getElementById('f-phone').value;
-      const village = document.getElementById('f-village').value;
+      const name = document.getElementById('f-name').value.trim();
+      const phone = (document.getElementById('f-phone').value || "").toString().trim();
+      const village = document.getElementById('f-village').value.trim();
       const supervisor = document.getElementById('f-supervisor').value || "Satish Reddy";
       const advBank = document.getElementById('f-adv-bank').value || "Cash/Bank";
       const type = document.querySelector('input[name="p-type"]:checked').value;
@@ -1682,9 +1750,9 @@
     function generateDailyInwardSlip(e) {
       e.preventDefault();
       const orchId = document.getElementById('d-orchard-id').value;
-      const name = document.getElementById('d-farmer').value;
-      const phone = document.getElementById('d-phone').value;
-      const vehicle = document.getElementById('d-vehicle').value;
+      const name = document.getElementById('d-farmer').value.trim();
+      const phone = (document.getElementById('d-phone').value || "").toString().trim();
+      const vehicle = document.getElementById('d-vehicle').value.trim();
       const loader = document.getElementById('d-loader').value || "Mandi Incharge";
       const gross = Number(document.getElementById('d-gross-wt').value || 0);
       const tare = Number(document.getElementById('d-tare-wt').value || 0);
@@ -1747,9 +1815,9 @@
 
     function generateCustomerSlip(e) {
       e.preventDefault();
-      const name = document.getElementById('c-name').value;
-      const phone = document.getElementById('c-phone').value;
-      const vehicle = document.getElementById('c-vehicle').value;
+      const name = document.getElementById('c-name').value.trim();
+      const phone = (document.getElementById('c-phone').value || "").toString().trim();
+      const vehicle = document.getElementById('c-vehicle').value.trim();
       const lotNo = document.getElementById('c-lot-no').value || "E879";
       const supervisor = document.getElementById('c-supervisor').value || "Satish Reddy";
       const loader = document.getElementById('c-loader').value || "Plant Loader";
@@ -1950,9 +2018,9 @@
       const payments = APP_DATA.farmerPayments.filter(p => p.orchardId === orchId);
 
       const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
-      const totSentCrates = trips.reduce((a, b) => a + b.sentCrates, 0);
-      const totRecvCrates = trips.reduce((a, b) => a + b.recvCrates, 0);
-      const pendingCrates = totSentCrates - totRecvCrates;
+      const totSent = trips.reduce((a, b) => a + b.sentCrates, 0);
+      const totRecv = trips.reduce((a, b) => a + b.recvCrates, 0);
+      const pendingCrates = totSent - totRecv;
       const totPaid = (orch.advance || 0) + payments.reduce((a, b) => a + b.amount, 0);
 
       let totalGrossOrchardVal = orch.type === 'lump_sum' ? orch.total : (totChargeable * orch.rate);
@@ -1961,7 +2029,7 @@
       document.getElementById('orch-kpi-name').innerText = orch.name;
       document.getElementById('orch-kpi-village').innerText = orch.village;
       document.getElementById('orch-kpi-crates').innerText = `${pendingCrates} Pending`;
-      document.getElementById('orch-kpi-crates-breakdown').innerText = `Sent: ${totSentCrates} | Recv: ${totRecvCrates}`;
+      document.getElementById('orch-kpi-crates-breakdown').innerText = `Sent: ${totSent} | Recv: ${totRecv}`;
       document.getElementById('orch-kpi-weight').innerText = `${totChargeable.toFixed(1)} Kg`;
       document.getElementById('orch-kpi-trips').innerText = `${trips.length} Loads`;
       document.getElementById('orch-kpi-financials').innerText = `₹${balDue.toLocaleString('en-IN')} Due`;
@@ -2089,7 +2157,7 @@
     function clearAllData() {
       if(currentUser?.role !== 'admin') return alert("Only Admin can reset data");
       if(confirm("Are you sure you want to reset all records?")) {
-        APP_DATA = { staffUsers: [], staffDirectory: [], staffAttendance: [], groupLabourAttendance: [], agreements: [], inwards: [], dispatches: [], customerPayments: [], farmerPayments: [] };
+        APP_DATA = { staffUsers: [], staffDirectory: [], staffAttendance: [], groupLabourAttendance: [], agreements: [], inwards: [], dispatches: [], customerPayments: [], farmerPayments: [], blockedUsers: [] };
         saveData();
       }
     }
