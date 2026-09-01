@@ -57,7 +57,7 @@
       <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
         <div>
           <label class="block text-xs font-semibold mb-1">Username / Registered Mobile No.</label>
-          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="Username or 10-digit mobile" />
+          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="Username, Name or 10-digit mobile" />
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">Password</label>
@@ -970,7 +970,6 @@
           renderPartyAccountsTable();
           if (currentPartySession) renderPartyPortalView();
         } else {
-          // If Firestore is completely fresh and empty, push local state
           saveData();
         }
       }, (err) => {
@@ -1023,12 +1022,12 @@
     };
 
     function isUserBlocked(idOrPhone) {
-      const clean = (idOrPhone || "").toString().trim().toLowerCase();
+      const clean = (idOrPhone || "").toString().trim().toLowerCase().replace('@', '');
       return (APP_DATA.blockedUsers || []).includes(clean);
     }
 
     function toggleUserBlockStatus(idOrPhone, displayName) {
-      const clean = (idOrPhone || "").toString().trim().toLowerCase();
+      const clean = (idOrPhone || "").toString().trim().toLowerCase().replace('@', '');
       if (!APP_DATA.blockedUsers) APP_DATA.blockedUsers = [];
 
       if (isUserBlocked(clean)) {
@@ -1043,22 +1042,22 @@
 
     async function handleUniversalLogin(e) {
       e.preventDefault();
-      const u = (document.getElementById('login-user').value || "").trim().toLowerCase();
-      const p = (document.getElementById('login-pass').value || "").trim();
+      let rawU = (document.getElementById('login-user').value || "").trim();
+      let p = (document.getElementById('login-pass').value || "").trim();
+      let u = rawU.toLowerCase().replace('@', '');
 
       const btn = document.getElementById('btn-login-submit');
       btn.innerText = "Verifying...";
       btn.disabled = true;
 
       try {
-        // Guarantee latest data straight from Cloud before checking credentials
         const snap = await db.collection("plant_data").doc("main_state").get();
         if (snap.exists) {
           APP_DATA = snap.data();
           localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
         }
       } catch (err) {
-        console.warn("Live fetch failed, using local cached data", err);
+        console.warn("Cloud sync check failed, falling back to local storage:", err);
       } finally {
         btn.innerText = "Sign In";
         btn.disabled = false;
@@ -1068,13 +1067,17 @@
         return alert("Your account has been deactivated/blocked by Admin. Please contact Setia Waxing Plant.");
       }
 
+      // Master Admin
       if(u === "admin" && p === "Csetia@1122") {
         currentUser = { name: "Master Admin", username: "admin", role: "admin" };
         launchStaffPortal();
         return;
       }
 
-      const staff = (APP_DATA.staffUsers || []).find(s => (s.username || "").toLowerCase() === u && s.password === p);
+      // Staff (Check by Username OR Staff Name)
+      const staff = (APP_DATA.staffUsers || []).find(s => 
+        ((s.username || "").toLowerCase().replace('@', '') === u || (s.name || "").toLowerCase() === u) && s.password === p
+      );
       if(staff) {
         if(isUserBlocked(staff.username)) {
           return alert("Your staff account is blocked. Contact Master Admin.");
@@ -1084,27 +1087,39 @@
         return;
       }
 
-      const farmer = (APP_DATA.agreements || []).find(a => (a.phone || "").toString().trim() === u);
-      if(farmer && p === u) {
-        if(isUserBlocked(u)) {
-          return alert("Your farmer portal access is blocked. Contact Admin.");
+      // Farmer (Check by phone or name)
+      const farmer = (APP_DATA.agreements || []).find(a => 
+        (a.phone || "").toString().trim() === u || (a.name || "").toLowerCase().trim() === u
+      );
+      if(farmer) {
+        const farmerPhone = (farmer.phone || "").toString().trim();
+        if(p === farmerPhone || p === u) {
+          if(isUserBlocked(farmerPhone)) {
+            return alert("Your farmer portal access is blocked. Contact Admin.");
+          }
+          currentPartySession = { role: 'farmer', name: farmer.name, phone: farmerPhone, data: farmer };
+          launchPartyPortal();
+          return;
         }
-        currentPartySession = { role: 'farmer', name: farmer.name, phone: u, data: farmer };
-        launchPartyPortal();
-        return;
       }
 
-      const customer = (APP_DATA.dispatches || []).find(d => (d.phone || "").toString().trim() === u);
-      if(customer && p === u) {
-        if(isUserBlocked(u)) {
-          return alert("Your customer portal access is blocked. Contact Admin.");
+      // Customer (Check by phone or name)
+      const customer = (APP_DATA.dispatches || []).find(d => 
+        (d.phone || "").toString().trim() === u || (d.name || "").toLowerCase().trim() === u
+      );
+      if(customer) {
+        const customerPhone = (customer.phone || "").toString().trim();
+        if(p === customerPhone || p === u) {
+          if(isUserBlocked(customerPhone)) {
+            return alert("Your customer portal access is blocked. Contact Admin.");
+          }
+          currentPartySession = { role: 'customer', name: customer.name, phone: customerPhone, data: customer };
+          launchPartyPortal();
+          return;
         }
-        currentPartySession = { role: 'customer', name: customer.name, phone: u, data: customer };
-        launchPartyPortal();
-        return;
       }
 
-      alert("Invalid login details.\n\n• For Admin/Staff: Enter your assigned username & password.\n• For Farmers/Customers: Your username and password are your registered 10-digit mobile number.");
+      alert("Invalid login details.\n\n• For Admin/Staff: Enter your assigned username & password.\n• For Farmers/Customers: Enter your 10-digit registered mobile number for both username and password.");
     }
 
     function launchStaffPortal() {
@@ -1510,7 +1525,7 @@
       if(currentUser?.role !== 'admin') return alert("Only Admin can add staff");
 
       const name = document.getElementById('staff-name').value.trim();
-      const username = document.getElementById('staff-user').value.trim().toLowerCase();
+      const username = document.getElementById('staff-user').value.trim().toLowerCase().replace('@', '');
       const password = document.getElementById('staff-pass').value.trim();
 
       if((APP_DATA.staffUsers || []).some(u => u.username === username) || username === 'admin') {
