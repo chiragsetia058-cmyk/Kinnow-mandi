@@ -1,2291 +1,1196 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SETIA WAXING PLANT - Mandi, Accounts & Portal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  let currentUser = null;
+  let currentPartySession = null;
 
-  <!-- FIREBASE SDK COMPAT -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-</head>
-<body class="bg-gray-100 min-h-screen text-gray-800 font-sans pb-16">
+  let APP_DATA = {
+    staffUsers: [],
+    agreements: [],
+    inwards: [],
+    dispatches: []
+  };
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyB5WhV0yPQNXqRkBMED2m_bo_BrscJorgg",
-      authDomain: "setia-waxing-plant.firebaseapp.com",
-      projectId: "setia-waxing-plant",
-      storageBucket: "setia-waxing-plant.firebasestorage.app",
-      messagingSenderId: "315233905244",
-      appId: "1:315233905244:web:0e7c82c6e6dbce08c45499",
-      measurementId: "G-47BSFE55LT"
-    };
+  // ---------------------------------------------------------
+  // HELPERS
+  // ---------------------------------------------------------
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
+  function normalizePhone(value) {
+    if (!value) return "";
 
-  <!-- SVG EMBLEM LOGO -->
-  <template id="plant-logo-svg">
-    <svg viewBox="0 0 200 200" class="w-12 h-12 inline-block drop-shadow">
-      <circle cx="100" cy="100" r="96" fill="#0f172a" stroke="#d97706" stroke-width="4"/>
-      <path d="M100 25 L160 55 L160 115 C160 155 100 180 100 180 C100 180 40 155 40 115 L40 55 Z" fill="#1e293b" stroke="#f59e0b" stroke-width="3"/>
-      <path d="M100 45 C88 45 80 58 80 72 C80 88 92 98 100 110 C108 98 120 88 120 72 C120 58 112 45 100 45 Z" fill="#f8fafc"/>
-      <polygon points="94,72 106,72 100,88" fill="#f59e0b"/>
-      <path d="M40 70 Q70 60 85 75 Q60 95 45 110 Z" fill="#d97706"/>
-      <path d="M160 70 Q130 60 115 75 Q140 95 155 110 Z" fill="#d97706"/>
-      <rect x="36" y="112" width="128" height="28" rx="4" fill="#ffffff"/>
-      <text x="100" y="133" font-size="16" font-weight="900" font-family="Arial, sans-serif" fill="#000000" text-anchor="middle" letter-spacing="1.5">SETIA</text>
-    </svg>
-  </template>
+    let phone = String(value).replace(/\D/g, "");
 
-  <!-- 1. UNIVERSAL SINGLE LOGIN SCREEN -->
-  <div id="login-view" class="flex min-h-screen items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white p-7 rounded-2xl shadow-xl border border-gray-200 text-center">
-      <div class="flex justify-center mb-2">
-        <div id="login-logo-container"></div>
-      </div>
-      <h2 class="text-xl font-black text-amber-600 tracking-wider">SETIA WAXING PLANT</h2>
-      <p class="text-[11px] text-gray-500 mb-2 font-medium">Kinnow Mandi & Party Portal</p>
-      
-      <div id="cloud-status-badge" class="mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
-        Connecting to Cloud...
-      </div>
-
-      <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
-        <div>
-          <label class="block text-xs font-semibold mb-1">Username / Registered Mobile No.</label>
-          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="Username, Name or 10-digit mobile" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold mb-1">Password</label>
-          <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="••••••••" />
-        </div>
-
-        <button type="submit" id="btn-login-submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition text-xs shadow">
-          Sign In
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- 2. FARMER / CUSTOMER PRIVATE PORTAL VIEW -->
-  <div id="party-portal-view" class="hidden min-h-screen flex flex-col">
-    <header class="bg-slate-900 text-white px-4 md:px-6 py-3 shadow flex justify-between items-center border-b-2 border-amber-500">
-      <div class="flex items-center gap-2.5">
-        <div id="party-logo-container"></div>
-        <div>
-          <h1 class="font-extrabold text-sm md:text-base text-amber-400 tracking-wider">SETIA WAXING PLANT</h1>
-          <p class="text-[10px] text-gray-300" id="party-header-welcome">Party Account</p>
-        </div>
-      </div>
-      <button onclick="logoutPortal()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold text-white">
-        Logout
-      </button>
-    </header>
-
-    <div class="max-w-4xl mx-auto w-full p-4 space-y-5">
-      <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b pb-3">
-          <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700" id="party-portal-type">-</span>
-            <h2 class="text-lg font-black text-slate-900" id="party-portal-name">-</h2>
-            <p class="text-xs text-gray-500" id="party-portal-phone">-</p>
-          </div>
-          <div class="text-right">
-            <span class="text-[10px] text-gray-500 block">Balance Pending</span>
-            <h3 class="text-xl font-black" id="party-portal-balance">₹0</h3>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center" id="party-portal-kpi-grid"></div>
-      </div>
-
-      <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700" id="party-table-title">Your Statement & History</h3>
-        <div class="overflow-x-auto border rounded-xl">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-gray-100 border-b font-bold text-gray-700" id="party-table-head"></thead>
-            <tbody id="party-table-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3. MAIN ADMIN & STAFF APPLICATION -->
-  <div id="app-view" class="hidden min-h-screen flex flex-col">
-    <header class="bg-slate-900 text-white px-4 md:px-6 py-3 shadow flex justify-between items-center no-print sticky top-0 z-40 border-b-2 border-amber-500">
-      <div class="flex items-center gap-3">
-        <div id="header-logo-container"></div>
-        <div>
-          <h1 class="font-extrabold text-base md:text-lg text-amber-400 tracking-wider">SETIA WAXING PLANT</h1>
-          <p class="text-[11px] text-gray-300">Abohar Hub • Mandi Operations</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <span id="user-display" class="text-xs bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-full text-amber-300 font-semibold"></span>
-        <button onclick="logoutPortal()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold text-white">
-          Logout
-        </button>
-      </div>
-    </header>
-
-    <div class="max-w-6xl mx-auto w-full p-4 no-print">
-      <div class="grid grid-cols-3 md:grid-cols-7 border-b border-gray-300 gap-1 mb-6 text-center text-xs font-bold">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2.5 border-b-2 border-amber-600 text-amber-700">
-          📊 Dashboard
-        </button>
-        <button onclick="switchTab('customer-ledger')" id="tab-customer-ledger" class="py-2.5 text-gray-500 hover:text-amber-700">
-          👤 Customer
-        </button>
-        <button onclick="switchTab('orchards')" id="tab-orchards" class="py-2.5 text-gray-500 hover:text-amber-700">
-          🌳 Farmer
-        </button>
-        <button onclick="switchTab('farmer')" id="tab-farmer" class="py-2.5 text-gray-500 hover:text-amber-700">
-          1. New Deal
-        </button>
-        <button onclick="switchTab('daily')" id="tab-daily" class="py-2.5 text-gray-500 hover:text-amber-700">
-          2. Inward
-        </button>
-        <button onclick="switchTab('customer')" id="tab-customer" class="py-2.5 text-gray-500 hover:text-amber-700">
-          3. Dispatch
-        </button>
-        <button onclick="switchTab('attendance')" id="tab-attendance" class="py-2.5 text-gray-500 hover:text-amber-700 bg-amber-50">
-          👥 Attendance
-        </button>
-        <button onclick="switchTab('admin-panel')" id="tab-admin-panel" class="py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black hidden">
-          👑 Master Admin Control
-        </button>
-      </div>
-
-      <!-- TAB: MASTER ADMIN PANEL -->
-      <div id="admin-panel-section" class="hidden space-y-6">
-        <div class="bg-amber-50 border-2 border-amber-400 p-5 rounded-xl shadow-sm space-y-5">
-          <div class="flex flex-wrap justify-between items-center gap-3">
-            <div>
-              <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
-              <p class="text-xs text-amber-800">Manage user access permissions, add staff, and directly block or unblock accounts.</p>
-            </div>
-            <button onclick="forceSyncToCloud()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow">
-              ☁️ Force Push All Records to Cloud
-            </button>
-          </div>
-
-          <form onsubmit="createStaffAccount(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-white p-4 rounded-xl border border-amber-300">
-            <div>
-              <label class="block font-bold mb-1 text-slate-800">Staff Full Name</label>
-              <input type="text" id="staff-name" required class="w-full border rounded-lg p-2" placeholder="e.g. Ramesh Kumar" />
-            </div>
-            <div>
-              <label class="block font-bold mb-1 text-slate-800">Assigned Username</label>
-              <input type="text" id="staff-user" required class="w-full border rounded-lg p-2" placeholder="e.g. ramesh_setia" />
-            </div>
-            <div>
-              <label class="block font-bold mb-1 text-slate-800">Set Password</label>
-              <input type="password" id="staff-pass" required class="w-full border rounded-lg p-2" placeholder="••••••••" />
-            </div>
-            <div class="flex items-end">
-              <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
-                + Create Staff Account
-              </button>
-            </div>
-          </form>
-
-          <div>
-            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Staff Access Accounts</h4>
-            <div class="overflow-x-auto bg-white rounded-xl border">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-gray-100 border-b font-bold text-gray-700">
-                  <tr>
-                    <th class="p-2.5">Staff Name</th>
-                    <th class="p-2.5">Username</th>
-                    <th class="p-2.5">Password</th>
-                    <th class="p-2.5">Status</th>
-                    <th class="p-2.5 text-right">Access Control</th>
-                  </tr>
-                </thead>
-                <tbody id="staff-table-body"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <div>
-            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Farmer & Customer Registered Access Accounts</h4>
-            <div class="overflow-x-auto bg-white rounded-xl border">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-gray-100 border-b font-bold text-gray-700">
-                  <tr>
-                    <th class="p-2.5">Party Type</th>
-                    <th class="p-2.5">Party Name</th>
-                    <th class="p-2.5">Login Phone / Password</th>
-                    <th class="p-2.5">Status</th>
-                    <th class="p-2.5 text-right">Access Control</th>
-                  </tr>
-                </thead>
-                <tbody id="party-accounts-table-body"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB: ATTENDANCE & LABOUR -->
-      <div id="attendance-section" class="hidden space-y-6">
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-800 mb-2 pb-2 border-b">📋 Register New Staff Member</h3>
-          <form onsubmit="registerQuickStaff(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div>
-              <label class="block font-semibold mb-1">Staff Member Name</label>
-              <input type="text" id="reg-staff-name" required class="w-full border rounded-lg p-2" placeholder="e.g. Gurpreet Singh" />
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Role / Designation</label>
-              <input type="text" id="reg-staff-role" class="w-full border rounded-lg p-2" placeholder="e.g. Machine Operator" />
-            </div>
-            <div class="flex items-end">
-              <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
-                + Add to Staff Directory
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b">1. Staff Daily Attendance</h3>
-          <form onsubmit="recordStaffAttendance(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
-            <div>
-              <label class="block font-semibold mb-1">Staff Name</label>
-              <input list="staff-datalist" id="att-staff-input" required class="w-full border rounded-lg p-2 bg-amber-50 font-medium" placeholder="Select or type" />
-              <datalist id="staff-datalist"></datalist>
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Status</label>
-              <select id="att-staff-status" required class="w-full border rounded-lg p-2">
-                <option value="Present">Present</option>
-                <option value="Half Day">Half Day</option>
-                <option value="Absent">Absent</option>
-                <option value="Leave">Leave</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Daily Wages ₹</label>
-              <input type="number" id="att-staff-wage" class="w-full border rounded-lg p-2" placeholder="e.g. 500" />
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Date</label>
-              <input type="date" id="att-staff-date" required class="w-full border rounded-lg p-2" />
-            </div>
-            <div class="flex items-end">
-              <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
-                Save Attendance
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="bg-amber-50/70 p-5 rounded-xl border-2 border-amber-300 shadow-sm">
-          <div class="flex justify-between items-center mb-3 pb-2 border-b border-amber-200">
-            <div>
-              <h3 class="text-base font-black text-slate-900">2. Contractor Group Labour Attendance (Rani Model)</h3>
-              <p class="text-xs text-amber-900">Enter number of labourers working under contractor</p>
-            </div>
-          </div>
-          <form onsubmit="recordContractorLabour(event)" class="grid grid-cols-1 md:grid-cols-6 gap-3 text-xs">
-            <div>
-              <label class="block font-bold mb-1">Contractor Name</label>
-              <input type="text" id="att-group-head" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Rani Mukadam" />
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Persons Present</label>
-              <input type="number" id="att-group-count" required min="1" class="w-full border rounded-lg p-2 bg-white font-black text-amber-900" placeholder="e.g. 14" oninput="calculateGroupWage()" />
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Wage per Head ₹</label>
-              <input type="number" id="att-group-rate" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. 450" oninput="calculateGroupWage()" />
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Location</label>
-              <input type="text" id="att-group-orchard" class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Seed Farm" />
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Date</label>
-              <input type="date" id="att-group-date" required class="w-full border rounded-lg p-2 bg-white" />
-            </div>
-            <div class="flex items-end">
-              <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 rounded-lg shadow">
-                Save Group Labour
-              </button>
-            </div>
-          </form>
-          <div class="mt-2 text-right text-xs font-bold text-amber-900">
-            Calculated Payout: <span id="disp-group-total" class="text-sm font-black text-slate-900">₹0</span>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h4 class="text-xs font-bold uppercase text-slate-700 mb-3">Attendance History</h4>
-          <div class="overflow-x-auto border rounded-xl">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-gray-100 border-b font-bold text-gray-700">
-                <tr>
-                  <th class="p-2.5">Date</th>
-                  <th class="p-2.5">Category</th>
-                  <th class="p-2.5">Name / Head</th>
-                  <th class="p-2.5 text-center">Count / Status</th>
-                  <th class="p-2.5">Rate / Details</th>
-                  <th class="p-2.5 text-right">Total ₹</th>
-                  <th class="p-2.5 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody id="attendance-table-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- EDIT ATTENDANCE MODAL -->
-      <div id="edit-attendance-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 text-xs">
-          <h3 class="text-base font-bold text-slate-900 mb-3 pb-2 border-b" id="edit-modal-title">Edit Attendance</h3>
-          <form onsubmit="saveEditedAttendance(event)" class="space-y-3">
-            <input type="hidden" id="edit-att-id" />
-            <input type="hidden" id="edit-att-type" />
-            <div>
-              <label class="block font-semibold mb-1">Date</label>
-              <input type="date" id="edit-att-date" required class="w-full border rounded-lg p-2" />
-            </div>
-            <div id="edit-staff-fields">
-              <div>
-                <label class="block font-semibold mb-1">Staff Name</label>
-                <input type="text" id="edit-att-name" class="w-full border rounded-lg p-2" />
-              </div>
-              <div class="mt-2">
-                <label class="block font-semibold mb-1">Status</label>
-                <select id="edit-att-status" class="w-full border rounded-lg p-2">
-                  <option value="Present">Present</option>
-                  <option value="Half Day">Half Day</option>
-                  <option value="Absent">Absent</option>
-                  <option value="Leave">Leave</option>
-                </select>
-              </div>
-              <div class="mt-2">
-                <label class="block font-semibold mb-1">Daily Wages ₹</label>
-                <input type="number" id="edit-att-wage" class="w-full border rounded-lg p-2" />
-              </div>
-            </div>
-            <div id="edit-group-fields" class="hidden space-y-2">
-              <div>
-                <label class="block font-semibold mb-1">Contractor Name</label>
-                <input type="text" id="edit-att-head" class="w-full border rounded-lg p-2" />
-              </div>
-              <div>
-                <label class="block font-semibold mb-1">Labourers Present</label>
-                <input type="number" id="edit-att-count" class="w-full border rounded-lg p-2" />
-              </div>
-              <div>
-                <label class="block font-semibold mb-1">Rate per Person ₹</label>
-                <input type="number" id="edit-att-rate" class="w-full border rounded-lg p-2" />
-              </div>
-              <div>
-                <label class="block font-semibold mb-1">Location</label>
-                <input type="text" id="edit-att-orchard" class="w-full border rounded-lg p-2" />
-              </div>
-            </div>
-            <div class="flex gap-2 pt-3 border-t">
-              <button type="submit" class="flex-1 bg-slate-900 text-amber-400 font-bold py-2 rounded-lg">Save Changes</button>
-              <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded-lg">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- TAB 0: DASHBOARD -->
-      <div id="dashboard-section" class="space-y-6">
-        <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm gap-3">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold uppercase text-gray-500">Date Filter:</span>
-            <input type="date" id="dash-date-filter" class="border rounded-lg p-1.5 text-xs font-semibold" onchange="renderDashboard()" />
-            <button onclick="resetToToday()" class="bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg text-xs font-semibold text-gray-700">Today</button>
-          </div>
-          <button onclick="clearAllData()" id="btn-reset-data" class="text-xs text-red-500 hover:underline font-semibold hidden">
-            Reset Data (Admin Only)
-          </button>
-        </div>
-
-        <div>
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3" id="dash-period-title">Today's Performance</h4>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <p class="text-xs text-gray-500 font-medium">Kinnow Inward (Net)</p>
-              <h3 class="text-xl font-bold text-gray-800 mt-1" id="stat-daily-weight">0 Kg</h3>
-              <p class="text-[11px] text-gray-400 mt-1" id="stat-daily-cut">0 Kg (1kg/Qtl Cut)</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <p class="text-xs text-gray-500 font-medium">Dispatched Boxes</p>
-              <h3 class="text-xl font-bold text-amber-600 mt-1" id="stat-daily-boxes">0 Boxes</h3>
-              <p class="text-[11px] text-gray-400 mt-1" id="stat-daily-trips">0 Trucks</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <p class="text-xs text-gray-500 font-medium">Customer Collections</p>
-              <h3 class="text-xl font-bold text-emerald-700 mt-1" id="stat-daily-cust-recv">₹0</h3>
-              <p class="text-[11px] text-gray-400 mt-1">Bank receipts today</p>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <p class="text-xs text-gray-500 font-medium">Farmer Payments</p>
-              <h3 class="text-xl font-bold text-red-700 mt-1" id="stat-daily-farmer-paid">₹0</h3>
-              <p class="text-[11px] text-gray-400 mt-1">Disbursed today</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-slate-900 text-white p-5 rounded-2xl shadow-md border-t-4 border-amber-500">
-          <div class="flex justify-between items-center mb-4">
-            <h4 class="text-sm font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
-              <span>SETIA WAXING PLANT</span> • Season Cumulative Overview
-            </h4>
-            <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-bold">Season 2026</span>
-          </div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div class="border-r border-slate-700 pr-2">
-              <span class="text-xs text-gray-400">Total Billed Sales</span>
-              <p class="text-xl font-extrabold mt-1 text-amber-300" id="season-total-sales">₹0</p>
-              <span class="text-[10px] text-gray-400" id="season-cust-pending">₹0 Uncollected</span>
-            </div>
-            <div class="border-r border-slate-700 pr-2">
-              <span class="text-xs text-gray-400">Total Collections</span>
-              <p class="text-xl font-extrabold mt-1 text-emerald-400" id="season-total-received">₹0</p>
-              <span class="text-[10px] text-gray-400">Bank deposits</span>
-            </div>
-            <div class="border-r border-slate-700 pr-2">
-              <span class="text-xs text-gray-400">Farmer Fruit Dues</span>
-              <p class="text-xl font-extrabold mt-1 text-orange-400" id="season-farmer-dues">₹0</p>
-              <span class="text-[10px] text-gray-400" id="season-farmer-pending">₹0 Pending</span>
-            </div>
-            <div>
-              <span class="text-xs text-gray-400">Pending Crates</span>
-              <p class="text-xl font-extrabold mt-1 text-red-400" id="season-crates-unreturned">0</p>
-              <span class="text-[10px] text-gray-400">Outside with Farmers</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600 mb-3">Season Size Breakdown</h4>
-          <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-2 text-center" id="season-size-distribution"></div>
-        </div>
-      </div>
-
-      <!-- TAB 1: CUSTOMER MASTER LEDGER -->
-      <div id="customer-ledger-section" class="hidden space-y-6">
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">💳 Record Customer Payment Received</h3>
-          <form onsubmit="recordCustomerPayment(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
-            <div>
-              <label class="block font-semibold mb-1">Customer</label>
-              <select id="pay-cust-select" required class="w-full border rounded-lg p-2 bg-amber-50 text-slate-900 font-medium">
-                <option value="">-- Choose Customer --</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Amount Received ₹</label>
-              <input type="number" id="pay-cust-amount" required class="w-full border rounded-lg p-2" placeholder="e.g. 150000" />
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Bank Name / Cash</label>
-              <input type="text" id="pay-cust-bank" required class="w-full border rounded-lg p-2" placeholder="HDFC / SBI / Cash" />
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Payment Mode / Ref UTR</label>
-              <input type="text" id="pay-cust-ref" class="w-full border rounded-lg p-2" placeholder="NEFT / Cheque / UTR" />
-            </div>
-            <div class="flex items-end">
-              <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
-                + Add Payment
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
-          <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
-            <div>
-              <h3 class="text-base font-bold text-gray-800">Customer Statement & Ledger</h3>
-              <p class="text-xs text-gray-500">Inspect dispatches, payments and pending balance</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <select id="view-cust-select" class="border rounded-lg p-2 text-xs font-semibold bg-amber-50 text-slate-900 outline-none" onchange="renderCustomerLedger()">
-                <option value="">-- Select Customer to View --</option>
-              </select>
-              <button onclick="shareCustomerLedgerWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1">
-                💬 WhatsApp Ledger
-              </button>
-            </div>
-          </div>
-
-          <div id="cust-kpi-container" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div class="p-3.5 bg-gray-50 rounded-xl border">
-              <span class="text-xs text-gray-500 font-medium">Total Billed Sales</span>
-              <h4 class="text-lg font-bold text-gray-800 mt-1" id="cust-kpi-invoiced">₹0</h4>
-              <p class="text-[11px] text-gray-400" id="cust-kpi-boxes">0 Boxes</p>
-            </div>
-            <div class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200">
-              <span class="text-xs text-emerald-700 font-medium">Total Received (Bank/Cash)</span>
-              <h4 class="text-lg font-bold text-emerald-800 mt-1" id="cust-kpi-paid">₹0</h4>
-              <p class="text-[11px] text-emerald-600" id="cust-kpi-paycount">0 Receipts</p>
-            </div>
-            <div class="p-3.5 bg-red-50 rounded-xl border border-red-200">
-              <span class="text-xs text-red-600 font-medium">Balance Receivable</span>
-              <h4 class="text-xl font-black text-red-700 mt-1" id="cust-kpi-balance">₹0</h4>
-              <p class="text-[11px] text-red-500">Unpaid balance</p>
-            </div>
-          </div>
-
-          <div id="cust-ledger-table-wrap" class="hidden overflow-x-auto border rounded-xl">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-gray-100 border-b text-gray-700 font-bold">
-                <tr>
-                  <th class="p-2.5">Date</th>
-                  <th class="p-2.5">Type</th>
-                  <th class="p-2.5">Particulars / Bank</th>
-                  <th class="p-2.5 text-right">Debit (Billed ₹)</th>
-                  <th class="p-2.5 text-right">Credit (Paid ₹)</th>
-                  <th class="p-2.5 text-right">Balance ₹</th>
-                </tr>
-              </thead>
-              <tbody id="cust-ledger-tbody"></tbody>
-            </table>
-          </div>
-
-          <div id="no-cust-placeholder" class="text-center py-8 text-gray-400 text-xs">
-            Select a customer from the dropdown above to view statement.
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: FARMER MASTER LEDGER -->
-      <div id="orchards-section" class="hidden space-y-6">
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">💸 Record Payment Made to Farmer</h3>
-          <form onsubmit="recordFarmerPayment(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
-            <div>
-              <label class="block font-semibold mb-1">Select Orchard / Farmer</label>
-              <select id="pay-farmer-select" required class="w-full border rounded-lg p-2 bg-amber-50 text-slate-900 font-medium">
-                <option value="">-- Choose Orchard --</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Amount Paid ₹</label>
-              <input type="number" id="pay-farmer-amount" required class="w-full border rounded-lg p-2" placeholder="e.g. 50000" />
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Bank Account / Cash</label>
-              <input type="text" id="pay-farmer-bank" required class="w-full border rounded-lg p-2" placeholder="HDFC / SBI / Cash" />
-            </div>
-            <div>
-              <label class="block font-semibold mb-1">Payment Mode / Notes</label>
-              <input type="text" id="pay-farmer-ref" class="w-full border rounded-lg p-2" placeholder="NEFT / Cheque / UTR" />
-            </div>
-            <div class="flex items-end">
-              <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
-                + Record Payment
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
-          <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
-            <div>
-              <h3 class="text-base font-bold text-gray-800">Orchard Master Ledger & Crates Balance</h3>
-              <p class="text-xs text-gray-500">Inward weight, 1kg/qtl deductions, payments and crates count</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <select id="orchard-ledger-select" class="border rounded-lg p-2 text-xs font-semibold bg-amber-50 text-slate-900 outline-none" onchange="renderSingleOrchardSummary()">
-                <option value="">-- Choose an Orchard to view --</option>
-              </select>
-              <button onclick="shareFarmerLedgerWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1">
-                💬 WhatsApp Ledger
-              </button>
-            </div>
-          </div>
-
-          <div id="orchard-summary-card" class="hidden space-y-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div class="p-3 bg-gray-50 rounded-xl border">
-                <span class="text-xs text-gray-500 font-medium">Orchard / Farmer</span>
-                <h4 class="text-base font-bold text-gray-800 mt-1" id="orch-kpi-name">-</h4>
-                <p class="text-[11px] text-gray-400" id="orch-kpi-village">-</p>
-              </div>
-              <div class="p-3 bg-gray-50 rounded-xl border">
-                <span class="text-xs text-gray-500 font-medium">Pending Crates</span>
-                <h4 class="text-xl font-black text-red-600 mt-1" id="orch-kpi-crates">0</h4>
-                <p class="text-[11px] text-gray-500" id="orch-kpi-crates-breakdown">Sent: 0 | Recv: 0</p>
-              </div>
-              <div class="p-3 bg-gray-50 rounded-xl border">
-                <span class="text-xs text-gray-500 font-medium">Fruit Picked (Chargeable)</span>
-                <h4 class="text-base font-bold text-emerald-800 mt-1" id="orch-kpi-weight">0 Kg</h4>
-                <p class="text-[11px] text-gray-400" id="orch-kpi-trips">0 Loads</p>
-              </div>
-              <div class="p-3 bg-gray-50 rounded-xl border">
-                <span class="text-xs text-gray-500 font-medium">Balance Payable</span>
-                <h4 class="text-lg font-bold text-red-600 mt-1" id="orch-kpi-financials">₹0</h4>
-                <p class="text-[11px] text-gray-400" id="orch-kpi-paid-info">Paid: ₹0</p>
-              </div>
-            </div>
-
-            <div>
-              <h4 class="text-xs font-bold uppercase text-gray-600 mb-2">Inward Loads & Payment Timeline</h4>
-              <div class="overflow-x-auto border rounded-xl">
-                <table class="w-full text-left text-xs">
-                  <thead class="bg-gray-100 border-b text-gray-700 font-bold">
-                    <tr>
-                      <th class="p-2.5">Date</th>
-                      <th class="p-2.5">Token</th>
-                      <th class="p-2.5">Details</th>
-                      <th class="p-2.5 text-right">Inward Amt ₹</th>
-                      <th class="p-2.5 text-right">Paid Amt ₹</th>
-                      <th class="p-2.5 text-right">Crates In/Out</th>
-                    </tr>
-                  </thead>
-                  <tbody id="orchard-trips-tbody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          
-          <div id="no-orchard-placeholder" class="text-center py-8 text-gray-400 text-xs">
-            Select an orchard from the dropdown to view its full statement.
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: NEW ORCHARD AGREEMENT -->
-      <div id="farmer-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 class="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Orchard Purchase Agreement (ਬਾਗ਼ ਖ਼ਰੀਦ ਇਕਰਾਰਨਾਮਾ)</h3>
-        <form onsubmit="generateFarmerSlip(event)" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name</label>
-              <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Jatin" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Registered Mobile Number</label>
-              <input type="tel" id="f-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Village / Location</label>
-              <input type="text" id="f-village" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Khuian" />
-            </div>
-          </div>
-
-          <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
-            <label class="block text-xs font-semibold mb-2">Deal Type (ਸੌਦੇ ਦੀ ਕਿਸਮ)</label>
-            <div class="flex gap-4">
-              <label class="flex items-center text-sm gap-2">
-                <input type="radio" name="p-type" value="lump_sum" checked onchange="togglePurchaseType()" /> Full Orchard / Lump Sum (ਮੁੱਕਤਾ)
-              </label>
-              <label class="flex items-center text-sm gap-2">
-                <input type="radio" name="p-type" value="per_kg" onchange="togglePurchaseType()" /> Per Kg Basis (ਪ੍ਰਤੀ ਕਿੱਲੋ)
-              </label>
-            </div>
-          </div>
-
-          <div id="lump-sum-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold mb-1">Total Agreement Value ₹</label>
-              <input type="number" id="f-lumpsum" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 500000" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Advance Token Paid ₹</label>
-              <input type="number" id="f-advance" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 100000" />
-            </div>
-          </div>
-
-          <div id="per-kg-fields" class="hidden space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-semibold mb-1">Agreed Rate per Kg ₹</label>
-                <input type="number" id="f-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 26" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1">Advance Token Paid ₹</label>
-                <input type="number" id="f-kg-advance" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold mb-1">Advance Bank / Cash Mode</label>
-              <input type="text" id="f-adv-bank" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. HDFC Bank / Cash" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Supervisor / Signer Name</label>
-              <input type="text" id="f-supervisor" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Satish Reddy" />
-            </div>
-          </div>
-
-          <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg shadow">
-            Save Deal & Register Farmer Portal Access
-          </button>
-        </form>
-      </div>
-
-      <!-- TAB 4: DAILY INWARD SLIP -->
-      <div id="daily-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <div class="flex justify-between items-center border-b pb-2 mb-4">
-          <h3 class="text-base font-bold text-gray-800">Daily Orchard Inward (ਤੁੜਾਈ ਤੇ ਆਮਦ)</h3>
-          <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-bold">
-            ⚡ Auto-Fill Enabled
-          </span>
-        </div>
-
-        <div class="mb-5 bg-amber-50 p-3.5 rounded-xl border border-amber-200">
-          <label class="block text-xs font-bold text-slate-900 mb-1">Select Saved Orchard (ਸੇਵ ਕੀਤਾ ਬਾਗ਼ ਚੁਣੋ)</label>
-          <select id="inward-orchard-select" class="w-full border border-amber-300 rounded-lg p-2 text-sm bg-white font-medium outline-none" onchange="autoFillOrchardDetails()">
-            <option value="">-- Choose saved orchard to auto-fill details --</option>
-          </select>
-        </div>
-
-        <form onsubmit="generateDailyInwardSlip(event)" class="space-y-4">
-          <input type="hidden" id="d-orchard-id" value="" />
-          <input type="hidden" id="d-village" value="" />
-          
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name</label>
-              <input type="text" id="d-farmer" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Jatin" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Farmer WhatsApp No.</label>
-              <input type="tel" id="d-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm" placeholder="10-digit mobile" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Vehicle / Trolley No.</label>
-              <input type="text" id="d-vehicle" required class="w-full border rounded-lg p-2 text-sm" placeholder="PB 15 XX XXXX" />
-            </div>
-          </div>
-
-          <div class="bg-gray-50 p-4 rounded-lg border grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label class="block text-xs font-semibold mb-1">Gross Weight (Kg)</label>
-              <input type="number" id="d-gross-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 4200" oninput="calculateDailyWeight()" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Tare (Empty Vehicle Kg)</label>
-              <input type="number" id="d-tare-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 1200" oninput="calculateDailyWeight()" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Rate per Kg ₹</label>
-              <input type="number" id="d-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm" placeholder="0" oninput="calculateDailyWeight()" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Loader / Incharge</label>
-              <input type="text" id="d-loader" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Ramesh Loader" />
-            </div>
-          </div>
-
-          <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs flex justify-between flex-wrap gap-2">
-            <span>Net Weight: <b id="disp-net-wt">0</b> Kg</span>
-            <span>1 Kg/Quintal Cut: <b id="disp-cut-wt" class="text-red-600">0</b> Kg</span>
-            <span>Final Chargeable Weight: <b id="disp-final-wt" class="text-slate-900 font-bold">0</b> Kg</span>
-          </div>
-
-          <div class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold mb-1">Empty Crates Sent to Orchard</label>
-              <input type="number" id="d-crates-sent" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Filled Crates Received</label>
-              <input type="number" id="d-crates-recv" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-            </div>
-          </div>
-
-          <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg">
-            Record Trip & Generate SETIA Inward Slip
-          </button>
-        </form>
-      </div>
-
-      <!-- TAB 5: CUSTOMER DISPATCH INVOICE -->
-      <div id="customer-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 class="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Kinnow Dispatch Invoice (ਗ੍ਰਾਹਕ ਨਿਕਾਸੀ ਪਰਚੀ)</h3>
-        <form onsubmit="generateCustomerSlip(event)" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label class="block text-xs font-semibold mb-1">Customer / Buyer Name</label>
-              <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Chifu Agritech" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Registered Mobile Number</label>
-              <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Vehicle / Truck No</label>
-              <input type="text" id="c-vehicle" required class="w-full border rounded-lg p-2 text-sm" placeholder="PB 15 XX XXXX" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Mandi / Lot No.</label>
-              <input type="text" id="c-lot-no" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. E879 / C-30" />
-            </div>
-          </div>
-
-          <div class="mt-4">
-            <div class="flex justify-between items-center mb-2">
-              <h4 class="text-xs font-bold uppercase text-slate-700">Kinnow Size Matrix (Boxes & Rates)</h4>
-              <button type="button" onclick="addCustomSizeRow()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs px-2.5 py-1 rounded font-bold border border-amber-300">
-                + Add Extra Size
-              </button>
-            </div>
-            <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 text-center" id="kinnow-size-grid"></div>
-            <div id="custom-sizes-container" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3"></div>
-          </div>
-
-          <div class="border-t pt-4 bg-gray-50 p-4 rounded-xl space-y-3">
-            <h4 class="text-xs font-bold uppercase text-slate-700">Freight & Miscellaneous Expenses (ਫੁਟਕਲ ਖ਼ਰਚੇ)</h4>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <div>
-                <label class="block text-xs font-semibold mb-1">Freight / Bhada ₹</label>
-                <input type="number" id="c-freight" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1">Labour / Loading ₹</label>
-                <input type="number" id="c-labour" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1">Packaging / Stencil ₹</label>
-                <input type="number" id="c-pack-charge" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1">Misc Expense ₹</label>
-                <input type="number" id="c-misc" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Supervisor & Loader Signer</label>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input type="text" id="c-supervisor" class="border rounded-lg p-2 text-sm" placeholder="Supervisor (e.g. Satish Reddy)" />
-                <input type="text" id="c-loader" class="border rounded-lg p-2 text-sm" placeholder="Loader / Dispatcher Name" />
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg shadow">
-            Save Invoice & Register Customer Portal Access
-          </button>
-        </form>
-      </div>
-
-      <!-- MODAL & SLIP VIEWER -->
-      <div id="slip-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-3 md:p-6 z-50 overflow-y-auto">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-4 md:p-6 overflow-y-auto max-h-[92vh]">
-          <div id="printable-slip"></div>
-          <div class="flex gap-2 mt-6 no-print border-t pt-4">
-            <button onclick="triggerDirectPrint()" class="flex-1 bg-slate-900 hover:bg-black text-amber-400 py-2.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1">
-              🖨️ Print Slip / PDF
-            </button>
-            <button id="whatsapp-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1">
-              💬 Send on WhatsApp
-            </button>
-            <button onclick="closeModal()" class="px-4 py-2.5 border border-gray-300 rounded-lg text-xs font-bold text-gray-700">
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <script>
-    const KINNOW_SIZES = ["36", "42", "45", "54", "60", "72", "84", "96", "108"];
-    let customSizeIndex = 0;
-    let currentUser = null;
-    let currentPartySession = null;
-
-    let APP_DATA = JSON.parse(localStorage.getItem('SETIA_WAXING_PORTAL_V10')) || {
-      staffUsers: [],
-      staffDirectory: [],
-      staffAttendance: [],
-      groupLabourAttendance: [],
-      agreements: [],
-      inwards: [],
-      dispatches: [],
-      customerPayments: [],
-      farmerPayments: [],
-      blockedUsers: []
-    };
-
-    function generatePartyToken(type, name, locationOrSecondName = "") {
-      const cleanName = (name || "").trim();
-      const cleanLoc = (locationOrSecondName || "").trim();
-      let prefix = "";
-
-      if (type === 'farmer') {
-        const p1 = cleanName ? cleanName.charAt(0).toUpperCase() : 'F';
-        const p2 = cleanLoc ? cleanLoc.charAt(0).toUpperCase() : (cleanName.length > 1 ? cleanName.charAt(1).toUpperCase() : 'O');
-        prefix = `${p1}${p2}`;
-
-        const pastCount = (APP_DATA.inwards || []).filter(i => 
-          (i.name && i.name.trim().toLowerCase() === cleanName.toLowerCase())
-        ).length;
-
-        return `${prefix}-${pastCount + 1}`;
-      } else {
-        const words = cleanName.split(/\s+/).filter(Boolean);
-        if (words.length >= 2) {
-          prefix = (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
-        } else if (cleanName.length >= 2) {
-          prefix = cleanName.substring(0, 2).toUpperCase();
-        } else {
-          prefix = (cleanName.charAt(0) || "C").toUpperCase() + "P";
-        }
-
-        const pastCount = (APP_DATA.dispatches || []).filter(d => 
-          (d.name && d.name.trim().toLowerCase() === cleanName.toLowerCase())
-        ).length;
-
-        return `${prefix}-${pastCount + 1}`;
-      }
+    // Convert +91XXXXXXXXXX / 91XXXXXXXXXX to XXXXXXXXXX
+    if (phone.length === 12 && phone.startsWith("91")) {
+      phone = phone.substring(2);
     }
 
-    function setupCloudListeners() {
-      const badge = document.getElementById('cloud-status-badge');
-      if (badge) {
-        badge.innerText = "☁️ Firebase Cloud Sync Active";
-        badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
+    return phone;
+  }
+
+  function normalizeUsername(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/^@/, "");
+  }
+
+  function todayDate() {
+    return new Date().toISOString().split("T")[0];
+  }
+
+  function updateCloudBadge(text, type = "normal") {
+    const badge = document.getElementById("cloud-status-badge");
+    if (!badge) return;
+
+    badge.innerText = text;
+
+    if (type === "success") {
+      badge.className =
+        "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
+    } else if (type === "error") {
+      badge.className =
+        "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-red-100 text-red-800";
+    } else {
+      badge.className =
+        "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800";
+    }
+  }
+
+  // ---------------------------------------------------------
+  // FIRESTORE
+  // ---------------------------------------------------------
+
+  async function loadCloudData() {
+    try {
+      updateCloudBadge("☁️ Connecting to Cloud...");
+
+      const snap = await db
+        .collection("plant_data")
+        .doc("main_state")
+        .get();
+
+      if (snap.exists) {
+        const cloudData = snap.data() || {};
+
+        APP_DATA = {
+          staffUsers: Array.isArray(cloudData.staffUsers)
+            ? cloudData.staffUsers
+            : [],
+
+          agreements: Array.isArray(cloudData.agreements)
+            ? cloudData.agreements
+            : [],
+
+          inwards: Array.isArray(cloudData.inwards)
+            ? cloudData.inwards
+            : [],
+
+          dispatches: Array.isArray(cloudData.dispatches)
+            ? cloudData.dispatches
+            : []
+        };
+
+        localStorage.setItem(
+          "SETIA_WAXING_PORTAL_V10",
+          JSON.stringify(APP_DATA)
+        );
+
+        updateCloudBadge("☁️ Firebase Cloud Sync Active", "success");
+
+        console.log("CLOUD DATA LOADED:", APP_DATA);
+
+        return true;
       }
 
-      db.collection("plant_data").doc("main_state").onSnapshot((doc) => {
-        if (doc.exists) {
-          APP_DATA = doc.data();
-          localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-          populateDropdowns();
+      // If no document exists, create it
+      await db
+        .collection("plant_data")
+        .doc("main_state")
+        .set(APP_DATA);
+
+      updateCloudBadge("☁️ Firebase Cloud Sync Active", "success");
+
+      return true;
+
+    } catch (error) {
+      console.error("FIRESTORE LOAD ERROR:", error);
+
+      updateCloudBadge(
+        "❌ Cloud connection failed",
+        "error"
+      );
+
+      return false;
+    }
+  }
+
+  // ---------------------------------------------------------
+  // REAL-TIME CLOUD LISTENER
+  // ---------------------------------------------------------
+
+  function setupCloudListeners() {
+
+    db.collection("plant_data")
+      .doc("main_state")
+      .onSnapshot(
+        (doc) => {
+
+          if (!doc.exists) {
+            console.log("main_state does not exist.");
+            return;
+          }
+
+          const data = doc.data() || {};
+
+          APP_DATA = {
+            staffUsers: Array.isArray(data.staffUsers)
+              ? data.staffUsers
+              : [],
+
+            agreements: Array.isArray(data.agreements)
+              ? data.agreements
+              : [],
+
+            inwards: Array.isArray(data.inwards)
+              ? data.inwards
+              : [],
+
+            dispatches: Array.isArray(data.dispatches)
+              ? data.dispatches
+              : []
+          };
+
+          localStorage.setItem(
+            "SETIA_WAXING_PORTAL_V10",
+            JSON.stringify(APP_DATA)
+          );
+
+          updateCloudBadge(
+            "☁️ Firebase Cloud Sync Active",
+            "success"
+          );
+
           renderDashboard();
-          renderAttendanceTable();
           renderStaffTable();
-          renderPartyAccountsTable();
-          if (currentPartySession) renderPartyPortalView();
-        } else {
-          saveData();
+
+          console.log("REAL-TIME CLOUD UPDATE:", APP_DATA);
+        },
+
+        (error) => {
+          console.error("Firestore listener error:", error);
+
+          updateCloudBadge(
+            "❌ Firestore read failed",
+            "error"
+          );
         }
-      }, (err) => {
-        console.error("Firestore sync error:", err);
-      });
-    }
+      );
+  }
 
-    function saveData() {
-      localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-      db.collection("plant_data").doc("main_state").set(APP_DATA)
-        .catch(err => console.error("Cloud write failed:", err));
+  // ---------------------------------------------------------
+  // SAVE DATA
+  // ---------------------------------------------------------
 
-      populateDropdowns();
+  async function saveData() {
+
+    localStorage.setItem(
+      "SETIA_WAXING_PORTAL_V10",
+      JSON.stringify(APP_DATA)
+    );
+
+    try {
+
+      await db
+        .collection("plant_data")
+        .doc("main_state")
+        .set(APP_DATA);
+
+      console.log("DATA SUCCESSFULLY SAVED TO FIRESTORE");
+
       renderDashboard();
-      renderAttendanceTable();
       renderStaffTable();
-      renderPartyAccountsTable();
+
+      return true;
+
+    } catch (error) {
+
+      console.error("CLOUD WRITE FAILED:", error);
+
+      alert(
+        "⚠️ Cloud save failed.\n\n" +
+        "Your data may only be saved on this device.\n\n" +
+        error.message
+      );
+
+      return false;
     }
+  }
 
-    function forceSyncToCloud() {
-      saveData();
-      alert("All local plant records successfully uploaded to Firebase Cloud Firestore!");
+  async function forceSyncToCloud() {
+
+    const success = await saveData();
+
+    if (success) {
+      alert("✅ All records successfully pushed to Cloud Firestore!");
     }
+  }
 
-    window.onload = function() {
-      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
-      document.getElementById('login-logo-container').innerHTML = logoSvg;
-      document.getElementById('header-logo-container').innerHTML = logoSvg;
-      document.getElementById('party-logo-container').innerHTML = logoSvg;
+  // ---------------------------------------------------------
+  // LOGIN
+  // ---------------------------------------------------------
 
-      const grid = document.getElementById('kinnow-size-grid');
-      grid.innerHTML = "";
-      KINNOW_SIZES.forEach(size => {
-        grid.innerHTML += `
-          <div class="border rounded-lg p-1.5 bg-gray-50 text-center">
-            <div class="text-[11px] font-extrabold text-amber-700">${size}</div>
-            <input type="number" id="size-qty-${size}" placeholder="Qty" class="w-full border rounded p-1 text-xs mt-1 text-center font-medium" />
-            <input type="number" id="size-rate-${size}" placeholder="₹ Rate" class="w-full border rounded p-1 text-xs mt-1 text-center font-medium" />
-          </div>
-        `;
+  async function handleUniversalLogin(e) {
+
+    e.preventDefault();
+
+    const rawU =
+      document.getElementById("login-user").value.trim();
+
+    const password =
+      document.getElementById("login-pass").value.trim();
+
+    const username =
+      normalizeUsername(rawU);
+
+    const phone =
+      normalizePhone(rawU);
+
+    const btn =
+      document.getElementById("btn-login-submit");
+
+    btn.innerText = "Connecting to Cloud...";
+    btn.disabled = true;
+
+    try {
+
+      // ALWAYS GET FRESH DATA FROM FIRESTORE
+      const cloudOK = await loadCloudData();
+
+      if (!cloudOK) {
+
+        alert(
+          "❌ Unable to connect to the cloud database.\n\n" +
+          "Please check your internet connection and Firebase settings."
+        );
+
+        return;
+      }
+
+      console.log("LOGIN ATTEMPT:", {
+        entered: rawU,
+        username,
+        phone,
+        staffUsers: APP_DATA.staffUsers,
+        farmers: APP_DATA.agreements,
+        customers: APP_DATA.dispatches
       });
 
-      const todayStr = new Date().toISOString().split('T')[0];
-      document.getElementById('att-staff-date').value = todayStr;
-      document.getElementById('att-group-date').value = todayStr;
+      // ---------------------------------------------------
+      // MASTER ADMIN
+      // ---------------------------------------------------
 
-      resetToToday();
-      populateDropdowns();
-      setupCloudListeners();
-    };
+      if (
+        username === "admin" &&
+        password === "Csetia@1122"
+      ) {
 
-    function isUserBlocked(idOrPhone) {
-      const clean = (idOrPhone || "").toString().trim().toLowerCase().replace('@', '');
-      return (APP_DATA.blockedUsers || []).includes(clean);
-    }
+        currentUser = {
+          name: "Master Admin",
+          username: "admin",
+          role: "admin"
+        };
 
-    function toggleUserBlockStatus(idOrPhone, displayName) {
-      const clean = (idOrPhone || "").toString().trim().toLowerCase().replace('@', '');
-      if (!APP_DATA.blockedUsers) APP_DATA.blockedUsers = [];
-
-      if (isUserBlocked(clean)) {
-        APP_DATA.blockedUsers = APP_DATA.blockedUsers.filter(u => u !== clean);
-        alert(`Account for ${displayName} (${idOrPhone}) has been UNBLOCKED.`);
-      } else {
-        APP_DATA.blockedUsers.push(clean);
-        alert(`Account for ${displayName} (${idOrPhone}) has been BLOCKED.`);
-      }
-      saveData();
-    }
-
-    async function handleUniversalLogin(e) {
-      e.preventDefault();
-      let rawU = (document.getElementById('login-user').value || "").trim();
-      let p = (document.getElementById('login-pass').value || "").trim();
-      let u = rawU.toLowerCase().replace('@', '');
-
-      const btn = document.getElementById('btn-login-submit');
-      btn.innerText = "Verifying...";
-      btn.disabled = true;
-
-      try {
-        const snap = await db.collection("plant_data").doc("main_state").get();
-        if (snap.exists) {
-          APP_DATA = snap.data();
-          localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-        }
-      } catch (err) {
-        console.warn("Cloud sync check failed, falling back to local storage:", err);
-      } finally {
-        btn.innerText = "Sign In";
-        btn.disabled = false;
-      }
-
-      if(isUserBlocked(u)) {
-        return alert("Your account has been deactivated/blocked by Admin. Please contact Setia Waxing Plant.");
-      }
-
-      // Master Admin
-      if(u === "admin" && p === "Csetia@1122") {
-        currentUser = { name: "Master Admin", username: "admin", role: "admin" };
         launchStaffPortal();
         return;
       }
 
-      // Staff (Check by Username OR Staff Name)
-      const staff = (APP_DATA.staffUsers || []).find(s => 
-        ((s.username || "").toLowerCase().replace('@', '') === u || (s.name || "").toLowerCase() === u) && s.password === p
-      );
-      if(staff) {
-        if(isUserBlocked(staff.username)) {
-          return alert("Your staff account is blocked. Contact Master Admin.");
-        }
-        currentUser = { name: staff.name, username: staff.username, role: "staff" };
-        launchStaffPortal();
-        return;
-      }
+      // ---------------------------------------------------
+      // STAFF LOGIN
+      // ---------------------------------------------------
 
-      // Farmer (Check by phone or name)
-      const farmer = (APP_DATA.agreements || []).find(a => 
-        (a.phone || "").toString().trim() === u || (a.name || "").toLowerCase().trim() === u
-      );
-      if(farmer) {
-        const farmerPhone = (farmer.phone || "").toString().trim();
-        if(p === farmerPhone || p === u) {
-          if(isUserBlocked(farmerPhone)) {
-            return alert("Your farmer portal access is blocked. Contact Admin.");
-          }
-          currentPartySession = { role: 'farmer', name: farmer.name, phone: farmerPhone, data: farmer };
-          launchPartyPortal();
-          return;
-        }
-      }
+      const staff =
+        (APP_DATA.staffUsers || []).find((s) => {
 
-      // Customer (Check by phone or name)
-      const customer = (APP_DATA.dispatches || []).find(d => 
-        (d.phone || "").toString().trim() === u || (d.name || "").toLowerCase().trim() === u
-      );
-      if(customer) {
-        const customerPhone = (customer.phone || "").toString().trim();
-        if(p === customerPhone || p === u) {
-          if(isUserBlocked(customerPhone)) {
-            return alert("Your customer portal access is blocked. Contact Admin.");
-          }
-          currentPartySession = { role: 'customer', name: customer.name, phone: customerPhone, data: customer };
-          launchPartyPortal();
-          return;
-        }
-      }
+          const savedUsername =
+            normalizeUsername(s.username);
 
-      alert("Invalid login details.\n\n• For Admin/Staff: Enter your assigned username & password.\n• For Farmers/Customers: Enter your 10-digit registered mobile number for both username and password.");
-    }
+          const savedName =
+            String(s.name || "")
+              .trim()
+              .toLowerCase();
 
-    function launchStaffPortal() {
-      document.getElementById('login-view').classList.add('hidden');
-      document.getElementById('party-portal-view').classList.add('hidden');
-      document.getElementById('app-view').classList.remove('hidden');
-      document.getElementById('user-display').innerText = `${currentUser.name} (${currentUser.role.toUpperCase()})`;
-
-      if(currentUser.role === 'admin') {
-        document.getElementById('tab-admin-panel').classList.remove('hidden');
-        document.getElementById('btn-reset-data').classList.remove('hidden');
-      } else {
-        document.getElementById('tab-admin-panel').classList.add('hidden');
-        document.getElementById('btn-reset-data').classList.add('hidden');
-      }
-
-      renderDashboard();
-      renderStaffTable();
-      renderPartyAccountsTable();
-      renderAttendanceTable();
-    }
-
-    function launchPartyPortal() {
-      document.getElementById('login-view').classList.add('hidden');
-      document.getElementById('app-view').classList.add('hidden');
-      document.getElementById('party-portal-view').classList.remove('hidden');
-      renderPartyPortalView();
-    }
-
-    function logoutPortal() {
-      currentUser = null;
-      currentPartySession = null;
-      document.getElementById('app-view').classList.add('hidden');
-      document.getElementById('party-portal-view').classList.add('hidden');
-      document.getElementById('login-view').classList.remove('hidden');
-      document.getElementById('login-user').value = "";
-      document.getElementById('login-pass').value = "";
-    }
-
-    function renderPartyPortalView() {
-      if(!currentPartySession) return;
-      const { role, name, phone } = currentPartySession;
-
-      document.getElementById('party-portal-name').innerText = name;
-      document.getElementById('party-portal-phone').innerText = `Registered Mobile: +91 ${phone}`;
-      document.getElementById('party-header-welcome').innerText = `${role.toUpperCase()} SELF-SERVICE`;
-      document.getElementById('party-portal-type').innerText = `${role.toUpperCase()} ACCOUNT`;
-
-      const kpiGrid = document.getElementById('party-portal-kpi-grid');
-      const thead = document.getElementById('party-table-head');
-      const tbody = document.getElementById('party-table-body');
-
-      if(role === 'farmer') {
-        const orchards = (APP_DATA.agreements || []).filter(a => (a.phone || "").toString().trim() === phone);
-        const orchIds = orchards.map(o => o.id);
-        const trips = (APP_DATA.inwards || []).filter(i => orchIds.includes(i.orchardId) || (i.phone || "").toString().trim() === phone);
-        const payments = (APP_DATA.farmerPayments || []).filter(p => orchIds.includes(p.orchardId));
-
-        const totChargeable = trips.reduce((a,b) => a + b.chargeable, 0);
-        const totSent = trips.reduce((a,b) => a + b.sentCrates, 0);
-        const totRecv = trips.reduce((a,b) => a + b.recvCrates, 0);
-        const pendingCrates = totSent - totRecv;
-
-        let totalGross = 0;
-        orchards.forEach(o => {
-          if(o.type === 'lump_sum') totalGross += o.total;
-          else {
-            const orchTrips = trips.filter(t => t.orchardId === o.id);
-            totalGross += orchTrips.reduce((a,b) => a + b.totalTripAmt, 0);
-          }
+          return (
+            (
+              savedUsername === username ||
+              savedName === username
+            ) &&
+            String(s.password || "") === password
+          );
         });
 
-        const totalPaid = orchards.reduce((a,b) => a + (b.advance||0), 0) + payments.reduce((a,b) => a + b.amount, 0);
-        const balanceDue = totalGross - totalPaid;
+      if (staff) {
 
-        document.getElementById('party-portal-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
-        document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-amber-800' : 'text-emerald-700'}`;
+        currentUser = {
+          name: staff.name,
+          username: staff.username,
+          role: "staff"
+        };
 
-        kpiGrid.innerHTML = `
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Chargeable Fruit</span>
-            <span class="text-base font-black text-slate-800">${totChargeable.toFixed(1)} Kg</span>
-            <span class="text-[10px] text-gray-400 block">${trips.length} Loads</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Pending Crates</span>
-            <span class="text-base font-black text-red-600">${pendingCrates}</span>
-            <span class="text-[10px] text-gray-400 block">Sent: ${totSent} | Recv: ${totRecv}</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Total Valuation</span>
-            <span class="text-base font-black text-slate-800">₹${totalGross.toLocaleString('en-IN')}</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Total Received</span>
-            <span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span>
-          </div>
-        `;
-
-        thead.innerHTML = `
-          <tr>
-            <th class="p-2.5">Date</th>
-            <th class="p-2.5">Token</th>
-            <th class="p-2.5">Particulars</th>
-            <th class="p-2.5 text-right">Net Wt</th>
-            <th class="p-2.5 text-right">Chargeable Wt</th>
-            <th class="p-2.5 text-right">Trip Val ₹</th>
-            <th class="p-2.5 text-right">Paid Amt ₹</th>
-          </tr>
-        `;
-
-        const history = [
-          ...trips.map(t => ({ date: t.date, type: 'INWARD TRIP', token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
-          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
-        ].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        tbody.innerHTML = history.map(h => `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-2.5">${h.date}</td>
-            <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
-            <td class="p-2.5 font-medium">${h.desc}</td>
-            <td class="p-2.5 text-right">${h.net > 0 ? h.net.toFixed(1) + ' Kg' : '-'}</td>
-            <td class="p-2.5 text-right font-bold text-slate-900">${h.chg > 0 ? h.chg.toFixed(1) + ' Kg' : '-'}</td>
-            <td class="p-2.5 text-right font-semibold text-slate-800">${h.val > 0 ? '₹' + h.val.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right font-bold text-emerald-700">${h.paid > 0 ? '₹' + h.paid.toLocaleString('en-IN') : '-'}</td>
-          </tr>
-        `).join('');
-
-      } else {
-        const dispatches = (APP_DATA.dispatches || []).filter(d => (d.phone || "").toString().trim() === phone || d.name.toLowerCase() === name.toLowerCase());
-        const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.toLowerCase() === name.toLowerCase());
-
-        const totalBilled = dispatches.reduce((a,b) => a + b.grandTotal, 0);
-        const totalBoxes = dispatches.reduce((a,b) => a + b.totalBoxes, 0);
-        const totalPaid = payments.reduce((a,b) => a + b.amount, 0);
-        const balanceDue = totalBilled - totalPaid;
-
-        document.getElementById('party-portal-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
-        document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-red-700' : 'text-emerald-700'}`;
-
-        kpiGrid.innerHTML = `
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Total Billed Sales</span>
-            <span class="text-base font-black text-slate-800">₹${totalBilled.toLocaleString('en-IN')}</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Boxes Purchased</span>
-            <span class="text-base font-black text-amber-700">${totalBoxes} Boxes</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Total Paid in Bank</span>
-            <span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Pending Balance</span>
-            <span class="text-base font-black text-red-600">₹${balanceDue.toLocaleString('en-IN')}</span>
-          </div>
-        `;
-
-        thead.innerHTML = `
-          <tr>
-            <th class="p-2.5">Date</th>
-            <th class="p-2.5">Token</th>
-            <th class="p-2.5">Dispatch / Details</th>
-            <th class="p-2.5 text-center">Boxes</th>
-            <th class="p-2.5 text-right">Debit (Billed ₹)</th>
-            <th class="p-2.5 text-right">Credit (Paid ₹)</th>
-          </tr>
-        `;
-
-        const history = [
-          ...dispatches.map(d => ({ date: d.date, type: 'DISPATCH', token: d.tokenNo, desc: `Dispatch (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
-          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
-        ].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        tbody.innerHTML = history.map(h => `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-2.5">${h.date}</td>
-            <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
-            <td class="p-2.5 font-medium">${h.desc}</td>
-            <td class="p-2.5 text-center font-bold">${h.boxes}</td>
-            <td class="p-2.5 text-right font-bold text-slate-900">${h.debit > 0 ? '₹' + h.debit.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right font-bold text-emerald-700">${h.credit > 0 ? '₹' + h.credit.toLocaleString('en-IN') : '-'}</td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    function renderStaffTable() {
-      const tbody = document.getElementById('staff-table-body');
-      if(!tbody) return;
-      if((APP_DATA.staffUsers || []).length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No staff accounts created yet.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = APP_DATA.staffUsers.map(s => {
-        const blocked = isUserBlocked(s.username);
-        return `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-2.5 font-bold text-slate-800">${s.name}</td>
-            <td class="p-2.5 font-mono text-amber-900">@${s.username}</td>
-            <td class="p-2.5 font-mono text-gray-500">${s.password}</td>
-            <td class="p-2.5">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">
-                ${blocked ? 'Blocked' : 'Active'}
-              </span>
-            </td>
-            <td class="p-2.5 text-right space-x-2">
-              <button onclick="toggleUserBlockStatus('${s.username}', '${s.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">
-                ${blocked ? '✅ Unblock' : '🚫 Block'}
-              </button>
-              <button onclick="deleteStaffUser('${s.id}')" class="text-red-600 font-bold text-[11px] hover:underline">Delete</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderPartyAccountsTable() {
-      const tbody = document.getElementById('party-accounts-table-body');
-      if(!tbody) return;
-
-      const partyRows = [];
-
-      (APP_DATA.agreements || []).forEach(a => {
-        partyRows.push({ type: 'Farmer', name: a.name, phone: (a.phone || "").toString().trim() });
-      });
-
-      const custMap = new Map();
-      (APP_DATA.dispatches || []).forEach(d => {
-        const ph = (d.phone || "").toString().trim();
-        if(!custMap.has(ph)) {
-          custMap.set(ph, { type: 'Customer', name: d.name, phone: ph });
-        }
-      });
-      custMap.forEach(v => partyRows.push(v));
-
-      if(partyRows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No parties registered yet. Create a deal or dispatch slip to auto-generate party logins.</td></tr>`;
+        launchStaffPortal();
         return;
       }
 
-      tbody.innerHTML = partyRows.map(p => {
-        const blocked = isUserBlocked(p.phone);
-        return `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.type === 'Farmer' ? 'bg-emerald-100 text-emerald-900' : 'bg-blue-100 text-blue-900'}">${p.type}</span></td>
-            <td class="p-2.5 font-bold text-slate-800">${p.name}</td>
-            <td class="p-2.5 font-mono font-bold text-amber-900">${p.phone}</td>
-            <td class="p-2.5">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">
-                ${blocked ? 'Blocked' : 'Active'}
-              </span>
-            </td>
-            <td class="p-2.5 text-right">
-              <button onclick="toggleUserBlockStatus('${p.phone}', '${p.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">
-                ${blocked ? '✅ Unblock Access' : '🚫 Block Access'}
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
+      // ---------------------------------------------------
+      // FARMER LOGIN
+      // Username = Mobile
+      // Password = Mobile
+      // ---------------------------------------------------
 
-    function triggerDirectPrint() {
-      const slipContent = document.getElementById('printable-slip').innerHTML;
-      if (!slipContent) return alert("No slip content to print");
+      const farmer =
+        (APP_DATA.agreements || []).find((a) => {
 
-      const printWin = window.open('', '_blank', 'width=800,height=900');
-      if (!printWin) {
-        return alert("Please allow popups in Safari to print.");
-      }
+          return normalizePhone(a.phone) === phone;
+        });
 
-      printWin.document.open();
-      printWin.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Setia Waxing Plant - Slip Print</title>
-            <script src="https://cdn.tailwindcss.com"><\/script>
-            <style>
-              @page { size: auto; margin: 10mm; }
-              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; color: #000; padding: 10px; }
-            </style>
-          </head>
-          <body>
-            ${slipContent}
-            <script>
-              window.onload = function() {
-                setTimeout(function() {
-                  window.focus();
-                  window.print();
-                }, 350);
-              };
-            <\/script>
-          </body>
-        </html>
-      `);
-      printWin.document.close();
-    }
+      if (
+        farmer &&
+        phone.length === 10 &&
+        normalizePhone(password) === phone
+      ) {
 
-    function addCustomSizeRow() {
-      customSizeIndex++;
-      const container = document.getElementById('custom-sizes-container');
-      const div = document.createElement('div');
-      div.className = "border border-amber-300 rounded-lg p-2 bg-amber-50 flex flex-col gap-1 relative";
-      div.id = `custom-size-box-${customSizeIndex}`;
-      div.innerHTML = `
-        <div class="flex justify-between items-center">
-          <input type="text" id="cust-size-name-${customSizeIndex}" placeholder="Size (e.g. 120 / Small)" class="w-3/4 border rounded p-1 text-xs font-bold" />
-          <button type="button" onclick="document.getElementById('custom-size-box-${customSizeIndex}').remove()" class="text-red-500 font-bold text-xs px-1">✕</button>
-        </div>
-        <div class="flex gap-1">
-          <input type="number" id="cust-size-qty-${customSizeIndex}" placeholder="Boxes" class="w-1/2 border rounded p-1 text-xs" />
-          <input type="number" id="cust-size-rate-${customSizeIndex}" placeholder="Rate ₹" class="w-1/2 border rounded p-1 text-xs" />
-        </div>
-      `;
-      container.appendChild(div);
-    }
+        currentPartySession = {
+          role: "farmer",
+          name: farmer.name,
+          phone: phone
+        };
 
-    function registerQuickStaff(e) {
-      e.preventDefault();
-      const name = document.getElementById('reg-staff-name').value.trim();
-      const role = document.getElementById('reg-staff-role').value.trim() || 'Staff';
-
-      if((APP_DATA.staffDirectory || []).some(s => s.name.toLowerCase() === name.toLowerCase())) {
-        return alert("Staff member already registered!");
-      }
-
-      if(!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
-      APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role });
-      saveData();
-      alert(`Staff member ${name} added to directory!`);
-      e.target.reset();
-    }
-
-    function populateDropdowns() {
-      const inwardSelect = document.getElementById('inward-orchard-select');
-      const orchLedgerSelect = document.getElementById('orchard-ledger-select');
-      const payFarmerSelect = document.getElementById('pay-farmer-select');
-      const staffDatalist = document.getElementById('staff-datalist');
-
-      inwardSelect.innerHTML = `<option value="">-- Choose saved orchard to auto-fill details --</option>`;
-      orchLedgerSelect.innerHTML = `<option value="">-- Choose an Orchard to view --</option>`;
-      payFarmerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
-      staffDatalist.innerHTML = "";
-
-      (APP_DATA.agreements || []).forEach((orch) => {
-        const opt = `<option value="${orch.id}">${orch.name} (${orch.village})</option>`;
-        inwardSelect.innerHTML += opt;
-        orchLedgerSelect.innerHTML += opt;
-        payFarmerSelect.innerHTML += opt;
-      });
-
-      const allStaffNames = new Set([
-        ...(APP_DATA.staffUsers || []).map(u => u.name),
-        ...(APP_DATA.staffDirectory || []).map(d => d.name)
-      ]);
-
-      allStaffNames.forEach(name => {
-        staffDatalist.innerHTML += `<option value="${name}"></option>`;
-      });
-
-      const uniqueCusts = [...new Set((APP_DATA.dispatches || []).map(d => d.name.trim()))];
-      const payCustSelect = document.getElementById('pay-cust-select');
-      const viewCustSelect = document.getElementById('view-cust-select');
-
-      payCustSelect.innerHTML = `<option value="">-- Choose Customer --</option>`;
-      viewCustSelect.innerHTML = `<option value="">-- Select Customer to View --</option>`;
-
-      uniqueCusts.forEach(c => {
-        const opt = `<option value="${c}">${c}</option>`;
-        payCustSelect.innerHTML += opt;
-        viewCustSelect.innerHTML += opt;
-      });
-    }
-
-    function switchTab(tab) {
-      ['dashboard', 'customer-ledger', 'orchards', 'farmer', 'daily', 'customer', 'attendance', 'admin-panel'].forEach(t => {
-        const sec = document.getElementById(`${t}-section`);
-        const btn = document.getElementById(`tab-${t}`);
-        if(sec) sec.classList.add('hidden');
-        if(btn) btn.className = btn.id === 'tab-admin-panel' ? 'py-2.5 text-amber-900 bg-amber-200 col-span-3 md:col-span-7 font-black' : 'py-2.5 text-gray-500 hover:text-amber-700 font-bold';
-      });
-
-      const activeSec = document.getElementById(`${tab}-section`);
-      const activeBtn = document.getElementById(`tab-${tab}`);
-      if(activeSec) activeSec.classList.remove('hidden');
-      if(activeBtn) activeBtn.className = activeBtn.id === 'tab-admin-panel' ? 'py-2.5 bg-amber-300 text-black border-b-2 border-slate-900 col-span-3 md:col-span-7 font-black' : 'py-2.5 border-b-2 border-amber-600 text-amber-700 font-black';
-
-      if(tab === 'dashboard') renderDashboard();
-      if(tab === 'customer-ledger') renderCustomerLedger();
-      if(tab === 'orchards') renderSingleOrchardSummary();
-      if(tab === 'attendance') renderAttendanceTable();
-      if(tab === 'admin-panel') {
-        renderStaffTable();
-        renderPartyAccountsTable();
-      }
-    }
-
-    function createStaffAccount(e) {
-      e.preventDefault();
-      if(currentUser?.role !== 'admin') return alert("Only Admin can add staff");
-
-      const name = document.getElementById('staff-name').value.trim();
-      const username = document.getElementById('staff-user').value.trim().toLowerCase().replace('@', '');
-      const password = document.getElementById('staff-pass').value.trim();
-
-      if((APP_DATA.staffUsers || []).some(u => u.username === username) || username === 'admin') {
-        return alert("Username already taken. Pick another.");
-      }
-
-      if(!APP_DATA.staffUsers) APP_DATA.staffUsers = [];
-      APP_DATA.staffUsers.push({ id: 'staff_' + Date.now(), name, username, password, role: 'staff' });
-      saveData();
-      alert(`Staff account for ${name} (@${username}) created successfully!`);
-      e.target.reset();
-    }
-
-    function deleteStaffUser(id) {
-      if(confirm("Delete this staff account?")) {
-        APP_DATA.staffUsers = APP_DATA.staffUsers.filter(u => u.id !== id);
-        saveData();
-      }
-    }
-
-    function recordStaffAttendance(e) {
-      e.preventDefault();
-      const staffName = document.getElementById('att-staff-input').value.trim();
-      const status = document.getElementById('att-staff-status').value;
-      const wage = Number(document.getElementById('att-staff-wage').value || 0);
-      const date = document.getElementById('att-staff-date').value;
-
-      if(!APP_DATA.staffAttendance) APP_DATA.staffAttendance = [];
-      APP_DATA.staffAttendance.push({ id: 'att_' + Date.now(), type: 'Single Staff', name: staffName, status, wage, date });
-      saveData();
-      alert(`Recorded attendance for ${staffName}: ${status}`);
-      e.target.reset();
-      document.getElementById('att-staff-date').value = new Date().toISOString().split('T')[0];
-    }
-
-    function calculateGroupWage() {
-      const count = Number(document.getElementById('att-group-count').value || 0);
-      const rate = Number(document.getElementById('att-group-rate').value || 0);
-      const total = count * rate;
-      document.getElementById('disp-group-total').innerText = `₹${total.toLocaleString('en-IN')}`;
-    }
-
-    function recordContractorLabour(e) {
-      e.preventDefault();
-      const head = document.getElementById('att-group-head').value;
-      const count = Number(document.getElementById('att-group-count').value || 0);
-      const rate = Number(document.getElementById('att-group-rate').value || 0);
-      const orchard = document.getElementById('att-group-orchard').value || "Plant / Orchard";
-      const date = document.getElementById('att-group-date').value;
-      const totalPayable = count * rate;
-
-      if(!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
-      APP_DATA.groupLabourAttendance.push({ id: 'grp_' + Date.now(), type: 'Orchard Contractor Group', head, count, rate, orchard, date, totalPayable });
-      saveData();
-      alert(`Recorded ${count} persons under ${head}. Total: ₹${totalPayable.toLocaleString('en-IN')}`);
-      e.target.reset();
-      document.getElementById('att-group-date').value = new Date().toISOString().split('T')[0];
-      calculateGroupWage();
-    }
-
-    function openEditAttendanceModal(id, cat) {
-      const modal = document.getElementById('edit-attendance-modal');
-      document.getElementById('edit-att-id').value = id;
-      document.getElementById('edit-att-type').value = cat;
-
-      if(cat === 'Single Staff') {
-        const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
-        if(!item) return;
-        document.getElementById('edit-modal-title').innerText = `Edit Staff: ${item.name}`;
-        document.getElementById('edit-att-date').value = item.date;
-        document.getElementById('edit-att-name').value = item.name;
-        document.getElementById('edit-att-status').value = item.status;
-        document.getElementById('edit-att-wage').value = item.wage || 0;
-
-        document.getElementById('edit-staff-fields').classList.remove('hidden');
-        document.getElementById('edit-group-fields').classList.add('hidden');
-      } else {
-        const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
-        if(!item) return;
-        document.getElementById('edit-modal-title').innerText = `Edit Group: ${item.head}`;
-        document.getElementById('edit-att-date').value = item.date;
-        document.getElementById('edit-att-head').value = item.head;
-        document.getElementById('edit-att-count').value = item.count;
-        document.getElementById('edit-att-rate').value = item.rate;
-        document.getElementById('edit-att-orchard').value = item.orchard || '';
-
-        document.getElementById('edit-staff-fields').classList.add('hidden');
-        document.getElementById('edit-group-fields').classList.remove('hidden');
-      }
-
-      modal.classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-      document.getElementById('edit-attendance-modal').classList.add('hidden');
-    }
-
-    function saveEditedAttendance(e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-att-id').value;
-      const cat = document.getElementById('edit-att-type').value;
-      const date = document.getElementById('edit-att-date').value;
-
-      if(cat === 'Single Staff') {
-        const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
-        if(item) {
-          item.date = date;
-          item.name = document.getElementById('edit-att-name').value;
-          item.status = document.getElementById('edit-att-status').value;
-          item.wage = Number(document.getElementById('edit-att-wage').value || 0);
-        }
-      } else {
-        const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
-        if(item) {
-          item.date = date;
-          item.head = document.getElementById('edit-att-head').value;
-          item.count = Number(document.getElementById('edit-att-count').value || 0);
-          item.rate = Number(document.getElementById('edit-att-rate').value || 0);
-          item.orchard = document.getElementById('edit-att-orchard').value;
-          item.totalPayable = item.count * item.rate;
-        }
-      }
-
-      saveData();
-      closeEditModal();
-      alert("Attendance updated successfully!");
-    }
-
-    function deleteAttendance(id, cat) {
-      if(confirm("Delete this attendance record?")) {
-        if(cat === 'Single Staff') {
-          APP_DATA.staffAttendance = APP_DATA.staffAttendance.filter(x => x.id !== id);
-        } else {
-          APP_DATA.groupLabourAttendance = APP_DATA.groupLabourAttendance.filter(x => x.id !== id);
-        }
-        saveData();
-      }
-    }
-
-    function renderAttendanceTable() {
-      const tbody = document.getElementById('attendance-table-body');
-      if(!tbody) return;
-
-      const combined = [
-        ...(APP_DATA.staffAttendance || []).map(s => ({ id: s.id, date: s.date, cat: 'Single Staff', title: s.name, countOrStatus: s.status, detail: s.wage ? `₹${s.wage}/day` : '-', total: s.wage || 0 })),
-        ...(APP_DATA.groupLabourAttendance || []).map(g => ({ id: g.id, date: g.date, cat: 'Contractor Group', title: `${g.head} (${g.orchard})`, countOrStatus: `${g.count} Persons`, detail: `@₹${g.rate}/head`, total: g.totalPayable }))
-      ].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-      if(combined.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-gray-400">No attendance entries recorded yet.</td></tr>`;
+        launchPartyPortal();
         return;
       }
 
-      tbody.innerHTML = combined.map(r => `
-        <tr class="border-b hover:bg-gray-50">
-          <td class="p-2.5 font-medium">${r.date}</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.cat.includes('Contractor') ? 'bg-amber-100 text-amber-900' : 'bg-blue-100 text-blue-900'}">${r.cat}</span></td>
-          <td class="p-2.5 font-bold text-slate-800">${r.title}</td>
-          <td class="p-2.5 text-center font-bold text-emerald-800">${r.countOrStatus}</td>
-          <td class="p-2.5 text-gray-600">${r.detail}</td>
-          <td class="p-2.5 text-right font-bold text-slate-900">₹${r.total.toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right space-x-2">
-            <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">✏️ Edit</button>
-            <button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+      // ---------------------------------------------------
+      // CUSTOMER LOGIN
+      // Username = Mobile
+      // Password = Mobile
+      // ---------------------------------------------------
+
+      const customer =
+        (APP_DATA.dispatches || []).find((d) => {
+
+          return normalizePhone(d.phone) === phone;
+        });
+
+      if (
+        customer &&
+        phone.length === 10 &&
+        normalizePhone(password) === phone
+      ) {
+
+        currentPartySession = {
+          role: "customer",
+          name: customer.name,
+          phone: phone
+        };
+
+        launchPartyPortal();
+        return;
+      }
+
+      // ---------------------------------------------------
+      // INVALID
+      // ---------------------------------------------------
+
+      alert(
+        "❌ Invalid login details.\n\n" +
+        "If this account was created on another phone, " +
+        "make sure the account has been synced to Firebase."
+      );
+
+    } catch (error) {
+
+      console.error("LOGIN ERROR:", error);
+
+      alert(
+        "❌ Login error:\n\n" +
+        error.message
+      );
+
+    } finally {
+
+      btn.innerText = "Sign In";
+      btn.disabled = false;
+    }
+  }
+
+  // ---------------------------------------------------------
+  // STAFF ACCOUNT
+  // ---------------------------------------------------------
+
+  async function createStaffAccount(e) {
+
+    e.preventDefault();
+
+    const name =
+      document.getElementById("staff-name").value.trim();
+
+    const username =
+      normalizeUsername(
+        document.getElementById("staff-user").value
+      );
+
+    const password =
+      document.getElementById("staff-pass").value.trim();
+
+    if (!APP_DATA.staffUsers) {
+      APP_DATA.staffUsers = [];
+    }
+
+    if (
+      APP_DATA.staffUsers.some(
+        s => normalizeUsername(s.username) === username
+      )
+    ) {
+
+      alert("❌ Staff username already exists!");
+      return;
+    }
+
+    APP_DATA.staffUsers.push({
+      id: "staff_" + Date.now(),
+      name: name,
+      username: username,
+      password: password,
+      createdAt: new Date().toISOString()
+    });
+
+    const success = await saveData();
+
+    if (success) {
+
+      alert(
+        `✅ Staff account @${username} created successfully!\n\n` +
+        "This account is now stored in Firebase and can be used on another phone."
+      );
+
+      e.target.reset();
+    }
+  }
+
+  // ---------------------------------------------------------
+  // CUSTOMER
+  // ---------------------------------------------------------
+
+  async function generateCustomerSlip(e) {
+
+    e.preventDefault();
+
+    const name =
+      document.getElementById("c-name").value.trim();
+
+    const phone =
+      normalizePhone(
+        document.getElementById("c-phone").value
+      );
+
+    const vehicle =
+      document.getElementById("c-vehicle").value.trim();
+
+    const boxes =
+      Number(
+        document.getElementById("c-boxes").value || 0
+      );
+
+    const totalAmt =
+      Number(
+        document.getElementById("c-total-amt").value || 0
+      );
+
+    if (phone.length !== 10) {
+
+      alert("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    if (!APP_DATA.dispatches) {
+      APP_DATA.dispatches = [];
+    }
+
+    APP_DATA.dispatches.push({
+
+      id: "disp_" + Date.now(),
+
+      name,
+      phone,
+      vehicle,
+      boxes,
+      totalAmt,
+
+      date: todayDate(),
+
+      createdAt: new Date().toISOString()
+    });
+
+    const success = await saveData();
+
+    if (success) {
+
+      alert(
+        `✅ Customer ${name} registered successfully!\n\n` +
+        `Login ID: ${phone}\n` +
+        `Password: ${phone}`
+      );
+
+      e.target.reset();
+    }
+  }
+
+  // ---------------------------------------------------------
+  // FARMER
+  // ---------------------------------------------------------
+
+  async function generateFarmerSlip(e) {
+
+    e.preventDefault();
+
+    const name =
+      document.getElementById("f-name").value.trim();
+
+    const phone =
+      normalizePhone(
+        document.getElementById("f-phone").value
+      );
+
+    const village =
+      document.getElementById("f-village").value.trim();
+
+    if (phone.length !== 10) {
+
+      alert("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    if (!APP_DATA.agreements) {
+      APP_DATA.agreements = [];
+    }
+
+    APP_DATA.agreements.push({
+
+      id: "orch_" + Date.now(),
+
+      name,
+      phone,
+      village,
+
+      date: todayDate(),
+
+      createdAt: new Date().toISOString()
+    });
+
+    const success = await saveData();
+
+    if (success) {
+
+      alert(
+        `✅ Farmer ${name} registered successfully!\n\n` +
+        `Login ID: ${phone}\n` +
+        `Password: ${phone}`
+      );
+
+      e.target.reset();
+    }
+  }
+
+  // ---------------------------------------------------------
+  // INWARD
+  // ---------------------------------------------------------
+
+  async function generateDailyInwardSlip(e) {
+
+    e.preventDefault();
+
+    const name =
+      document.getElementById("d-farmer").value.trim();
+
+    const phone =
+      normalizePhone(
+        document.getElementById("d-phone").value
+      );
+
+    const vehicle =
+      document.getElementById("d-vehicle").value.trim();
+
+    const gross =
+      Number(
+        document.getElementById("d-gross-wt").value || 0
+      );
+
+    const tare =
+      Number(
+        document.getElementById("d-tare-wt").value || 0
+      );
+
+    const net =
+      Math.max(0, gross - tare);
+
+    if (!APP_DATA.inwards) {
+      APP_DATA.inwards = [];
+    }
+
+    APP_DATA.inwards.push({
+
+      id: "inw_" + Date.now(),
+
+      name,
+      phone,
+      vehicle,
+      gross,
+      tare,
+      net,
+
+      date: todayDate(),
+
+      createdAt: new Date().toISOString()
+    });
+
+    const success = await saveData();
+
+    if (success) {
+
+      alert(
+        "✅ Inward slip saved and synced to Firebase!"
+      );
+
+      e.target.reset();
+    }
+  }
+
+  // ---------------------------------------------------------
+  // STAFF TABLE
+  // ---------------------------------------------------------
+
+  function renderStaffTable() {
+
+    const tbody =
+      document.getElementById("staff-table-body");
+
+    if (!tbody) return;
+
+    if (
+      !APP_DATA.staffUsers ||
+      APP_DATA.staffUsers.length === 0
+    ) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4"
+              class="p-3 text-center text-gray-400">
+            No staff accounts created yet.
           </td>
         </tr>
-      `).join('');
-    }
-
-    function autoFillOrchardDetails() {
-      const selId = document.getElementById('inward-orchard-select').value;
-      if (!selId) {
-        document.getElementById('d-orchard-id').value = "";
-        document.getElementById('d-farmer').value = "";
-        document.getElementById('d-phone').value = "";
-        document.getElementById('d-rate').value = "";
-        document.getElementById('d-village').value = "";
-        return;
-      }
-      const orch = (APP_DATA.agreements || []).find(a => a.id === selId);
-      if (orch) {
-        document.getElementById('d-orchard-id').value = orch.id;
-        document.getElementById('d-farmer').value = orch.name;
-        document.getElementById('d-phone').value = (orch.phone || "").toString().trim();
-        document.getElementById('d-rate').value = orch.rate || 0;
-        document.getElementById('d-village').value = orch.village || "";
-        calculateDailyWeight();
-      }
-    }
-
-    function resetToToday() {
-      const todayStr = new Date().toISOString().split('T')[0];
-      document.getElementById('dash-date-filter').value = todayStr;
-      renderDashboard();
-    }
-
-    function togglePurchaseType() {
-      const isPerKg = document.querySelector('input[name="p-type"]:checked').value === 'per_kg';
-      document.getElementById('per-kg-fields').classList.toggle('hidden', !isPerKg);
-      document.getElementById('lump-sum-fields').classList.toggle('hidden', isPerKg);
-    }
-
-    function calculateDailyWeight() {
-      const gross = Number(document.getElementById('d-gross-wt').value || 0);
-      const tare = Number(document.getElementById('d-tare-wt').value || 0);
-      const net = Math.max(0, gross - tare);
-      const deduction = net > 0 ? (net / 100) * 1 : 0;
-      const finalWt = net - deduction;
-
-      document.getElementById('disp-net-wt').innerText = net.toFixed(1);
-      document.getElementById('disp-cut-wt').innerText = deduction.toFixed(1);
-      document.getElementById('disp-final-wt').innerText = finalWt.toFixed(1);
-    }
-
-    function recordCustomerPayment(e) {
-      e.preventDefault();
-      const customer = document.getElementById('pay-cust-select').value;
-      const amount = Number(document.getElementById('pay-cust-amount').value || 0);
-      const bank = document.getElementById('pay-cust-bank').value;
-      const ref = document.getElementById('pay-cust-ref').value || "Direct";
-      const dateStr = new Date().toISOString().split('T')[0];
-
-      if(!APP_DATA.customerPayments) APP_DATA.customerPayments = [];
-      APP_DATA.customerPayments.push({ id: 'cpay_' + Date.now(), date: dateStr, customer, amount, bank, ref });
-      saveData();
-      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment from ${customer}`);
-      e.target.reset();
-      renderCustomerLedger();
-    }
-
-    function recordFarmerPayment(e) {
-      e.preventDefault();
-      const orchardId = document.getElementById('pay-farmer-select').value;
-      const amount = Number(document.getElementById('pay-farmer-amount').value || 0);
-      const bank = document.getElementById('pay-farmer-bank').value;
-      const ref = document.getElementById('pay-farmer-ref').value || "Installment";
-      const dateStr = new Date().toISOString().split('T')[0];
-
-      const orch = (APP_DATA.agreements || []).find(a => a.id === orchardId);
-      if(!APP_DATA.farmerPayments) APP_DATA.farmerPayments = [];
-      APP_DATA.farmerPayments.push({ id: 'fpay_' + Date.now(), date: dateStr, orchardId, farmerName: orch ? orch.name : "Farmer", amount, bank, ref });
-      saveData();
-      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment to ${orch ? orch.name : 'Farmer'}`);
-      e.target.reset();
-      renderSingleOrchardSummary();
-    }
-
-    function generateFarmerSlip(e) {
-      e.preventDefault();
-      const name = document.getElementById('f-name').value.trim();
-      const phone = (document.getElementById('f-phone').value || "").toString().trim();
-      const village = document.getElementById('f-village').value.trim();
-      const supervisor = document.getElementById('f-supervisor').value || "Satish Reddy";
-      const advBank = document.getElementById('f-adv-bank').value || "Cash/Bank";
-      const type = document.querySelector('input[name="p-type"]:checked').value;
-      const dateStr = new Date().toISOString().split('T')[0];
-      
-      const tokenNo = generatePartyToken('farmer', name, village);
-      const orchId = 'orch_' + Date.now();
-
-      let dealData = { id: orchId, tokenNo, type, name, phone, village, supervisor, advBank, date: dateStr };
-      let dealHTML = "";
-      let waDeal = "";
-
-      if(type === 'lump_sum') {
-        const total = Number(document.getElementById('f-lumpsum').value || 0);
-        const adv = Number(document.getElementById('f-advance').value || 0);
-        dealData.total = total;
-        dealData.advance = adv;
-        dealHTML = `
-          <div class="flex justify-between py-1"><span>Deal:</span><b>Full Orchard (ਮੁੱਕਤਾ ਬਾਗ਼)</b></div>
-          <div class="flex justify-between py-1"><span>Agreed Value:</span><span>₹${total.toLocaleString('en-IN')}</span></div>
-          <div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance Paid:</span><span>₹${adv.toLocaleString('en-IN')} (${advBank})</span></div>
-          <div class="flex justify-between py-1 text-red-700 font-bold border-t"><span>Balance Due:</span><span>₹${(total - adv).toLocaleString('en-IN')}</span></div>
-        `;
-        waDeal = `Deal: *Full Orchard*%0AAmount: Rs. ${total.toLocaleString('en-IN')}%0AAdvance: Rs. ${adv.toLocaleString('en-IN')}`;
-      } else {
-        const rate = Number(document.getElementById('f-rate').value || 0);
-        const adv = Number(document.getElementById('f-kg-advance').value || 0);
-        dealData.rate = rate;
-        dealData.advance = adv;
-        dealHTML = `
-          <div class="flex justify-between py-1"><span>Deal:</span><b>Per Kg Basis (ਪ੍ਰਤੀ ਕਿੱਲੋ)</b></div>
-          <div class="flex justify-between py-1"><span>Agreed Rate:</span><b>₹${rate} / Kg</b></div>
-          <div class="flex justify-between py-1 text-amber-800 font-semibold"><span>Mandi Deduction:</span><span>1 Kg per Quintal (100 Kg)</span></div>
-          <div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance Paid:</span><span>₹${adv.toLocaleString('en-IN')} (${advBank})</span></div>
-        `;
-        waDeal = `Deal: *Per Kg*%0ARate: Rs. ${rate}/Kg (1kg/Qtl cut)%0AAdvance: Rs. ${adv.toLocaleString('en-IN')}`;
-      }
-
-      if(!APP_DATA.agreements) APP_DATA.agreements = [];
-      APP_DATA.agreements.push(dealData);
-      saveData();
-
-      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
-      const slipHTML = `
-        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
-          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
-            <div class="w-16">${logoSvg}</div>
-            <div class="text-center flex-1">
-              <h1 class="text-xl font-black uppercase tracking-wider text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700 tracking-widest">Orchard Purchase Agreement (ਖ਼ਰੀਦ ਇਕਰਾਰਨਾਮਾ)</p>
-            </div>
-            <div class="text-right text-[11px] font-bold">
-              <div>Date: ${new Date().toLocaleDateString('en-IN')}</div>
-              <div>Customer Code: <b class="text-amber-700">(SETIA)</b></div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 border border-black mb-2 text-center">
-            <div class="p-1.5 border-r border-black font-bold">
-              <span class="text-[10px] block text-gray-600">Token No.</span>
-              <span class="text-base font-black text-amber-900">${tokenNo}</span>
-            </div>
-            <div class="p-1.5 font-bold">
-              <span class="text-[10px] block text-gray-600">Farmer Name</span>
-              <span class="text-sm font-black">${name} (${village})</span>
-            </div>
-          </div>
-          <div class="border border-black p-2.5 bg-gray-50 mb-3 space-y-1">${dealHTML}</div>
-          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">
-            🔐 <b>Farmer Online Portal Access:</b><br/>
-            Username: <b>${phone}</b> | Password: <b>${phone}</b>
-          </div>
-          <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-2 text-center">
-            <div>
-              <div class="font-bold text-xs mb-4">Farmer Signature</div>
-              <div class="border-b border-black w-3/4 mx-auto"></div>
-              <p class="text-[10px] text-gray-500 mt-1">${name}</p>
-            </div>
-            <div>
-              <div class="font-bold text-xs mb-4">Supervisor Signature</div>
-              <div class="border-b border-black w-3/4 mx-auto"></div>
-              <p class="text-[10px] text-gray-700 font-bold mt-1">${supervisor}</p>
-            </div>
-          </div>
-        </div>
       `;
 
-      showSlip(slipHTML, phone, `*SETIA ORCHARD AGREEMENT*%0AToken: ${tokenNo}%0AFarmer: ${name} (${village})%0A${waDeal}%0A%0A*Online Ledger Login:*%0AUser: ${phone} | Pass: ${phone}`);
-      e.target.reset();
+      return;
     }
 
-    function generateDailyInwardSlip(e) {
-      e.preventDefault();
-      const orchId = document.getElementById('d-orchard-id').value;
-      const name = document.getElementById('d-farmer').value.trim();
-      const phone = (document.getElementById('d-phone').value || "").toString().trim();
-      const vehicle = document.getElementById('d-vehicle').value.trim();
-      const village = document.getElementById('d-village').value.trim();
-      const loader = document.getElementById('d-loader').value || "Mandi Incharge";
-      const gross = Number(document.getElementById('d-gross-wt').value || 0);
-      const tare = Number(document.getElementById('d-tare-wt').value || 0);
-      const rate = Number(document.getElementById('d-rate').value || 0);
-      const sentCrates = Number(document.getElementById('d-crates-sent').value || 0);
-      const recvCrates = Number(document.getElementById('d-crates-recv').value || 0);
-      const dateStr = new Date().toISOString().split('T')[0];
+    tbody.innerHTML =
+      APP_DATA.staffUsers.map(s => `
 
-      const tokenNo = generatePartyToken('farmer', name, village);
-
-      const net = Math.max(0, gross - tare);
-      const cut = (net / 100) * 1;
-      const chargeable = net - cut;
-      const totalTripAmt = rate > 0 ? (chargeable * rate) : 0;
-
-      if(!APP_DATA.inwards) APP_DATA.inwards = [];
-      APP_DATA.inwards.push({ id: 'inw_' + Date.now(), orchardId: orchId, date: dateStr, tokenNo, name, phone, vehicle, loader, gross, tare, net, cut, chargeable, rate, totalTripAmt, sentCrates, recvCrates });
-      saveData();
-
-      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
-      const slipHTML = `
-        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
-          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
-            <div class="w-16">${logoSvg}</div>
-            <div class="text-center flex-1">
-              <h1 class="text-xl font-black uppercase tracking-wider text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700 tracking-widest">Inward & Harvesting Slip (ਆਮਦ ਪਰਚੀ)</p>
-            </div>
-            <div class="text-right text-[11px] font-bold">
-              <div>Date: ${new Date().toLocaleDateString('en-IN')}</div>
-              <div>Customer Code: <b class="text-amber-700">(SETIA)</b></div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 border border-black mb-2 text-center">
-            <div class="p-1 border-r border-black font-bold"><span class="text-[10px] block text-gray-600">Token No.</span><span class="text-base font-black text-amber-900">${tokenNo}</span></div>
-            <div class="p-1 font-bold"><span class="text-[10px] block text-gray-600">Farmer / Orchard</span><span class="text-sm font-black">${name}</span></div>
-          </div>
-          <table class="w-full border border-black text-center mb-2">
-            <tr class="bg-gray-100 border-b border-black font-bold">
-              <td class="p-1 border-r border-black">Vehicle</td><td class="p-1 border-r border-black">Gross</td><td class="p-1 border-r border-black">Tare</td><td class="p-1 border-r border-black">Net Wt</td><td class="p-1 border-r border-black text-red-600">1kg/Qtl Cut</td><td class="p-1 font-black">Chargeable Wt</td>
-            </tr>
-            <tr class="font-bold text-sm">
-              <td class="p-1.5 border-r border-black">${vehicle}</td><td class="p-1.5 border-r border-black">${gross} Kg</td><td class="p-1.5 border-r border-black">${tare} Kg</td><td class="p-1.5 border-r border-black">${net.toFixed(1)} Kg</td><td class="p-1.5 border-r border-black text-red-600">-${cut.toFixed(1)} Kg</td><td class="p-1.5 bg-amber-50 font-black">${chargeable.toFixed(1)} Kg</td>
-            </tr>
-          </table>
-          <div class="flex justify-between border border-black p-2 bg-gray-50 text-xs font-bold mb-3">
-            <span>Crates: Sent ${sentCrates} | Recv ${recvCrates}</span>
-            <span>Trip Total (@₹${rate}/Kg): <b class="text-sm text-amber-800">₹${totalTripAmt.toLocaleString('en-IN')}</b></span>
-          </div>
-          <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-2 text-center">
-            <div><div class="font-bold text-xs mb-3">Loader Sign</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-600 mt-1">${loader}</p></div>
-            <div><div class="font-bold text-xs mb-3">Supervisor Signature</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-700 font-bold mt-1">SETIA PLANT</p></div>
-          </div>
-        </div>
-      `;
-
-      showSlip(slipHTML, phone, `*SETIA HARVEST SLIP*%0AToken: ${tokenNo}%0AFarmer: ${name}%0AVehicle: ${vehicle}%0ANet: ${net.toFixed(1)} Kg | Chargeable: *${chargeable.toFixed(1)} Kg*${rate > 0 ? `%0AAmount: Rs. ${totalTripAmt}` : ''}`);
-      e.target.reset();
-      document.getElementById('inward-orchard-select').value = "";
-      calculateDailyWeight();
-    }
-
-    function generateCustomerSlip(e) {
-      e.preventDefault();
-      const name = document.getElementById('c-name').value.trim();
-      const phone = (document.getElementById('c-phone').value || "").toString().trim();
-      const vehicle = document.getElementById('c-vehicle').value.trim();
-      const lotNo = document.getElementById('c-lot-no').value || "E879";
-      const supervisor = document.getElementById('c-supervisor').value || "Satish Reddy";
-      const loader = document.getElementById('c-loader').value || "Plant Loader";
-
-      const freight = Number(document.getElementById('c-freight').value || 0);
-      const labour = Number(document.getElementById('c-labour').value || 0);
-      const packaging = Number(document.getElementById('c-pack-charge').value || 0);
-      const misc = Number(document.getElementById('c-misc').value || 0);
-
-      const tokenNo = generatePartyToken('customer', name);
-      const dateStr = new Date().toISOString().split('T')[0];
-
-      let totalBoxes = 0;
-      let totalAmount = 0;
-      let sizeHeaders = "";
-      let sizeQtyRow = "";
-      let sizePriceRow = "";
-      let waSizes = "";
-      let sizesBreakdown = {};
-
-      KINNOW_SIZES.forEach(size => {
-        const qty = Number(document.getElementById(`size-qty-${size}`).value || 0);
-        const rate = Number(document.getElementById(`size-rate-${size}`).value || 0);
-        sizeHeaders += `<th class="p-1 border border-black font-bold text-[10px]">${size}</th>`;
-        sizeQtyRow += `<td class="p-1 border border-black font-extrabold">${qty > 0 ? qty : '-'}</td>`;
-        sizePriceRow += `<td class="p-1 border border-black text-[10px]">${rate > 0 ? rate : '-'}</td>`;
-        if(qty > 0) {
-          totalBoxes += qty;
-          totalAmount += (qty * rate);
-          sizesBreakdown[size] = qty;
-          waSizes += `%0ASize ${size}: ${qty} boxes @ Rs.${rate}`;
-        }
-      });
-
-      for(let i=1; i<=customSizeIndex; i++) {
-        const nameEl = document.getElementById(`cust-size-name-${i}`);
-        if(nameEl) {
-          const sName = nameEl.value || `Extra ${i}`;
-          const sQty = Number(document.getElementById(`cust-size-qty-${i}`).value || 0);
-          const sRate = Number(document.getElementById(`cust-size-rate-${i}`).value || 0);
-          sizeHeaders += `<th class="p-1 border border-black font-bold text-[10px] bg-amber-50">${sName}</th>`;
-          sizeQtyRow += `<td class="p-1 border border-black font-extrabold bg-amber-50">${sQty > 0 ? sQty : '-'}</td>`;
-          sizePriceRow += `<td class="p-1 border border-black text-[10px] bg-amber-50">${sRate > 0 ? sRate : '-'}</td>`;
-          if(sQty > 0) {
-            totalBoxes += sQty;
-            totalAmount += (sQty * sRate);
-            sizesBreakdown[sName] = sQty;
-            waSizes += `%0A${sName}: ${sQty} boxes @ Rs.${sRate}`;
-          }
-        }
-      }
-
-      const miscSum = freight + labour + packaging + misc;
-      const grandTotal = totalAmount + miscSum;
-
-      if(!APP_DATA.dispatches) APP_DATA.dispatches = [];
-      APP_DATA.dispatches.push({ id: 'disp_' + Date.now(), tokenNo, date: dateStr, name, phone, vehicle, lotNo, freight, labour, packaging, misc, totalBoxes, grandTotal, sizesBreakdown });
-      saveData();
-
-      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
-      const slipHTML = `
-        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
-          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
-            <div class="w-16">${logoSvg}</div>
-            <div class="text-center flex-1">
-              <h1 class="text-xl font-black tracking-widest text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700 tracking-wider">Customer Invoice & Dispatch Slip</p>
-            </div>
-            <div class="text-right text-[11px] font-bold">
-              <div>Date: ${new Date().toLocaleDateString('en-IN')}</div>
-              <div>Customer Code: <b class="text-amber-800">(SETIA)</b></div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 border border-black mb-2 text-center">
-            <div class="p-1 border-r border-black font-bold"><span class="text-[10px] block text-gray-600">Token No.</span><span class="text-base font-black text-amber-900">${tokenNo}</span></div>
-            <div class="p-1 font-bold"><span class="text-[10px] block text-gray-600">Customer Name</span><span class="text-sm font-black">${name}</span></div>
-          </div>
-          <div class="overflow-x-auto mb-2">
-            <table class="w-full border border-black text-center border-collapse">
-              <tr class="bg-gray-100 font-bold border-b border-black">
-                <th class="p-1 border border-black">Mandi No.</th><th class="p-1 border border-black">Variety</th><th class="p-1 border border-black">Grade</th><th class="p-1 border border-black">Lot No</th><th class="p-1 border border-black">Vehicle</th>${sizeHeaders}<th class="p-1 border border-black font-black bg-gray-200">Total Boxes</th>
-              </tr>
-              <tr class="font-bold">
-                <td class="p-1 border border-black">Abohar</td><td class="p-1 border border-black">Kinnow</td><td class="p-1 border border-black">A-Grade</td><td class="p-1 border border-black">${lotNo}</td><td class="p-1 border border-black">${vehicle}</td>${sizeQtyRow}<td class="p-1 border border-black font-black text-sm bg-gray-200">${totalBoxes}</td>
-              </tr>
-              <tr class="font-semibold text-gray-600">
-                <td colspan="5" class="p-1 border border-black text-right pr-2 font-bold text-[10px]">Price / Rate ₹</td>${sizePriceRow}<td class="p-1 border border-black font-black text-slate-900">₹${totalAmount.toLocaleString('en-IN')}</td>
-              </tr>
-            </table>
-          </div>
-          <div class="border border-black p-2 bg-gray-50 mb-3 text-xs">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px]">
-              <div>Freight: <b>₹${freight}</b></div><div>Labour: <b>₹${labour}</b></div><div>Packaging: <b>₹${packaging}</b></div><div>Misc: <b>₹${misc}</b></div>
-            </div>
-            <div class="flex justify-between items-center border-t border-black mt-2 pt-1 font-black text-sm text-slate-900">
-              <span>Grand Total Payable:</span><span class="text-base text-amber-900">₹${grandTotal.toLocaleString('en-IN')}</span>
-            </div>
-          </div>
-          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">
-            🔐 <b>Customer Online Portal Access:</b><br/>
-            Username: <b>${phone}</b> | Password: <b>${phone}</b>
-          </div>
-          <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-2 text-center">
-            <div><div class="font-bold text-xs mb-3">Loader Sign</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-600 mt-1">${loader}</p></div>
-            <div><div class="font-bold text-xs mb-3">Supervisor Signature</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-800 font-bold mt-1">${supervisor}</p></div>
-          </div>
-        </div>
-      `;
-
-      showSlip(slipHTML, phone, `*SETIA CUSTOMER DISPATCH*%0AToken: ${tokenNo}%0ACustomer: ${name}%0AVehicle: ${vehicle}%0A${waSizes}%0ATotal Boxes: *${totalBoxes}*%0AGrand Total: *Rs. ${grandTotal.toLocaleString('en-IN')}*%0A%0A*Online Ledger Login:*%0AUser: ${phone} | Pass: ${phone}`);
-      e.target.reset();
-      document.getElementById('custom-sizes-container').innerHTML = "";
-    }
-
-    function renderCustomerLedger() {
-      const custName = document.getElementById('view-cust-select').value;
-      const kpi = document.getElementById('cust-kpi-container');
-      const tableWrap = document.getElementById('cust-ledger-table-wrap');
-      const placeholder = document.getElementById('no-cust-placeholder');
-      const tbody = document.getElementById('cust-ledger-tbody');
-
-      if (!custName) {
-        kpi.classList.add('hidden');
-        tableWrap.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-        return;
-      }
-
-      placeholder.classList.add('hidden');
-      kpi.classList.remove('hidden');
-      tableWrap.classList.remove('hidden');
-
-      const invoices = (APP_DATA.dispatches || []).filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
-      const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
-
-      const totalBilled = invoices.reduce((a, b) => a + b.grandTotal, 0);
-      const totalBoxes = invoices.reduce((a, b) => a + b.totalBoxes, 0);
-      const totalPaid = payments.reduce((a, b) => a + b.amount, 0);
-      const balanceDue = totalBilled - totalPaid;
-
-      document.getElementById('cust-kpi-invoiced').innerText = `₹${totalBilled.toLocaleString('en-IN')}`;
-      document.getElementById('cust-kpi-boxes').innerText = `${totalBoxes} Boxes`;
-      document.getElementById('cust-kpi-paid').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
-      document.getElementById('cust-kpi-paycount').innerText = `${payments.length} Receipts`;
-      document.getElementById('cust-kpi-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
-
-      const combined = [
-        ...invoices.map(i => ({ date: i.date, type: 'INVOICE', desc: `Token ${i.tokenNo} (${i.vehicle}) - ${i.totalBoxes} Boxes`, debit: i.grandTotal, credit: 0 })),
-        ...payments.map(p => ({ date: p.date, type: 'PAYMENT', desc: `Bank: ${p.bank} (${p.ref})`, debit: 0, credit: p.amount }))
-      ].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-      let running = 0;
-      tbody.innerHTML = combined.map(row => {
-        running += (row.debit - row.credit);
-        return `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-2.5">${row.date}</td>
-            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.type === 'INVOICE' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${row.type}</span></td>
-            <td class="p-2.5 font-medium">${row.desc}</td>
-            <td class="p-2.5 text-right font-semibold text-gray-800">${row.debit > 0 ? '₹' + row.debit.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right font-semibold text-emerald-700">${row.credit > 0 ? '₹' + row.credit.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right font-bold ${running > 0 ? 'text-red-600' : 'text-emerald-700'}">₹${running.toLocaleString('en-IN')}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function shareCustomerLedgerWA() {
-      const custName = document.getElementById('view-cust-select').value;
-      if(!custName) return alert("Select customer first");
-      const invoices = (APP_DATA.dispatches || []).filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
-      const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
-      const totalBilled = invoices.reduce((a, b) => a + b.grandTotal, 0);
-      const totalPaid = payments.reduce((a, b) => a + b.amount, 0);
-      const balanceDue = totalBilled - totalPaid;
-      const custPhone = invoices.length > 0 ? invoices[0].phone : "";
-
-      const waMsg = `*SETIA PLANT - STATEMENT*%0ACustomer: *${custName}*%0ATotal Invoiced: Rs. ${totalBilled.toLocaleString('en-IN')}%0ATotal Paid: Rs. ${totalPaid.toLocaleString('en-IN')}%0A*Pending Balance: Rs. ${balanceDue.toLocaleString('en-IN')}*`;
-      window.open(`https://wa.me/91${custPhone}?text=${waMsg}`, '_blank');
-    }
-
-    function renderSingleOrchardSummary() {
-      const orchId = document.getElementById('orchard-ledger-select').value;
-      const card = document.getElementById('orchard-summary-card');
-      const placeholder = document.getElementById('no-orchard-placeholder');
-
-      if (!orchId) {
-        card.classList.add('hidden');
-        placeholder.classList.remove('hidden');
-        return;
-      }
-      const orch = (APP_DATA.agreements || []).find(a => a.id === orchId);
-      if (!orch) return;
-
-      placeholder.classList.add('hidden');
-      card.classList.remove('hidden');
-
-      const trips = (APP_DATA.inwards || []).filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
-      const payments = (APP_DATA.farmerPayments || []).filter(p => p.orchardId === orchId);
-
-      const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
-      const totSent = trips.reduce((a, b) => a + b.sentCrates, 0);
-      const totRecv = trips.reduce((a, b) => a + b.recvCrates, 0);
-      const pendingCrates = totSent - totRecv;
-      const totPaid = (orch.advance || 0) + payments.reduce((a, b) => a + b.amount, 0);
-
-      let totalGrossOrchardVal = orch.type === 'lump_sum' ? orch.total : (totChargeable * orch.rate);
-      const balDue = totalGrossOrchardVal - totPaid;
-
-      document.getElementById('orch-kpi-name').innerText = orch.name;
-      document.getElementById('orch-kpi-village').innerText = orch.village;
-      document.getElementById('orch-kpi-crates').innerText = `${pendingCrates} Pending`;
-      document.getElementById('orch-kpi-crates-breakdown').innerText = `Sent: ${totSent} | Recv: ${totRecv}`;
-      document.getElementById('orch-kpi-weight').innerText = `${totChargeable.toFixed(1)} Kg`;
-      document.getElementById('orch-kpi-trips').innerText = `${trips.length} Loads`;
-      document.getElementById('orch-kpi-financials').innerText = `₹${balDue.toLocaleString('en-IN')} Due`;
-      document.getElementById('orch-kpi-paid-info').innerText = `Paid: ₹${totPaid.toLocaleString('en-IN')}`;
-
-      const history = [
-        ...(orch.advance > 0 ? [{ date: orch.date, type: 'ADVANCE TOKEN', desc: `Token ${orch.tokenNo} (${orch.advBank || 'Bank/Cash'})`, inwardAmt: 0, paidAmt: orch.advance, crates: '-' }] : []),
-        ...trips.map(t => ({ date: t.date, type: 'INWARD TRIP', desc: `Token ${t.tokenNo} (${t.vehicle}) - ${t.chargeable.toFixed(1)} Kg`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
-        ...payments.map(p => ({ date: p.date, type: 'BANK PAYMENT', desc: `Paid: ${p.bank} (${p.ref})`, inwardAmt: 0, paidAmt: p.amount, crates: '-' }))
-      ].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-      const tbody = document.getElementById('orchard-trips-tbody');
-      tbody.innerHTML = history.map(h => `
         <tr class="border-b hover:bg-gray-50">
-          <td class="p-2.5">${h.date}</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${h.type.includes('PAYMENT') || h.type.includes('ADVANCE') ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${h.type}</span></td>
-          <td class="p-2.5 font-medium">${h.desc}</td>
-          <td class="p-2.5 text-right font-semibold text-gray-800">${h.inwardAmt > 0 ? '₹' + h.inwardAmt.toLocaleString('en-IN') : '-'}</td>
-          <td class="p-2.5 text-right font-semibold text-emerald-700">${h.paidAmt > 0 ? '₹' + h.paidAmt.toLocaleString('en-IN') : '-'}</td>
-          <td class="p-2.5 text-right font-medium">${h.crates}</td>
+
+          <td class="p-2.5 font-bold">
+            ${escapeHtml(s.name)}
+          </td>
+
+          <td class="p-2.5 font-mono text-amber-900">
+            @${escapeHtml(s.username)}
+          </td>
+
+          <td class="p-2.5 font-mono text-gray-500">
+            ${escapeHtml(s.password)}
+          </td>
+
+          <td class="p-2.5 text-right">
+
+            <button
+              onclick="deleteStaff('${s.id}')"
+              class="text-red-600 font-bold text-xs">
+
+              Delete
+
+            </button>
+
+          </td>
+
         </tr>
-      `).join('');
+
+      `).join("");
+  }
+
+  async function deleteStaff(id) {
+
+    if (!confirm("Delete this staff account?")) {
+      return;
     }
 
-    function shareFarmerLedgerWA() {
-      const orchId = document.getElementById('orchard-ledger-select').value;
-      if(!orchId) return alert("Select orchard first");
-      const orch = (APP_DATA.agreements || []).find(a => a.id === orchId);
-      const trips = (APP_DATA.inwards || []).filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
-      const payments = (APP_DATA.farmerPayments || []).filter(p => p.orchardId === orchId);
-      const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
-      const totSent = trips.reduce((a, b) => a + b.sentCrates, 0);
-      const totRecv = trips.reduce((a, b) => a + b.recvCrates, 0);
-      const pendingCrates = totSent - totRecv;
-      const totPaid = (orch.advance || 0) + payments.reduce((a, b) => a + b.amount, 0);
-      const totalVal = orch.type === 'lump_sum' ? orch.total : (totChargeable * orch.rate);
-      const balDue = totalVal - totPaid;
+    APP_DATA.staffUsers =
+      (APP_DATA.staffUsers || [])
+        .filter(x => x.id !== id);
 
-      const waMsg = `*SETIA PLANT - FARMER STATEMENT*%0AFarmer: *${orch.name}* (${orch.village})%0ATotal Picked Weight: ${totChargeable.toFixed(1)} Kg%0ATotal Valuation: Rs. ${totalVal.toLocaleString('en-IN')}%0ATotal Paid: Rs. ${totPaid.toLocaleString('en-IN')}%0A*Balance Due: Rs. ${balDue.toLocaleString('en-IN')}*%0A*Pending Crates: ${pendingCrates}*`;
-      window.open(`https://wa.me/91${orch.phone}?text=${waMsg}`, '_blank');
+    await saveData();
+  }
+
+  function escapeHtml(value) {
+
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // ---------------------------------------------------------
+  // DASHBOARD
+  // ---------------------------------------------------------
+
+  function renderDashboard() {
+
+    const dateElement =
+      document.getElementById("dash-date-filter");
+
+    if (!dateElement) return;
+
+    const today =
+      dateElement.value || todayDate();
+
+    const dayInwards =
+      (APP_DATA.inwards || [])
+        .filter(i => i.date === today);
+
+    const dayDispatches =
+      (APP_DATA.dispatches || [])
+        .filter(d => d.date === today);
+
+    const netWt =
+      dayInwards.reduce(
+        (a, b) => a + Number(b.net || 0),
+        0
+      );
+
+    const boxes =
+      dayDispatches.reduce(
+        (a, b) => a + Number(b.boxes || 0),
+        0
+      );
+
+    const sales =
+      dayDispatches.reduce(
+        (a, b) => a + Number(b.totalAmt || 0),
+        0
+      );
+
+    document.getElementById(
+      "stat-daily-weight"
+    ).innerText =
+      `${netWt.toLocaleString("en-IN")} Kg`;
+
+    document.getElementById(
+      "stat-daily-boxes"
+    ).innerText =
+      `${boxes.toLocaleString("en-IN")} Boxes`;
+
+    document.getElementById(
+      "stat-daily-cust-recv"
+    ).innerText =
+      `₹${sales.toLocaleString("en-IN")}`;
+  }
+
+  // ---------------------------------------------------------
+  // STAFF PORTAL
+  // ---------------------------------------------------------
+
+  function launchStaffPortal() {
+
+    document
+      .getElementById("login-view")
+      .classList.add("hidden");
+
+    document
+      .getElementById("party-portal-view")
+      .classList.add("hidden");
+
+    document
+      .getElementById("app-view")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("user-display")
+      .innerText =
+      `${currentUser.name} (${currentUser.role.toUpperCase()})`;
+
+    if (currentUser.role === "admin") {
+
+      document
+        .getElementById("tab-admin-panel")
+        .classList.remove("hidden");
+
+    } else {
+
+      document
+        .getElementById("tab-admin-panel")
+        .classList.add("hidden");
     }
 
-    function renderDashboard() {
-      const filterDate = document.getElementById('dash-date-filter').value;
-      const isToday = filterDate === new Date().toISOString().split('T')[0];
-      document.getElementById('dash-period-title').innerText = isToday ? "Today's Performance" : `Summary on ${filterDate}`;
+    switchTab("dashboard");
+    renderDashboard();
+  }
 
-      const dayInwards = (APP_DATA.inwards || []).filter(i => i.date === filterDate);
-      const dayDispatches = (APP_DATA.dispatches || []).filter(d => d.date === filterDate);
-      const dayCustPay = (APP_DATA.customerPayments || []).filter(p => p.date === filterDate);
-      const dayFarmerPay = (APP_DATA.farmerPayments || []).filter(p => p.date === filterDate);
+  // ---------------------------------------------------------
+  // PARTY PORTAL
+  // ---------------------------------------------------------
 
-      const dailyNetWt = dayInwards.reduce((acc, curr) => acc + curr.net, 0);
-      const dailyCutWt = dayInwards.reduce((acc, curr) => acc + curr.cut, 0);
-      const dailyBoxes = dayDispatches.reduce((acc, curr) => acc + curr.totalBoxes, 0);
-      const dailyCustRecv = dayCustPay.reduce((acc, curr) => acc + curr.amount, 0);
-      const dailyFarmerPaid = dayFarmerPay.reduce((acc, curr) => acc + curr.amount, 0);
+  function launchPartyPortal() {
 
-      document.getElementById('stat-daily-weight').innerText = `${dailyNetWt.toLocaleString('en-IN')} Kg`;
-      document.getElementById('stat-daily-cut').innerText = `${dailyCutWt.toFixed(1)} Kg (1kg/Qtl)`;
-      document.getElementById('stat-daily-boxes').innerText = `${dailyBoxes.toLocaleString('en-IN')} Boxes`;
-      document.getElementById('stat-daily-trips').innerText = `${dayDispatches.length} Trucks`;
-      document.getElementById('stat-daily-cust-recv').innerText = `₹${dailyCustRecv.toLocaleString('en-IN')}`;
-      document.getElementById('stat-daily-farmer-paid').innerText = `₹${dailyFarmerPaid.toLocaleString('en-IN')}`;
+    document
+      .getElementById("login-view")
+      .classList.add("hidden");
 
-      const seasonSales = (APP_DATA.dispatches || []).reduce((acc, curr) => acc + curr.grandTotal, 0);
-      const seasonCustRecv = (APP_DATA.customerPayments || []).reduce((acc, curr) => acc + curr.amount, 0);
-      const seasonCustPending = seasonSales - seasonCustRecv;
+    document
+      .getElementById("app-view")
+      .classList.add("hidden");
 
-      let seasonFarmerGross = 0;
-      (APP_DATA.agreements || []).forEach(a => {
-        if(a.type === 'lump_sum') {
-          seasonFarmerGross += a.total;
-        } else {
-          const inws = (APP_DATA.inwards || []).filter(i => i.orchardId === a.id);
-          const chWt = inws.reduce((x, y) => x + y.chargeable, 0);
-          seasonFarmerGross += (chWt * a.rate);
-        }
-      });
+    document
+      .getElementById("party-portal-view")
+      .classList.remove("hidden");
 
-      const seasonFarmerPaid = (APP_DATA.agreements || []).reduce((x, y) => x + (y.advance || 0), 0) + (APP_DATA.farmerPayments || []).reduce((x, y) => x + y.amount, 0);
-      const seasonFarmerPending = seasonFarmerGross - seasonFarmerPaid;
+    document
+      .getElementById("party-portal-name")
+      .innerText =
+      currentPartySession.name;
 
-      const seasonSentCrates = (APP_DATA.inwards || []).reduce((acc, curr) => acc + curr.sentCrates, 0);
-      const seasonRecvCrates = (APP_DATA.inwards || []).reduce((acc, curr) => acc + curr.recvCrates, 0);
+    document
+      .getElementById("party-portal-phone")
+      .innerText =
+      `+91 ${currentPartySession.phone}`;
 
-      document.getElementById('season-total-sales').innerText = `₹${seasonSales.toLocaleString('en-IN')}`;
-      document.getElementById('season-cust-pending').innerText = `₹${seasonCustPending.toLocaleString('en-IN')} Pending`;
-      document.getElementById('season-total-received').innerText = `₹${seasonCustRecv.toLocaleString('en-IN')}`;
-      document.getElementById('season-farmer-dues').innerText = `₹${seasonFarmerGross.toLocaleString('en-IN')}`;
-      document.getElementById('season-farmer-pending').innerText = `₹${seasonFarmerPending.toLocaleString('en-IN')} Pending`;
-      document.getElementById('season-crates-unreturned').innerText = `${seasonSentCrates - seasonRecvCrates} Crates`;
+    document
+      .getElementById("party-portal-type")
+      .innerText =
+      `${currentPartySession.role.toUpperCase()} PORTAL`;
 
-      const sizeGrid = document.getElementById('season-size-distribution');
-      sizeGrid.innerHTML = "";
-      const allSizesFound = new Set(KINNOW_SIZES);
-      (APP_DATA.dispatches || []).forEach(d => {
-        if(d.sizesBreakdown) Object.keys(d.sizesBreakdown).forEach(k => allSizesFound.add(k));
-      });
+    renderPartyPortal();
+  }
 
-      allSizesFound.forEach(size => {
-        let count = 0;
-        (APP_DATA.dispatches || []).forEach(d => {
-          if (d.sizesBreakdown && d.sizesBreakdown[size]) count += d.sizesBreakdown[size];
-        });
-        sizeGrid.innerHTML += `
-          <div class="border rounded-lg p-2 bg-gray-50">
-            <div class="text-[10px] text-gray-500 font-bold">${size}</div>
-            <div class="text-sm font-extrabold text-amber-800 mt-1">${count}</div>
+  function renderPartyPortal() {
+
+    if (!currentPartySession) return;
+
+    const phone =
+      normalizePhone(
+        currentPartySession.phone
+      );
+
+    if (currentPartySession.role === "farmer") {
+
+      const farmer =
+        (APP_DATA.agreements || [])
+          .find(a =>
+            normalizePhone(a.phone) === phone
+          );
+
+      const inwards =
+        (APP_DATA.inwards || [])
+          .filter(i =>
+            normalizePhone(i.phone) === phone
+          );
+
+      const kpi =
+        document.getElementById(
+          "party-portal-kpi-grid"
+        );
+
+      if (kpi) {
+
+        const totalWeight =
+          inwards.reduce(
+            (sum, x) => sum + Number(x.net || 0),
+            0
+          );
+
+        kpi.innerHTML = `
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <div class="text-[10px] text-gray-500">
+              INWARD RECORDS
+            </div>
+            <div class="font-black text-lg">
+              ${inwards.length}
+            </div>
           </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <div class="text-[10px] text-gray-500">
+              TOTAL NET WEIGHT
+            </div>
+            <div class="font-black text-lg">
+              ${totalWeight.toLocaleString("en-IN")} Kg
+            </div>
+          </div>
+
         `;
-      });
+      }
+
+      document.getElementById(
+        "party-table-head"
+      ).innerHTML = `
+        <tr>
+          <th class="p-2.5">Date</th>
+          <th class="p-2.5">Vehicle</th>
+          <th class="p-2.5">Gross</th>
+          <th class="p-2.5">Tare</th>
+          <th class="p-2.5">Net</th>
+        </tr>
+      `;
+
+      document.getElementById(
+        "party-table-body"
+      ).innerHTML =
+        inwards.map(i => `
+          <tr class="border-b">
+            <td class="p-2.5">${i.date}</td>
+            <td class="p-2.5">${escapeHtml(i.vehicle)}</td>
+            <td class="p-2.5">${i.gross} Kg</td>
+            <td class="p-2.5">${i.tare} Kg</td>
+            <td class="p-2.5 font-bold">${i.net} Kg</td>
+          </tr>
+        `).join("");
+
+    } else {
+
+      const dispatches =
+        (APP_DATA.dispatches || [])
+          .filter(d =>
+            normalizePhone(d.phone) === phone
+          );
+
+      const totalBoxes =
+        dispatches.reduce(
+          (sum, x) => sum + Number(x.boxes || 0),
+          0
+        );
+
+      const totalAmount =
+        dispatches.reduce(
+          (sum, x) => sum + Number(x.totalAmt || 0),
+          0
+        );
+
+      document.getElementById(
+        "party-portal-kpi-grid"
+      ).innerHTML = `
+
+        <div class="bg-gray-50 p-3 rounded-xl">
+          <div class="text-[10px] text-gray-500">
+            DISPATCHES
+          </div>
+          <div class="font-black text-lg">
+            ${dispatches.length}
+          </div>
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-xl">
+          <div class="text-[10px] text-gray-500">
+            TOTAL BOXES
+          </div>
+          <div class="font-black text-lg">
+            ${totalBoxes.toLocaleString("en-IN")}
+          </div>
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-xl">
+          <div class="text-[10px] text-gray-500">
+            TOTAL BILL
+          </div>
+          <div class="font-black text-lg">
+            ₹${totalAmount.toLocaleString("en-IN")}
+          </div>
+        </div>
+
+      `;
+
+      document.getElementById(
+        "party-table-head"
+      ).innerHTML = `
+        <tr>
+          <th class="p-2.5">Date</th>
+          <th class="p-2.5">Vehicle</th>
+          <th class="p-2.5">Boxes</th>
+          <th class="p-2.5">Amount</th>
+        </tr>
+      `;
+
+      document.getElementById(
+        "party-table-body"
+      ).innerHTML =
+        dispatches.map(d => `
+          <tr class="border-b">
+            <td class="p-2.5">${d.date}</td>
+            <td class="p-2.5">${escapeHtml(d.vehicle)}</td>
+            <td class="p-2.5 font-bold">${d.boxes}</td>
+            <td class="p-2.5 font-bold">
+              ₹${Number(d.totalAmt || 0).toLocaleString("en-IN")}
+            </td>
+          </tr>
+        `).join("");
+    }
+  }
+
+  // ---------------------------------------------------------
+  // LOGOUT
+  // ---------------------------------------------------------
+
+  function logoutPortal() {
+
+    currentUser = null;
+    currentPartySession = null;
+
+    document
+      .getElementById("app-view")
+      .classList.add("hidden");
+
+    document
+      .getElementById("party-portal-view")
+      .classList.add("hidden");
+
+    document
+      .getElementById("login-view")
+      .classList.remove("hidden");
+
+    document.getElementById("login-user").value = "";
+    document.getElementById("login-pass").value = "";
+  }
+
+  // ---------------------------------------------------------
+  // TABS
+  // ---------------------------------------------------------
+
+  function switchTab(tab) {
+
+    [
+      "dashboard",
+      "customer-ledger",
+      "orchards",
+      "farmer",
+      "daily",
+      "customer",
+      "attendance",
+      "admin-panel"
+    ].forEach(t => {
+
+      const sec =
+        document.getElementById(`${t}-section`);
+
+      const btn =
+        document.getElementById(`tab-${t}`);
+
+      if (sec) {
+        sec.classList.add("hidden");
+      }
+
+      if (btn) {
+        btn.className =
+          "py-2.5 text-gray-500 hover:text-amber-700 font-bold";
+      }
+    });
+
+    const activeSec =
+      document.getElementById(`${tab}-section`);
+
+    const activeBtn =
+      document.getElementById(`tab-${tab}`);
+
+    if (activeSec) {
+      activeSec.classList.remove("hidden");
     }
 
-    function showSlip(html, phone, waText) {
-      document.getElementById('printable-slip').innerHTML = html;
-      document.getElementById('whatsapp-btn').onclick = () => window.open(`https://wa.me/91${phone}?text=${waText}`, '_blank');
-      document.getElementById('slip-modal').classList.remove('hidden');
+    if (activeBtn) {
+      activeBtn.className =
+        "py-2.5 border-b-2 border-amber-600 text-amber-700 font-black";
     }
+  }
 
-    function closeModal() {
-      document.getElementById('slip-modal').classList.add('hidden');
-    }
+  // ---------------------------------------------------------
+  // DATE
+  // ---------------------------------------------------------
 
-    function clearAllData() {
-      if(currentUser?.role !== 'admin') return alert("Only Admin can reset data");
-      if(confirm("Are you sure you want to reset all records across all devices?")) {
-        APP_DATA = { staffUsers: [], staffDirectory: [], staffAttendance: [], groupLabourAttendance: [], agreements: [], inwards: [], dispatches: [], customerPayments: [], farmerPayments: [], blockedUsers: [] };
-        saveData();
+  function resetToToday() {
+
+    const el =
+      document.getElementById("dash-date-filter");
+
+    if (!el) return;
+
+    el.value = todayDate();
+
+    renderDashboard();
+  }
+
+  // ---------------------------------------------------------
+  // START APPLICATION
+  // ---------------------------------------------------------
+
+  window.onload = async function() {
+
+    // Load local backup first
+    const saved =
+      localStorage.getItem(
+        "SETIA_WAXING_PORTAL_V10"
+      );
+
+    if (saved) {
+
+      try {
+
+        APP_DATA = Object.assign(
+          APP_DATA,
+          JSON.parse(saved)
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "Local data could not be loaded",
+          error
+        );
       }
     }
-  </script>
-</body>
-</html>
+
+    // Logo
+    const logoSvg =
+      document.getElementById(
+        "plant-logo-svg"
+      ).innerHTML;
+
+    document.getElementById(
+      "login-logo-container"
+    ).innerHTML = logoSvg;
+
+    document.getElementById(
+      "header-logo-container"
+    ).innerHTML = logoSvg;
+
+    document.getElementById(
+      "party-logo-container"
+    ).innerHTML = logoSvg;
+
+    resetToToday();
+
+    // Connect to cloud
+    await loadCloudData();
+
+    // Start real-time listener
+    setupCloudListeners();
+
+    renderDashboard();
+    renderStaffTable();
+  };
+</script>
