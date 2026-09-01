@@ -5,8 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SETIA WAXING PLANT - Mandi, Accounts & Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FIREBASE SDK COMPAT -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800 font-sans pb-16">
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB5WhV0yPQNXqRkBMED2m_bo_BrscJorgg",
+      authDomain: "setia-waxing-plant.firebaseapp.com",
+      projectId: "setia-waxing-plant",
+      storageBucket: "setia-waxing-plant.firebasestorage.app",
+      messagingSenderId: "315233905244",
+      appId: "1:315233905244:web:0e7c82c6e6dbce08c45499",
+      measurementId: "G-47BSFE55LT"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
 
   <!-- SVG EMBLEM LOGO -->
   <template id="plant-logo-svg">
@@ -22,28 +41,27 @@
     </svg>
   </template>
 
-  <!-- 1. UNIVERSAL SINGLE LOGIN SCREEN (ADMIN / STAFF / FARMER / CUSTOMER) -->
+  <!-- 1. UNIVERSAL SINGLE LOGIN SCREEN -->
   <div id="login-view" class="flex min-h-screen items-center justify-center p-4">
     <div class="w-full max-w-md bg-white p-7 rounded-2xl shadow-xl border border-gray-200 text-center">
       <div class="flex justify-center mb-2">
         <div id="login-logo-container"></div>
       </div>
       <h2 class="text-xl font-black text-amber-600 tracking-wider">SETIA WAXING PLANT</h2>
-      <p class="text-[11px] text-gray-500 mb-5 font-medium">Kinnow Mandi & Party Portal</p>
+      <p class="text-[11px] text-gray-500 mb-2 font-medium">Kinnow Mandi & Party Portal</p>
+      
+      <div id="cloud-status-badge" class="mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
+        Connecting to Cloud Database...
+      </div>
 
       <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
         <div>
           <label class="block text-xs font-semibold mb-1">Username / Registered Mobile No.</label>
-          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="e.g. admin or 10-digit mobile" />
+          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="Username or 10-digit mobile" />
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">Password</label>
           <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="••••••••" />
-        </div>
-        
-        <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-900 space-y-1">
-          <div>👑 <b>Admin:</b> <code>admin</code> / <code>admin123</code></div>
-          <div>👨‍🌾 <b>Farmers & Customers:</b> Username & Password are your <b>registered 10-digit mobile number</b>.</div>
         </div>
 
         <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition text-xs shadow">
@@ -98,7 +116,6 @@
 
   <!-- 3. MAIN ADMIN & STAFF APPLICATION -->
   <div id="app-view" class="hidden min-h-screen flex flex-col">
-    <!-- Navbar -->
     <header class="bg-slate-900 text-white px-4 md:px-6 py-3 shadow flex justify-between items-center no-print sticky top-0 z-40 border-b-2 border-amber-500">
       <div class="flex items-center gap-3">
         <div id="header-logo-container"></div>
@@ -115,7 +132,6 @@
       </div>
     </header>
 
-    <!-- Navigation Tabs -->
     <div class="max-w-6xl mx-auto w-full p-4 no-print">
       <div class="grid grid-cols-3 md:grid-cols-7 border-b border-gray-300 gap-1 mb-6 text-center text-xs font-bold">
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2.5 border-b-2 border-amber-600 text-amber-700">
@@ -152,7 +168,6 @@
             <p class="text-xs text-amber-800">Manage user access permissions, add staff, and directly block or unblock accounts.</p>
           </div>
 
-          <!-- Add Staff Form -->
           <form onsubmit="createStaffAccount(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-white p-4 rounded-xl border border-amber-300">
             <div>
               <label class="block font-bold mb-1 text-slate-800">Staff Full Name</label>
@@ -173,7 +188,6 @@
             </div>
           </form>
 
-          <!-- Staff Accounts Table with Block/Unblock -->
           <div>
             <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Staff Access Accounts</h4>
             <div class="overflow-x-auto bg-white rounded-xl border">
@@ -192,7 +206,6 @@
             </div>
           </div>
 
-          <!-- Registered Party Logins with Block/Unblock -->
           <div>
             <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Farmer & Customer Registered Access Accounts</h4>
             <div class="overflow-x-auto bg-white rounded-xl border">
@@ -307,7 +320,7 @@
         </div>
 
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h4 class="text-xs font-bold uppercase text-slate-700 mb-3">Attendance History (Click Edit to change)</h4>
+          <h4 class="text-xs font-bold uppercase text-slate-700 mb-3">Attendance History</h4>
           <div class="overflow-x-auto border rounded-xl">
             <table class="w-full text-left text-xs">
               <thead class="bg-gray-100 border-b font-bold text-gray-700">
@@ -608,12 +621,12 @@
               <div class="p-3 bg-gray-50 rounded-xl border">
                 <span class="text-xs text-gray-500 font-medium">Fruit Picked (Chargeable)</span>
                 <h4 class="text-base font-bold text-emerald-800 mt-1" id="orch-kpi-weight">0 Kg</h4>
-                <p class="text-[11px] text-gray-400" id="orch-kpi-trips">0 Loads</p>
+                <p class="text-[11px] text-gray-500" id="orch-kpi-trips">0 Loads</p>
               </div>
               <div class="p-3 bg-gray-50 rounded-xl border">
                 <span class="text-xs text-gray-500 font-medium">Balance Payable</span>
                 <h4 class="text-lg font-bold text-red-600 mt-1" id="orch-kpi-financials">₹0</h4>
-                <p class="text-[11px] text-gray-400" id="orch-kpi-paid-info">Paid: ₹0</p>
+                <p class="text-[11px] text-gray-500" id="orch-kpi-paid-info">Paid: ₹0</p>
               </div>
             </div>
 
@@ -653,7 +666,7 @@
               <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Sunil Kumar" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">Registered Mobile Number (Login ID & Password)</label>
+              <label class="block text-xs font-semibold mb-1">Registered Mobile Number</label>
               <input type="tel" id="f-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
             </div>
             <div>
@@ -801,7 +814,7 @@
               <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Chifu Agritech" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">Registered Mobile Number (Login ID & Password)</label>
+              <label class="block text-xs font-semibold mb-1">Registered Mobile Number</label>
               <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
             </div>
             <div>
@@ -897,11 +910,39 @@
       dispatches: [],
       customerPayments: [],
       farmerPayments: [],
-      blockedUsers: [] // List of blocked usernames or phone numbers
+      blockedUsers: []
     };
+
+    function setupCloudListeners() {
+      const badge = document.getElementById('cloud-status-badge');
+      if (badge) {
+        badge.innerText = "☁️ Firebase Realtime Cloud Connected";
+        badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
+      }
+
+      db.collection("plant_data").doc("main_state").onSnapshot((doc) => {
+        if (doc.exists) {
+          APP_DATA = doc.data();
+          localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
+          populateDropdowns();
+          renderDashboard();
+          renderAttendanceTable();
+          renderStaffTable();
+          renderPartyAccountsTable();
+          if (currentPartySession) renderPartyPortalView();
+        } else {
+          saveData();
+        }
+      }, (err) => {
+        console.error("Firestore sync error:", err);
+      });
+    }
 
     function saveData() {
       localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
+      db.collection("plant_data").doc("main_state").set(APP_DATA)
+        .catch(err => console.error("Cloud write failed:", err));
+
       populateDropdowns();
       renderDashboard();
       renderAttendanceTable();
@@ -933,9 +974,9 @@
 
       resetToToday();
       populateDropdowns();
+      setupCloudListeners();
     };
 
-    // --- USER ACCESS STATUS / BLOCK MANAGEMENT ---
     function isUserBlocked(idOrPhone) {
       const clean = (idOrPhone || "").toString().trim().toLowerCase();
       return (APP_DATA.blockedUsers || []).includes(clean);
@@ -955,25 +996,21 @@
       saveData();
     }
 
-    // --- UNIVERSAL AUTHENTICATION ---
     function handleUniversalLogin(e) {
       e.preventDefault();
       const u = (document.getElementById('login-user').value || "").trim().toLowerCase();
       const p = (document.getElementById('login-pass').value || "").trim();
 
-      // Check block state
       if(isUserBlocked(u)) {
         return alert("Your account has been deactivated/blocked by Admin. Please contact Setia Waxing Plant.");
       }
 
-      // 1. Admin Login
-      if(u === "admin" && p === "admin123") {
+      if(u === "admin" && p === "Csetia@1122") {
         currentUser = { name: "Master Admin", username: "admin", role: "admin" };
         launchStaffPortal();
         return;
       }
 
-      // 2. Staff Login
       const staff = APP_DATA.staffUsers.find(s => (s.username || "").toLowerCase() === u && s.password === p);
       if(staff) {
         if(isUserBlocked(staff.username)) {
@@ -984,7 +1021,6 @@
         return;
       }
 
-      // 3. Farmer Auto Login (Username = Phone, Password = Phone)
       const farmer = APP_DATA.agreements.find(a => (a.phone || "").toString().trim() === u);
       if(farmer && p === u) {
         if(isUserBlocked(u)) {
@@ -995,7 +1031,6 @@
         return;
       }
 
-      // 4. Customer Auto Login (Username = Phone, Password = Phone)
       const customer = APP_DATA.dispatches.find(d => (d.phone || "").toString().trim() === u);
       if(customer && p === u) {
         if(isUserBlocked(u)) {
@@ -1245,7 +1280,7 @@
       custMap.forEach(v => partyRows.push(v));
 
       if(partyRows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No parties registered yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No parties registered yet. Create a deal or dispatch slip to auto-generate party logins.</td></tr>`;
         return;
       }
 
@@ -1271,7 +1306,6 @@
       }).join('');
     }
 
-    // --- DIRECT PRINT FIX (ISOLATED WINDOW POPUP PRINTING) ---
     function triggerDirectPrint() {
       const slipContent = document.getElementById('printable-slip').innerHTML;
       if (!slipContent) return alert("No slip content to print");
@@ -1309,7 +1343,6 @@
       printWin.document.close();
     }
 
-    // --- UTILITIES & APP LOGIC ---
     function addCustomSizeRow() {
       customSizeIndex++;
       const container = document.getElementById('custom-sizes-container');
@@ -2061,9 +2094,9 @@
       const trips = APP_DATA.inwards.filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
       const payments = APP_DATA.farmerPayments.filter(p => p.orchardId === orchId);
       const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
-      const totSentCrates = trips.reduce((a, b) => a + b.sentCrates, 0);
-      const totRecvCrates = trips.reduce((a, b) => a + b.recvCrates, 0);
-      const pendingCrates = totSentCrates - totRecvCrates;
+      const totSent = trips.reduce((a, b) => a + b.sentCrates, 0);
+      const totRecv = trips.reduce((a, b) => a + b.recvCrates, 0);
+      const pendingCrates = totSent - totRecv;
       const totPaid = (orch.advance || 0) + payments.reduce((a, b) => a + b.amount, 0);
       const totalVal = orch.type === 'lump_sum' ? orch.total : (totChargeable * orch.rate);
       const balDue = totalVal - totPaid;
@@ -2156,7 +2189,7 @@
 
     function clearAllData() {
       if(currentUser?.role !== 'admin') return alert("Only Admin can reset data");
-      if(confirm("Are you sure you want to reset all records?")) {
+      if(confirm("Are you sure you want to reset all records across all devices?")) {
         APP_DATA = { staffUsers: [], staffDirectory: [], staffAttendance: [], groupLabourAttendance: [], agreements: [], inwards: [], dispatches: [], customerPayments: [], farmerPayments: [], blockedUsers: [] };
         saveData();
       }
