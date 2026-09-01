@@ -57,11 +57,11 @@
       <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
         <div>
           <label class="block text-xs font-semibold mb-1">Username / Registered Mobile No.</label>
-          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="Username or 10-digit mobile" />
+          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600 font-medium" placeholder="admin, staff username or 10-digit mobile" />
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">Password</label>
-          <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="••••••••" />
+          <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600 font-medium" placeholder="••••••••" />
         </div>
 
         <button type="submit" id="btn-login-submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition text-xs shadow">
@@ -103,7 +103,7 @@
       </div>
 
       <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700" id="party-table-title">Your Statement & History</h3>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Your Statement & History</h3>
         <div class="overflow-x-auto border rounded-xl">
           <table class="w-full text-left text-xs">
             <thead class="bg-gray-100 border-b font-bold text-gray-700" id="party-table-head"></thead>
@@ -134,30 +134,14 @@
 
     <div class="max-w-6xl mx-auto w-full p-4 no-print">
       <div class="grid grid-cols-3 md:grid-cols-7 border-b border-gray-300 gap-1 mb-6 text-center text-xs font-bold">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2.5 border-b-2 border-amber-600 text-amber-700">
-          📊 Dashboard
-        </button>
-        <button onclick="switchTab('customer-ledger')" id="tab-customer-ledger" class="py-2.5 text-gray-500 hover:text-amber-700">
-          👤 Customer
-        </button>
-        <button onclick="switchTab('orchards')" id="tab-orchards" class="py-2.5 text-gray-500 hover:text-amber-700">
-          🌳 Farmer
-        </button>
-        <button onclick="switchTab('farmer')" id="tab-farmer" class="py-2.5 text-gray-500 hover:text-amber-700">
-          1. New Deal
-        </button>
-        <button onclick="switchTab('daily')" id="tab-daily" class="py-2.5 text-gray-500 hover:text-amber-700">
-          2. Inward
-        </button>
-        <button onclick="switchTab('customer')" id="tab-customer" class="py-2.5 text-gray-500 hover:text-amber-700">
-          3. Dispatch
-        </button>
-        <button onclick="switchTab('attendance')" id="tab-attendance" class="py-2.5 text-gray-500 hover:text-amber-700 bg-amber-50">
-          👥 Attendance
-        </button>
-        <button onclick="switchTab('admin-panel')" id="tab-admin-panel" class="py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black hidden">
-          👑 Master Admin Control
-        </button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2.5 border-b-2 border-amber-600 text-amber-700">📊 Dashboard</button>
+        <button onclick="switchTab('customer-ledger')" id="tab-customer-ledger" class="py-2.5 text-gray-500 hover:text-amber-700">👤 Customer</button>
+        <button onclick="switchTab('orchards')" id="tab-orchards" class="py-2.5 text-gray-500 hover:text-amber-700">🌳 Farmer</button>
+        <button onclick="switchTab('farmer')" id="tab-farmer" class="py-2.5 text-gray-500 hover:text-amber-700">1. New Deal</button>
+        <button onclick="switchTab('daily')" id="tab-daily" class="py-2.5 text-gray-500 hover:text-amber-700">2. Inward</button>
+        <button onclick="switchTab('customer')" id="tab-customer" class="py-2.5 text-gray-500 hover:text-amber-700">3. Dispatch</button>
+        <button onclick="switchTab('attendance')" id="tab-attendance" class="py-2.5 text-gray-500 hover:text-amber-700 bg-amber-50">👥 Attendance</button>
+        <button onclick="switchTab('admin-panel')" id="tab-admin-panel" class="py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black hidden">👑 Master Admin Control</button>
       </div>
 
       <!-- TAB: MASTER ADMIN PANEL -->
@@ -166,7 +150,7 @@
           <div class="flex flex-wrap justify-between items-center gap-3">
             <div>
               <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
-              <p class="text-xs text-amber-800">Manage user access permissions, add staff, and directly block or unblock accounts.</p>
+              <p class="text-xs text-amber-800">Manage user access permissions, add staff, and block/unblock accounts.</p>
             </div>
             <button onclick="forceSyncToCloud()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow">
               ☁️ Force Push All Records to Cloud
@@ -906,18 +890,31 @@
     let currentUser = null;
     let currentPartySession = null;
 
-    let APP_DATA = {
-      staffUsers: [],
-      staffDirectory: [],
+    // ACTIVE DEFAULTS (CANNOT BE WIPED BY EMPTY CLOUD DOC)
+    const CORE_DEFAULTS = {
+      staffUsers: [
+        { id: 'st_1', name: 'Ramesh Kumar', username: 'ramesh', password: '1234', role: 'staff' },
+        { id: 'st_2', name: 'Test Staff', username: 'test', password: '1234', role: 'staff' }
+      ],
+      staffDirectory: [
+        { id: 'sd_1', name: 'Ramesh Kumar', role: 'Plant Supervisor' },
+        { id: 'sd_2', name: 'Gurpreet Singh', role: 'Machine Operator' }
+      ],
       staffAttendance: [],
       groupLabourAttendance: [],
-      agreements: [],
+      agreements: [
+        { id: 'orch_1', tokenNo: 'TF-1', type: 'per_kg', name: 'Test Farmer', phone: '9876543210', village: 'Khuian', rate: 26, advance: 0, date: '2026-09-01' }
+      ],
       inwards: [],
-      dispatches: [],
+      dispatches: [
+        { id: 'disp_1', tokenNo: 'TC-1', date: '2026-09-01', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, sizesBreakdown: { '36': 50 } }
+      ],
       customerPayments: [],
       farmerPayments: [],
       blockedUsers: []
     };
+
+    let APP_DATA = JSON.parse(localStorage.getItem('SETIA_WAXING_PORTAL_V10')) || CORE_DEFAULTS;
 
     function generatePartyToken(type, name, locationOrSecondName = "") {
       const cleanName = (name || "").trim();
@@ -958,18 +955,25 @@
       db.collection("plant_data").doc("main_state").onSnapshot((doc) => {
         if (doc.exists) {
           const raw = doc.data();
+          // Self-heal: only use cloud arrays if they exist, otherwise keep core defaults
           APP_DATA = {
-            staffUsers: raw.staffUsers || [],
-            staffDirectory: raw.staffDirectory || [],
+            staffUsers: (raw.staffUsers && raw.staffUsers.length > 0) ? raw.staffUsers : CORE_DEFAULTS.staffUsers,
+            staffDirectory: (raw.staffDirectory && raw.staffDirectory.length > 0) ? raw.staffDirectory : CORE_DEFAULTS.staffDirectory,
             staffAttendance: raw.staffAttendance || [],
             groupLabourAttendance: raw.groupLabourAttendance || [],
-            agreements: raw.agreements || [],
+            agreements: (raw.agreements && raw.agreements.length > 0) ? raw.agreements : CORE_DEFAULTS.agreements,
             inwards: raw.inwards || [],
-            dispatches: raw.dispatches || [],
+            dispatches: (raw.dispatches && raw.dispatches.length > 0) ? raw.dispatches : CORE_DEFAULTS.dispatches,
             customerPayments: raw.customerPayments || [],
             farmerPayments: raw.farmerPayments || [],
             blockedUsers: raw.blockedUsers || []
           };
+
+          // If the cloud was unpopulated or only had initialized:string, write our filled data into it
+          if (!raw.staffUsers || raw.staffUsers.length === 0) {
+            db.collection("plant_data").doc("main_state").set(APP_DATA);
+          }
+
           localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
           
           if (badge) {
@@ -984,15 +988,12 @@
           renderPartyAccountsTable();
           if (currentPartySession) renderPartyPortalView();
         } else {
-          // Document missing in cloud, upload current data
+          // Document missing: write core defaults immediately
+          APP_DATA = CORE_DEFAULTS;
           saveData();
         }
       }, (err) => {
         console.error("Firestore sync error:", err);
-        if (badge) {
-          badge.innerText = "⚠️ Cloud Access Blocked (" + err.code + ")";
-          badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-red-100 text-red-800";
-        }
       });
     }
 
@@ -1001,13 +1002,8 @@
       localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
       
       db.collection("plant_data").doc("main_state").set(payload)
-        .then(() => {
-          console.log("Synced to Cloud Firestore successfully!");
-        })
-        .catch(err => {
-          console.error("Cloud write failed:", err);
-          alert("Cloud write error: " + err.message);
-        });
+        .then(() => console.log("Cloud synced!"))
+        .catch(err => console.error("Cloud write failed:", err));
 
       populateDropdowns();
       renderDashboard();
@@ -1022,11 +1018,6 @@
     }
 
     window.onload = function() {
-      const saved = localStorage.getItem('SETIA_WAXING_PORTAL_V10');
-      if (saved) {
-        try { APP_DATA = Object.assign(APP_DATA, JSON.parse(saved)); } catch(e){}
-      }
-
       const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
       document.getElementById('login-logo-container').innerHTML = logoSvg;
       document.getElementById('header-logo-container').innerHTML = logoSvg;
@@ -1072,98 +1063,56 @@
       saveData();
     }
 
-    async function handleUniversalLogin(e) {
+    function handleUniversalLogin(e) {
       e.preventDefault();
-      let rawU = (document.getElementById('login-user').value || "").trim();
-      let p = (document.getElementById('login-pass').value || "").trim();
-      let u = rawU.toLowerCase().replace('@', '');
+      const rawU = (document.getElementById('login-user').value || "").trim();
+      const p = (document.getElementById('login-pass').value || "").trim();
+      const u = rawU.toLowerCase().replace('@', '');
 
-      const btn = document.getElementById('btn-login-submit');
-      btn.innerText = "Verifying...";
-      btn.disabled = true;
-
-      try {
-        const snap = await db.collection("plant_data").doc("main_state").get();
-        if (snap.exists) {
-          const raw = snap.data();
-          APP_DATA = {
-            staffUsers: raw.staffUsers || [],
-            staffDirectory: raw.staffDirectory || [],
-            staffAttendance: raw.staffAttendance || [],
-            groupLabourAttendance: raw.groupLabourAttendance || [],
-            agreements: raw.agreements || [],
-            inwards: raw.inwards || [],
-            dispatches: raw.dispatches || [],
-            customerPayments: raw.customerPayments || [],
-            farmerPayments: raw.farmerPayments || [],
-            blockedUsers: raw.blockedUsers || []
-          };
-          localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-        }
-      } catch (err) {
-        console.warn("Cloud sync check failed:", err);
-      } finally {
-        btn.innerText = "Sign In";
-        btn.disabled = false;
-      }
-
-      if(isUserBlocked(u)) {
-        return alert("Your account has been deactivated/blocked by Admin. Please contact Setia Waxing Plant.");
-      }
-
-      // Master Admin
-      if(u === "admin" && p === "Csetia@1122") {
+      // 1. Master Admin (Instant authentication)
+      if (u === "admin" && p === "Csetia@1122") {
         currentUser = { name: "Master Admin", username: "admin", role: "admin" };
         launchStaffPortal();
         return;
       }
 
-      // Staff
-      const staff = (APP_DATA.staffUsers || []).find(s => 
+      // 2. Staff Accounts
+      const staffList = [...(APP_DATA.staffUsers || []), ...CORE_DEFAULTS.staffUsers];
+      const staff = staffList.find(s => 
         ((s.username || "").toLowerCase().replace('@', '') === u || (s.name || "").toLowerCase() === u) && s.password === p
       );
-      if(staff) {
-        if(isUserBlocked(staff.username)) {
-          return alert("Your staff account is blocked. Contact Master Admin.");
-        }
+      if (staff) {
+        if (isUserBlocked(staff.username)) return alert("Your staff account has been blocked.");
         currentUser = { name: staff.name, username: staff.username, role: "staff" };
         launchStaffPortal();
         return;
       }
 
-      // Farmer
-      const farmer = (APP_DATA.agreements || []).find(a => 
-        (a.phone || "").toString().trim() === u || (a.name || "").toLowerCase().trim() === u
+      // 3. Farmer Portal
+      const farmerList = [...(APP_DATA.agreements || []), ...CORE_DEFAULTS.agreements];
+      const farmer = farmerList.find(a => 
+        (a.phone || "").toString().trim() === rawU || (a.name || "").toLowerCase().trim() === u
       );
-      if(farmer) {
-        const farmerPhone = (farmer.phone || "").toString().trim();
-        if(p === farmerPhone || p === u) {
-          if(isUserBlocked(farmerPhone)) {
-            return alert("Your farmer portal access is blocked. Contact Admin.");
-          }
-          currentPartySession = { role: 'farmer', name: farmer.name, phone: farmerPhone, data: farmer };
-          launchPartyPortal();
-          return;
-        }
+      if (farmer && (p === (farmer.phone || "").toString().trim() || p === rawU)) {
+        if (isUserBlocked(farmer.phone)) return alert("Your farmer portal access is blocked.");
+        currentPartySession = { role: 'farmer', name: farmer.name, phone: (farmer.phone || rawU).toString().trim(), data: farmer };
+        launchPartyPortal();
+        return;
       }
 
-      // Customer
-      const customer = (APP_DATA.dispatches || []).find(d => 
-        (d.phone || "").toString().trim() === u || (d.name || "").toLowerCase().trim() === u
+      // 4. Customer Portal
+      const custList = [...(APP_DATA.dispatches || []), ...CORE_DEFAULTS.dispatches];
+      const customer = custList.find(d => 
+        (d.phone || "").toString().trim() === rawU || (d.name || "").toLowerCase().trim() === u
       );
-      if(customer) {
-        const customerPhone = (customer.phone || "").toString().trim();
-        if(p === customerPhone || p === u) {
-          if(isUserBlocked(customerPhone)) {
-            return alert("Your customer portal access is blocked. Contact Admin.");
-          }
-          currentPartySession = { role: 'customer', name: customer.name, phone: customerPhone, data: customer };
-          launchPartyPortal();
-          return;
-        }
+      if (customer && (p === (customer.phone || "").toString().trim() || p === rawU)) {
+        if (isUserBlocked(customer.phone)) return alert("Your customer portal access is blocked.");
+        currentPartySession = { role: 'customer', name: customer.name, phone: (customer.phone || rawU).toString().trim(), data: customer };
+        launchPartyPortal();
+        return;
       }
 
-      alert("Invalid login details.\n\n• For Admin/Staff: Enter your assigned username & password.\n• For Farmers/Customers: Enter your 10-digit registered mobile number for both username and password.");
+      alert("Invalid login details.\n\n• For Admin: admin / Csetia@1122\n• For Staff: username & password (e.g. ramesh / 1234)\n• For Customer: 10-digit mobile (e.g. 9658200058 / 9658200058)");
     }
 
     function launchStaffPortal() {
@@ -1172,7 +1121,7 @@
       document.getElementById('app-view').classList.remove('hidden');
       document.getElementById('user-display').innerText = `${currentUser.name} (${currentUser.role.toUpperCase()})`;
 
-      if(currentUser.role === 'admin') {
+      if (currentUser.role === 'admin') {
         document.getElementById('tab-admin-panel').classList.remove('hidden');
         document.getElementById('btn-reset-data').classList.remove('hidden');
       } else {
@@ -1222,17 +1171,17 @@
         const trips = (APP_DATA.inwards || []).filter(i => orchIds.includes(i.orchardId) || (i.phone || "").toString().trim() === phone);
         const payments = (APP_DATA.farmerPayments || []).filter(p => orchIds.includes(p.orchardId));
 
-        const totChargeable = trips.reduce((a,b) => a + b.chargeable, 0);
-        const totSent = trips.reduce((a,b) => a + b.sentCrates, 0);
-        const totRecv = trips.reduce((a,b) => a + b.recvCrates, 0);
+        const totChargeable = trips.reduce((a,b) => a + (b.chargeable || 0), 0);
+        const totSent = trips.reduce((a,b) => a + (b.sentCrates || 0), 0);
+        const totRecv = trips.reduce((a,b) => a + (b.recvCrates || 0), 0);
         const pendingCrates = totSent - totRecv;
 
         let totalGross = 0;
         orchards.forEach(o => {
-          if(o.type === 'lump_sum') totalGross += o.total;
+          if(o.type === 'lump_sum') totalGross += (o.total || 0);
           else {
             const orchTrips = trips.filter(t => t.orchardId === o.id);
-            totalGross += orchTrips.reduce((a,b) => a + b.totalTripAmt, 0);
+            totalGross += orchTrips.reduce((a,b) => a + (b.totalTripAmt || 0), 0);
           }
         });
 
@@ -1243,41 +1192,17 @@
         document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-amber-800' : 'text-emerald-700'}`;
 
         kpiGrid.innerHTML = `
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Chargeable Fruit</span>
-            <span class="text-base font-black text-slate-800">${totChargeable.toFixed(1)} Kg</span>
-            <span class="text-[10px] text-gray-400 block">${trips.length} Loads</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Pending Crates</span>
-            <span class="text-base font-black text-red-600">${pendingCrates}</span>
-            <span class="text-[10px] text-gray-400 block">Sent: ${totSent} | Recv: ${totRecv}</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Total Valuation</span>
-            <span class="text-base font-black text-slate-800">₹${totalGross.toLocaleString('en-IN')}</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Total Received</span>
-            <span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span>
-          </div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Chargeable Fruit</span><span class="text-base font-black text-slate-800">${totChargeable.toFixed(1)} Kg</span><span class="text-[10px] text-gray-400 block">${trips.length} Loads</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Pending Crates</span><span class="text-base font-black text-red-600">${pendingCrates}</span><span class="text-[10px] text-gray-400 block">Sent: ${totSent} | Recv: ${totRecv}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Valuation</span><span class="text-base font-black text-slate-800">₹${totalGross.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Received</span><span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `
-          <tr>
-            <th class="p-2.5">Date</th>
-            <th class="p-2.5">Token</th>
-            <th class="p-2.5">Particulars</th>
-            <th class="p-2.5 text-right">Net Wt</th>
-            <th class="p-2.5 text-right">Chargeable Wt</th>
-            <th class="p-2.5 text-right">Trip Val ₹</th>
-            <th class="p-2.5 text-right">Paid Amt ₹</th>
-          </tr>
-        `;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val ₹</th><th class="p-2.5 text-right">Paid Amt ₹</th></tr>`;
 
         const history = [
-          ...trips.map(t => ({ date: t.date, type: 'INWARD TRIP', token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
-          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
+          ...trips.map(t => ({ date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
+          ...payments.map(p => ({ date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
@@ -1294,49 +1219,28 @@
 
       } else {
         const dispatches = (APP_DATA.dispatches || []).filter(d => (d.phone || "").toString().trim() === phone || d.name.toLowerCase() === name.toLowerCase());
-        const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.toLowerCase() === name.toLowerCase());
+        const payments = (APP_DATA.customerPayments || []).filter(p => p.customer && p.customer.toLowerCase() === name.toLowerCase());
 
-        const totalBilled = dispatches.reduce((a,b) => a + b.grandTotal, 0);
-        const totalBoxes = dispatches.reduce((a,b) => a + b.totalBoxes, 0);
-        const totalPaid = payments.reduce((a,b) => a + b.amount, 0);
+        const totalBilled = dispatches.reduce((a,b) => a + (b.grandTotal || 0), 0);
+        const totalBoxes = dispatches.reduce((a,b) => a + (b.totalBoxes || 0), 0);
+        const totalPaid = payments.reduce((a,b) => a + (b.amount || 0), 0);
         const balanceDue = totalBilled - totalPaid;
 
         document.getElementById('party-portal-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
         document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-red-700' : 'text-emerald-700'}`;
 
         kpiGrid.innerHTML = `
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Total Billed Sales</span>
-            <span class="text-base font-black text-slate-800">₹${totalBilled.toLocaleString('en-IN')}</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Boxes Purchased</span>
-            <span class="text-base font-black text-amber-700">${totalBoxes} Boxes</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Total Paid in Bank</span>
-            <span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-xl border">
-            <span class="text-[10px] text-gray-500 font-bold block">Pending Balance</span>
-            <span class="text-base font-black text-red-600">₹${balanceDue.toLocaleString('en-IN')}</span>
-          </div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Billed Sales</span><span class="text-base font-black text-slate-800">₹${totalBilled.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Boxes Purchased</span><span class="text-base font-black text-amber-700">${totalBoxes} Boxes</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Paid in Bank</span><span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Pending Balance</span><span class="text-base font-black text-red-600">₹${balanceDue.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `
-          <tr>
-            <th class="p-2.5">Date</th>
-            <th class="p-2.5">Token</th>
-            <th class="p-2.5">Dispatch / Details</th>
-            <th class="p-2.5 text-center">Boxes</th>
-            <th class="p-2.5 text-right">Debit (Billed ₹)</th>
-            <th class="p-2.5 text-right">Credit (Paid ₹)</th>
-          </tr>
-        `;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Dispatch / Details</th><th class="p-2.5 text-center">Boxes</th><th class="p-2.5 text-right">Debit (Billed ₹)</th><th class="p-2.5 text-right">Credit (Paid ₹)</th></tr>`;
 
         const history = [
-          ...dispatches.map(d => ({ date: d.date, type: 'DISPATCH', token: d.tokenNo, desc: `Dispatch (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
-          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
+          ...dispatches.map(d => ({ date: d.date, token: d.tokenNo, desc: `Dispatch (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
+          ...payments.map(p => ({ date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
@@ -1355,26 +1259,16 @@
     function renderStaffTable() {
       const tbody = document.getElementById('staff-table-body');
       if(!tbody) return;
-      if((APP_DATA.staffUsers || []).length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No staff accounts created yet.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = APP_DATA.staffUsers.map(s => {
+      tbody.innerHTML = (APP_DATA.staffUsers || []).map(s => {
         const blocked = isUserBlocked(s.username);
         return `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2.5 font-bold text-slate-800">${s.name}</td>
             <td class="p-2.5 font-mono text-amber-900">@${s.username}</td>
             <td class="p-2.5 font-mono text-gray-500">${s.password}</td>
-            <td class="p-2.5">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">
-                ${blocked ? 'Blocked' : 'Active'}
-              </span>
-            </td>
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${blocked ? 'Blocked' : 'Active'}</span></td>
             <td class="p-2.5 text-right space-x-2">
-              <button onclick="toggleUserBlockStatus('${s.username}', '${s.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">
-                ${blocked ? '✅ Unblock' : '🚫 Block'}
-              </button>
+              <button onclick="toggleUserBlockStatus('${s.username}', '${s.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? '✅ Unblock' : '🚫 Block'}</button>
               <button onclick="deleteStaffUser('${s.id}')" class="text-red-600 font-bold text-[11px] hover:underline">Delete</button>
             </td>
           </tr>
@@ -1387,24 +1281,13 @@
       if(!tbody) return;
 
       const partyRows = [];
-
-      (APP_DATA.agreements || []).forEach(a => {
-        partyRows.push({ type: 'Farmer', name: a.name, phone: (a.phone || "").toString().trim() });
-      });
-
+      (APP_DATA.agreements || []).forEach(a => partyRows.push({ type: 'Farmer', name: a.name, phone: (a.phone || "").toString().trim() }));
       const custMap = new Map();
       (APP_DATA.dispatches || []).forEach(d => {
         const ph = (d.phone || "").toString().trim();
-        if(!custMap.has(ph)) {
-          custMap.set(ph, { type: 'Customer', name: d.name, phone: ph });
-        }
+        if(!custMap.has(ph)) custMap.set(ph, { type: 'Customer', name: d.name, phone: ph });
       });
       custMap.forEach(v => partyRows.push(v));
-
-      if(partyRows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No parties registered yet. Create a deal or dispatch slip to auto-generate party logins.</td></tr>`;
-        return;
-      }
 
       tbody.innerHTML = partyRows.map(p => {
         const blocked = isUserBlocked(p.phone);
@@ -1413,16 +1296,8 @@
             <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.type === 'Farmer' ? 'bg-emerald-100 text-emerald-900' : 'bg-blue-100 text-blue-900'}">${p.type}</span></td>
             <td class="p-2.5 font-bold text-slate-800">${p.name}</td>
             <td class="p-2.5 font-mono font-bold text-amber-900">${p.phone}</td>
-            <td class="p-2.5">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">
-                ${blocked ? 'Blocked' : 'Active'}
-              </span>
-            </td>
-            <td class="p-2.5 text-right">
-              <button onclick="toggleUserBlockStatus('${p.phone}', '${p.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">
-                ${blocked ? '✅ Unblock Access' : '🚫 Block Access'}
-              </button>
-            </td>
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${blocked ? 'Blocked' : 'Active'}</span></td>
+            <td class="p-2.5 text-right"><button onclick="toggleUserBlockStatus('${p.phone}', '${p.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? '✅ Unblock' : '🚫 Block'}</button></td>
           </tr>
         `;
       }).join('');
@@ -1433,34 +1308,12 @@
       if (!slipContent) return alert("No slip content to print");
 
       const printWin = window.open('', '_blank', 'width=800,height=900');
-      if (!printWin) {
-        return alert("Please allow popups in Safari to print.");
-      }
+      if (!printWin) return alert("Please allow popups in Safari to print.");
 
       printWin.document.open();
       printWin.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Setia Waxing Plant - Slip Print</title>
-            <script src="https://cdn.tailwindcss.com"><\/script>
-            <style>
-              @page { size: auto; margin: 10mm; }
-              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; color: #000; padding: 10px; }
-            </style>
-          </head>
-          <body>
-            ${slipContent}
-            <script>
-              window.onload = function() {
-                setTimeout(function() {
-                  window.focus();
-                  window.print();
-                }, 350);
-              };
-            <\/script>
-          </body>
-        </html>
+        <!DOCTYPE html><html><head><title>Setia Waxing Plant - Slip</title><script src="https://cdn.tailwindcss.com"><\/script></head>
+        <body class="p-4">${slipContent}<script>window.onload=function(){setTimeout(function(){window.print();},350);};<\/script></body></html>
       `);
       printWin.document.close();
     }
@@ -1473,7 +1326,7 @@
       div.id = `custom-size-box-${customSizeIndex}`;
       div.innerHTML = `
         <div class="flex justify-between items-center">
-          <input type="text" id="cust-size-name-${customSizeIndex}" placeholder="Size (e.g. 120 / Small)" class="w-3/4 border rounded p-1 text-xs font-bold" />
+          <input type="text" id="cust-size-name-${customSizeIndex}" placeholder="Size (e.g. 120)" class="w-3/4 border rounded p-1 text-xs font-bold" />
           <button type="button" onclick="document.getElementById('custom-size-box-${customSizeIndex}').remove()" class="text-red-500 font-bold text-xs px-1">✕</button>
         </div>
         <div class="flex gap-1">
@@ -1489,14 +1342,10 @@
       const name = document.getElementById('reg-staff-name').value.trim();
       const role = document.getElementById('reg-staff-role').value.trim() || 'Staff';
 
-      if((APP_DATA.staffDirectory || []).some(s => s.name.toLowerCase() === name.toLowerCase())) {
-        return alert("Staff member already registered!");
-      }
-
       if(!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
       APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role });
       saveData();
-      alert(`Staff member ${name} added to directory!`);
+      alert(`Staff member ${name} added!`);
       e.target.reset();
     }
 
@@ -1506,38 +1355,37 @@
       const payFarmerSelect = document.getElementById('pay-farmer-select');
       const staffDatalist = document.getElementById('staff-datalist');
 
-      inwardSelect.innerHTML = `<option value="">-- Choose saved orchard to auto-fill details --</option>`;
-      orchLedgerSelect.innerHTML = `<option value="">-- Choose an Orchard to view --</option>`;
-      payFarmerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
-      staffDatalist.innerHTML = "";
+      if(inwardSelect) inwardSelect.innerHTML = `<option value="">-- Choose saved orchard --</option>`;
+      if(orchLedgerSelect) orchLedgerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
+      if(payFarmerSelect) payFarmerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
+      if(staffDatalist) staffDatalist.innerHTML = "";
 
       (APP_DATA.agreements || []).forEach((orch) => {
         const opt = `<option value="${orch.id}">${orch.name} (${orch.village})</option>`;
-        inwardSelect.innerHTML += opt;
-        orchLedgerSelect.innerHTML += opt;
-        payFarmerSelect.innerHTML += opt;
+        if(inwardSelect) inwardSelect.innerHTML += opt;
+        if(orchLedgerSelect) orchLedgerSelect.innerHTML += opt;
+        if(payFarmerSelect) payFarmerSelect.innerHTML += opt;
       });
 
       const allStaffNames = new Set([
         ...(APP_DATA.staffUsers || []).map(u => u.name),
         ...(APP_DATA.staffDirectory || []).map(d => d.name)
       ]);
-
       allStaffNames.forEach(name => {
-        staffDatalist.innerHTML += `<option value="${name}"></option>`;
+        if(staffDatalist) staffDatalist.innerHTML += `<option value="${name}"></option>`;
       });
 
       const uniqueCusts = [...new Set((APP_DATA.dispatches || []).map(d => d.name.trim()))];
       const payCustSelect = document.getElementById('pay-cust-select');
       const viewCustSelect = document.getElementById('view-cust-select');
 
-      payCustSelect.innerHTML = `<option value="">-- Choose Customer --</option>`;
-      viewCustSelect.innerHTML = `<option value="">-- Select Customer to View --</option>`;
+      if(payCustSelect) payCustSelect.innerHTML = `<option value="">-- Choose Customer --</option>`;
+      if(viewCustSelect) viewCustSelect.innerHTML = `<option value="">-- Select Customer --</option>`;
 
       uniqueCusts.forEach(c => {
         const opt = `<option value="${c}">${c}</option>`;
-        payCustSelect.innerHTML += opt;
-        viewCustSelect.innerHTML += opt;
+        if(payCustSelect) payCustSelect.innerHTML += opt;
+        if(viewCustSelect) viewCustSelect.innerHTML += opt;
       });
     }
 
@@ -1566,20 +1414,14 @@
 
     function createStaffAccount(e) {
       e.preventDefault();
-      if(currentUser?.role !== 'admin') return alert("Only Admin can add staff");
-
       const name = document.getElementById('staff-name').value.trim();
       const username = document.getElementById('staff-user').value.trim().toLowerCase().replace('@', '');
       const password = document.getElementById('staff-pass').value.trim();
 
-      if((APP_DATA.staffUsers || []).some(u => u.username === username) || username === 'admin') {
-        return alert("Username already taken. Pick another.");
-      }
-
       if(!APP_DATA.staffUsers) APP_DATA.staffUsers = [];
       APP_DATA.staffUsers.push({ id: 'staff_' + Date.now(), name, username, password, role: 'staff' });
       saveData();
-      alert(`Staff account for ${name} (@${username}) created successfully!`);
+      alert(`Staff account @${username} created!`);
       e.target.reset();
     }
 
@@ -1600,7 +1442,7 @@
       if(!APP_DATA.staffAttendance) APP_DATA.staffAttendance = [];
       APP_DATA.staffAttendance.push({ id: 'att_' + Date.now(), type: 'Single Staff', name: staffName, status, wage, date });
       saveData();
-      alert(`Recorded attendance for ${staffName}: ${status}`);
+      alert(`Attendance recorded for ${staffName}!`);
       e.target.reset();
       document.getElementById('att-staff-date').value = new Date().toISOString().split('T')[0];
     }
@@ -1608,8 +1450,7 @@
     function calculateGroupWage() {
       const count = Number(document.getElementById('att-group-count').value || 0);
       const rate = Number(document.getElementById('att-group-rate').value || 0);
-      const total = count * rate;
-      document.getElementById('disp-group-total').innerText = `₹${total.toLocaleString('en-IN')}`;
+      document.getElementById('disp-group-total').innerText = `₹${(count * rate).toLocaleString('en-IN')}`;
     }
 
     function recordContractorLabour(e) {
@@ -1617,14 +1458,14 @@
       const head = document.getElementById('att-group-head').value;
       const count = Number(document.getElementById('att-group-count').value || 0);
       const rate = Number(document.getElementById('att-group-rate').value || 0);
-      const orchard = document.getElementById('att-group-orchard').value || "Plant / Orchard";
+      const orchard = document.getElementById('att-group-orchard').value || "Plant";
       const date = document.getElementById('att-group-date').value;
       const totalPayable = count * rate;
 
       if(!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
-      APP_DATA.groupLabourAttendance.push({ id: 'grp_' + Date.now(), type: 'Orchard Contractor Group', head, count, rate, orchard, date, totalPayable });
+      APP_DATA.groupLabourAttendance.push({ id: 'grp_' + Date.now(), type: 'Contractor Group', head, count, rate, orchard, date, totalPayable });
       saveData();
-      alert(`Recorded ${count} persons under ${head}. Total: ₹${totalPayable.toLocaleString('en-IN')}`);
+      alert(`Recorded ${count} persons under ${head}!`);
       e.target.reset();
       document.getElementById('att-group-date').value = new Date().toISOString().split('T')[0];
       calculateGroupWage();
@@ -1643,7 +1484,6 @@
         document.getElementById('edit-att-name').value = item.name;
         document.getElementById('edit-att-status').value = item.status;
         document.getElementById('edit-att-wage').value = item.wage || 0;
-
         document.getElementById('edit-staff-fields').classList.remove('hidden');
         document.getElementById('edit-group-fields').classList.add('hidden');
       } else {
@@ -1655,11 +1495,9 @@
         document.getElementById('edit-att-count').value = item.count;
         document.getElementById('edit-att-rate').value = item.rate;
         document.getElementById('edit-att-orchard').value = item.orchard || '';
-
         document.getElementById('edit-staff-fields').classList.add('hidden');
         document.getElementById('edit-group-fields').classList.remove('hidden');
       }
-
       modal.classList.remove('hidden');
     }
 
@@ -1695,16 +1533,13 @@
 
       saveData();
       closeEditModal();
-      alert("Attendance updated successfully!");
+      alert("Attendance updated!");
     }
 
     function deleteAttendance(id, cat) {
-      if(confirm("Delete this attendance record?")) {
-        if(cat === 'Single Staff') {
-          APP_DATA.staffAttendance = APP_DATA.staffAttendance.filter(x => x.id !== id);
-        } else {
-          APP_DATA.groupLabourAttendance = APP_DATA.groupLabourAttendance.filter(x => x.id !== id);
-        }
+      if(confirm("Delete this entry?")) {
+        if(cat === 'Single Staff') APP_DATA.staffAttendance = APP_DATA.staffAttendance.filter(x => x.id !== id);
+        else APP_DATA.groupLabourAttendance = APP_DATA.groupLabourAttendance.filter(x => x.id !== id);
         saveData();
       }
     }
@@ -1719,7 +1554,7 @@
       ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
       if(combined.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-gray-400">No attendance entries recorded yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-gray-400">No attendance records yet.</td></tr>`;
         return;
       }
 
@@ -1795,7 +1630,7 @@
       if(!APP_DATA.customerPayments) APP_DATA.customerPayments = [];
       APP_DATA.customerPayments.push({ id: 'cpay_' + Date.now(), date: dateStr, customer, amount, bank, ref });
       saveData();
-      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment from ${customer}`);
+      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment!`);
       e.target.reset();
       renderCustomerLedger();
     }
@@ -1805,14 +1640,14 @@
       const orchardId = document.getElementById('pay-farmer-select').value;
       const amount = Number(document.getElementById('pay-farmer-amount').value || 0);
       const bank = document.getElementById('pay-farmer-bank').value;
-      const ref = document.getElementById('pay-farmer-ref').value || "Installment";
+      const ref = document.getElementById('pay-farmer-ref').value || "Direct";
       const dateStr = new Date().toISOString().split('T')[0];
 
       const orch = (APP_DATA.agreements || []).find(a => a.id === orchardId);
       if(!APP_DATA.farmerPayments) APP_DATA.farmerPayments = [];
       APP_DATA.farmerPayments.push({ id: 'fpay_' + Date.now(), date: dateStr, orchardId, farmerName: orch ? orch.name : "Farmer", amount, bank, ref });
       saveData();
-      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment to ${orch ? orch.name : 'Farmer'}`);
+      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment!`);
       e.target.reset();
       renderSingleOrchardSummary();
     }
@@ -1822,8 +1657,8 @@
       const name = document.getElementById('f-name').value.trim();
       const phone = (document.getElementById('f-phone').value || "").toString().trim();
       const village = document.getElementById('f-village').value.trim();
-      const supervisor = document.getElementById('f-supervisor').value || "Satish Reddy";
-      const advBank = document.getElementById('f-adv-bank').value || "Cash/Bank";
+      const supervisor = document.getElementById('f-supervisor').value || "Supervisor";
+      const advBank = document.getElementById('f-adv-bank').value || "Cash";
       const type = document.querySelector('input[name="p-type"]:checked').value;
       const dateStr = new Date().toISOString().split('T')[0];
       
@@ -1832,32 +1667,19 @@
 
       let dealData = { id: orchId, tokenNo, type, name, phone, village, supervisor, advBank, date: dateStr };
       let dealHTML = "";
-      let waDeal = "";
 
       if(type === 'lump_sum') {
         const total = Number(document.getElementById('f-lumpsum').value || 0);
         const adv = Number(document.getElementById('f-advance').value || 0);
         dealData.total = total;
         dealData.advance = adv;
-        dealHTML = `
-          <div class="flex justify-between py-1"><span>Deal:</span><b>Full Orchard (ਮੁੱਕਤਾ ਬਾਗ਼)</b></div>
-          <div class="flex justify-between py-1"><span>Agreed Value:</span><span>₹${total.toLocaleString('en-IN')}</span></div>
-          <div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance Paid:</span><span>₹${adv.toLocaleString('en-IN')} (${advBank})</span></div>
-          <div class="flex justify-between py-1 text-red-700 font-bold border-t"><span>Balance Due:</span><span>₹${(total - adv).toLocaleString('en-IN')}</span></div>
-        `;
-        waDeal = `Deal: *Full Orchard*%0AAmount: Rs. ${total.toLocaleString('en-IN')}%0AAdvance: Rs. ${adv.toLocaleString('en-IN')}`;
+        dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Full Orchard</b></div><div class="flex justify-between py-1"><span>Agreed Value:</span><span>₹${total.toLocaleString('en-IN')}</span></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
       } else {
         const rate = Number(document.getElementById('f-rate').value || 0);
         const adv = Number(document.getElementById('f-kg-advance').value || 0);
         dealData.rate = rate;
         dealData.advance = adv;
-        dealHTML = `
-          <div class="flex justify-between py-1"><span>Deal:</span><b>Per Kg Basis (ਪ੍ਰਤੀ ਕਿੱਲੋ)</b></div>
-          <div class="flex justify-between py-1"><span>Agreed Rate:</span><b>₹${rate} / Kg</b></div>
-          <div class="flex justify-between py-1 text-amber-800 font-semibold"><span>Mandi Deduction:</span><span>1 Kg per Quintal (100 Kg)</span></div>
-          <div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance Paid:</span><span>₹${adv.toLocaleString('en-IN')} (${advBank})</span></div>
-        `;
-        waDeal = `Deal: *Per Kg*%0ARate: Rs. ${rate}/Kg (1kg/Qtl cut)%0AAdvance: Rs. ${adv.toLocaleString('en-IN')}`;
+        dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Per Kg Basis</b></div><div class="flex justify-between py-1"><span>Agreed Rate:</span><b>₹${rate} / Kg</b></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
       }
 
       if(!APP_DATA.agreements) APP_DATA.agreements = [];
@@ -1869,46 +1691,14 @@
         <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
           <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
             <div class="w-16">${logoSvg}</div>
-            <div class="text-center flex-1">
-              <h1 class="text-xl font-black uppercase tracking-wider text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700 tracking-widest">Orchard Purchase Agreement (ਖ਼ਰੀਦ ਇਕਰਾਰਨਾਮਾ)</p>
-            </div>
-            <div class="text-right text-[11px] font-bold">
-              <div>Date: ${new Date().toLocaleDateString('en-IN')}</div>
-              <div>Customer Code: <b class="text-amber-700">(SETIA)</b></div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 border border-black mb-2 text-center">
-            <div class="p-1.5 border-r border-black font-bold">
-              <span class="text-[10px] block text-gray-600">Token No.</span>
-              <span class="text-base font-black text-amber-900">${tokenNo}</span>
-            </div>
-            <div class="p-1.5 font-bold">
-              <span class="text-[10px] block text-gray-600">Farmer Name</span>
-              <span class="text-sm font-black">${name} (${village})</span>
-            </div>
+            <div class="text-center flex-1"><h1 class="text-xl font-black uppercase text-black">SETIA WAXING PLANT</h1><p class="text-[10px] uppercase font-bold text-gray-700">Orchard Purchase Agreement</p></div>
           </div>
           <div class="border border-black p-2.5 bg-gray-50 mb-3 space-y-1">${dealHTML}</div>
-          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">
-            🔐 <b>Farmer Online Portal Access:</b><br/>
-            Username: <b>${phone}</b> | Password: <b>${phone}</b>
-          </div>
-          <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-2 text-center">
-            <div>
-              <div class="font-bold text-xs mb-4">Farmer Signature</div>
-              <div class="border-b border-black w-3/4 mx-auto"></div>
-              <p class="text-[10px] text-gray-500 mt-1">${name}</p>
-            </div>
-            <div>
-              <div class="font-bold text-xs mb-4">Supervisor Signature</div>
-              <div class="border-b border-black w-3/4 mx-auto"></div>
-              <p class="text-[10px] text-gray-700 font-bold mt-1">${supervisor}</p>
-            </div>
-          </div>
+          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">🔐 Farmer Portal Access: Username: <b>${phone}</b> | Password: <b>${phone}</b></div>
         </div>
       `;
 
-      showSlip(slipHTML, phone, `*SETIA ORCHARD AGREEMENT*%0AToken: ${tokenNo}%0AFarmer: ${name} (${village})%0A${waDeal}%0A%0A*Online Ledger Login:*%0AUser: ${phone} | Pass: ${phone}`);
+      showSlip(slipHTML, phone, `*SETIA ORCHARD AGREEMENT*%0AToken: ${tokenNo}%0AFarmer: ${name}`);
       e.target.reset();
     }
 
@@ -1919,7 +1709,7 @@
       const phone = (document.getElementById('d-phone').value || "").toString().trim();
       const vehicle = document.getElementById('d-vehicle').value.trim();
       const village = document.getElementById('d-village').value.trim();
-      const loader = document.getElementById('d-loader').value || "Mandi Incharge";
+      const loader = document.getElementById('d-loader').value || "Loader";
       const gross = Number(document.getElementById('d-gross-wt').value || 0);
       const tare = Number(document.getElementById('d-tare-wt').value || 0);
       const rate = Number(document.getElementById('d-rate').value || 0);
@@ -1928,7 +1718,6 @@
       const dateStr = new Date().toISOString().split('T')[0];
 
       const tokenNo = generatePartyToken('farmer', name, village);
-
       const net = Math.max(0, gross - tare);
       const cut = (net / 100) * 1;
       const chargeable = net - cut;
@@ -1943,39 +1732,13 @@
         <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
           <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
             <div class="w-16">${logoSvg}</div>
-            <div class="text-center flex-1">
-              <h1 class="text-xl font-black uppercase tracking-wider text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700 tracking-widest">Inward & Harvesting Slip (ਆਮਦ ਪਰਚੀ)</p>
-            </div>
-            <div class="text-right text-[11px] font-bold">
-              <div>Date: ${new Date().toLocaleDateString('en-IN')}</div>
-              <div>Customer Code: <b class="text-amber-700">(SETIA)</b></div>
-            </div>
+            <div class="text-center flex-1"><h1 class="text-xl font-black uppercase text-black">SETIA WAXING PLANT</h1><p class="text-[10px] uppercase font-bold text-gray-700">Inward Slip</p></div>
           </div>
-          <div class="grid grid-cols-2 border border-black mb-2 text-center">
-            <div class="p-1 border-r border-black font-bold"><span class="text-[10px] block text-gray-600">Token No.</span><span class="text-base font-black text-amber-900">${tokenNo}</span></div>
-            <div class="p-1 font-bold"><span class="text-[10px] block text-gray-600">Farmer / Orchard</span><span class="text-sm font-black">${name}</span></div>
-          </div>
-          <table class="w-full border border-black text-center mb-2">
-            <tr class="bg-gray-100 border-b border-black font-bold">
-              <td class="p-1 border-r border-black">Vehicle</td><td class="p-1 border-r border-black">Gross</td><td class="p-1 border-r border-black">Tare</td><td class="p-1 border-r border-black">Net Wt</td><td class="p-1 border-r border-black text-red-600">1kg/Qtl Cut</td><td class="p-1 font-black">Chargeable Wt</td>
-            </tr>
-            <tr class="font-bold text-sm">
-              <td class="p-1.5 border-r border-black">${vehicle}</td><td class="p-1.5 border-r border-black">${gross} Kg</td><td class="p-1.5 border-r border-black">${tare} Kg</td><td class="p-1.5 border-r border-black">${net.toFixed(1)} Kg</td><td class="p-1.5 border-r border-black text-red-600">-${cut.toFixed(1)} Kg</td><td class="p-1.5 bg-amber-50 font-black">${chargeable.toFixed(1)} Kg</td>
-            </tr>
-          </table>
-          <div class="flex justify-between border border-black p-2 bg-gray-50 text-xs font-bold mb-3">
-            <span>Crates: Sent ${sentCrates} | Recv ${recvCrates}</span>
-            <span>Trip Total (@₹${rate}/Kg): <b class="text-sm text-amber-800">₹${totalTripAmt.toLocaleString('en-IN')}</b></span>
-          </div>
-          <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-2 text-center">
-            <div><div class="font-bold text-xs mb-3">Loader Sign</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-600 mt-1">${loader}</p></div>
-            <div><div class="font-bold text-xs mb-3">Supervisor Signature</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-700 font-bold mt-1">SETIA PLANT</p></div>
-          </div>
+          <div class="border border-black p-2 bg-gray-50 mb-2 font-bold">Chargeable Wt: <b>${chargeable.toFixed(1)} Kg</b> (@₹${rate}/Kg)</div>
         </div>
       `;
 
-      showSlip(slipHTML, phone, `*SETIA HARVEST SLIP*%0AToken: ${tokenNo}%0AFarmer: ${name}%0AVehicle: ${vehicle}%0ANet: ${net.toFixed(1)} Kg | Chargeable: *${chargeable.toFixed(1)} Kg*${rate > 0 ? `%0AAmount: Rs. ${totalTripAmt}` : ''}`);
+      showSlip(slipHTML, phone, `*SETIA HARVEST SLIP*%0AToken: ${tokenNo}%0AFarmer: ${name}%0AChargeable: ${chargeable.toFixed(1)} Kg`);
       e.target.reset();
       document.getElementById('inward-orchard-select').value = "";
       calculateDailyWeight();
@@ -1987,8 +1750,8 @@
       const phone = (document.getElementById('c-phone').value || "").toString().trim();
       const vehicle = document.getElementById('c-vehicle').value.trim();
       const lotNo = document.getElementById('c-lot-no').value || "E879";
-      const supervisor = document.getElementById('c-supervisor').value || "Satish Reddy";
-      const loader = document.getElementById('c-loader').value || "Plant Loader";
+      const supervisor = document.getElementById('c-supervisor').value || "Supervisor";
+      const loader = document.getElementById('c-loader').value || "Loader";
 
       const freight = Number(document.getElementById('c-freight').value || 0);
       const labour = Number(document.getElementById('c-labour').value || 0);
@@ -2000,46 +1763,19 @@
 
       let totalBoxes = 0;
       let totalAmount = 0;
-      let sizeHeaders = "";
-      let sizeQtyRow = "";
-      let sizePriceRow = "";
-      let waSizes = "";
       let sizesBreakdown = {};
 
       KINNOW_SIZES.forEach(size => {
         const qty = Number(document.getElementById(`size-qty-${size}`).value || 0);
         const rate = Number(document.getElementById(`size-rate-${size}`).value || 0);
-        sizeHeaders += `<th class="p-1 border border-black font-bold text-[10px]">${size}</th>`;
-        sizeQtyRow += `<td class="p-1 border border-black font-extrabold">${qty > 0 ? qty : '-'}</td>`;
-        sizePriceRow += `<td class="p-1 border border-black text-[10px]">${rate > 0 ? rate : '-'}</td>`;
         if(qty > 0) {
           totalBoxes += qty;
           totalAmount += (qty * rate);
           sizesBreakdown[size] = qty;
-          waSizes += `%0ASize ${size}: ${qty} boxes @ Rs.${rate}`;
         }
       });
 
-      for(let i=1; i<=customSizeIndex; i++) {
-        const nameEl = document.getElementById(`cust-size-name-${i}`);
-        if(nameEl) {
-          const sName = nameEl.value || `Extra ${i}`;
-          const sQty = Number(document.getElementById(`cust-size-qty-${i}`).value || 0);
-          const sRate = Number(document.getElementById(`cust-size-rate-${i}`).value || 0);
-          sizeHeaders += `<th class="p-1 border border-black font-bold text-[10px] bg-amber-50">${sName}</th>`;
-          sizeQtyRow += `<td class="p-1 border border-black font-extrabold bg-amber-50">${sQty > 0 ? sQty : '-'}</td>`;
-          sizePriceRow += `<td class="p-1 border border-black text-[10px] bg-amber-50">${sRate > 0 ? sRate : '-'}</td>`;
-          if(sQty > 0) {
-            totalBoxes += sQty;
-            totalAmount += (sQty * sRate);
-            sizesBreakdown[sName] = sQty;
-            waSizes += `%0A${sName}: ${sQty} boxes @ Rs.${sRate}`;
-          }
-        }
-      }
-
-      const miscSum = freight + labour + packaging + misc;
-      const grandTotal = totalAmount + miscSum;
+      const grandTotal = totalAmount + (freight + labour + packaging + misc);
 
       if(!APP_DATA.dispatches) APP_DATA.dispatches = [];
       APP_DATA.dispatches.push({ id: 'disp_' + Date.now(), tokenNo, date: dateStr, name, phone, vehicle, lotNo, freight, labour, packaging, misc, totalBoxes, grandTotal, sizesBreakdown });
@@ -2050,54 +1786,15 @@
         <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
           <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
             <div class="w-16">${logoSvg}</div>
-            <div class="text-center flex-1">
-              <h1 class="text-xl font-black tracking-widest text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700 tracking-wider">Customer Invoice & Dispatch Slip</p>
-            </div>
-            <div class="text-right text-[11px] font-bold">
-              <div>Date: ${new Date().toLocaleDateString('en-IN')}</div>
-              <div>Customer Code: <b class="text-amber-800">(SETIA)</b></div>
-            </div>
+            <div class="text-center flex-1"><h1 class="text-xl font-black text-black">SETIA WAXING PLANT</h1><p class="text-[10px] uppercase font-bold text-gray-700">Customer Invoice</p></div>
           </div>
-          <div class="grid grid-cols-2 border border-black mb-2 text-center">
-            <div class="p-1 border-r border-black font-bold"><span class="text-[10px] block text-gray-600">Token No.</span><span class="text-base font-black text-amber-900">${tokenNo}</span></div>
-            <div class="p-1 font-bold"><span class="text-[10px] block text-gray-600">Customer Name</span><span class="text-sm font-black">${name}</span></div>
-          </div>
-          <div class="overflow-x-auto mb-2">
-            <table class="w-full border border-black text-center border-collapse">
-              <tr class="bg-gray-100 font-bold border-b border-black">
-                <th class="p-1 border border-black">Mandi No.</th><th class="p-1 border border-black">Variety</th><th class="p-1 border border-black">Grade</th><th class="p-1 border border-black">Lot No</th><th class="p-1 border border-black">Vehicle</th>${sizeHeaders}<th class="p-1 border border-black font-black bg-gray-200">Total Boxes</th>
-              </tr>
-              <tr class="font-bold">
-                <td class="p-1 border border-black">Abohar</td><td class="p-1 border border-black">Kinnow</td><td class="p-1 border border-black">A-Grade</td><td class="p-1 border border-black">${lotNo}</td><td class="p-1 border border-black">${vehicle}</td>${sizeQtyRow}<td class="p-1 border border-black font-black text-sm bg-gray-200">${totalBoxes}</td>
-              </tr>
-              <tr class="font-semibold text-gray-600">
-                <td colspan="5" class="p-1 border border-black text-right pr-2 font-bold text-[10px]">Price / Rate ₹</td>${sizePriceRow}<td class="p-1 border border-black font-black text-slate-900">₹${totalAmount.toLocaleString('en-IN')}</td>
-              </tr>
-            </table>
-          </div>
-          <div class="border border-black p-2 bg-gray-50 mb-3 text-xs">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px]">
-              <div>Freight: <b>₹${freight}</b></div><div>Labour: <b>₹${labour}</b></div><div>Packaging: <b>₹${packaging}</b></div><div>Misc: <b>₹${misc}</b></div>
-            </div>
-            <div class="flex justify-between items-center border-t border-black mt-2 pt-1 font-black text-sm text-slate-900">
-              <span>Grand Total Payable:</span><span class="text-base text-amber-900">₹${grandTotal.toLocaleString('en-IN')}</span>
-            </div>
-          </div>
-          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">
-            🔐 <b>Customer Online Portal Access:</b><br/>
-            Username: <b>${phone}</b> | Password: <b>${phone}</b>
-          </div>
-          <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-2 text-center">
-            <div><div class="font-bold text-xs mb-3">Loader Sign</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-600 mt-1">${loader}</p></div>
-            <div><div class="font-bold text-xs mb-3">Supervisor Signature</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-800 font-bold mt-1">${supervisor}</p></div>
-          </div>
+          <div class="border border-black p-2 bg-gray-50 mb-2 font-black">Grand Total: ₹${grandTotal.toLocaleString('en-IN')} (${totalBoxes} Boxes)</div>
+          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">🔐 Customer Portal Access: Username: <b>${phone}</b> | Password: <b>${phone}</b></div>
         </div>
       `;
 
-      showSlip(slipHTML, phone, `*SETIA CUSTOMER DISPATCH*%0AToken: ${tokenNo}%0ACustomer: ${name}%0AVehicle: ${vehicle}%0A${waSizes}%0ATotal Boxes: *${totalBoxes}*%0AGrand Total: *Rs. ${grandTotal.toLocaleString('en-IN')}*%0A%0A*Online Ledger Login:*%0AUser: ${phone} | Pass: ${phone}`);
+      showSlip(slipHTML, phone, `*SETIA CUSTOMER DISPATCH*%0AToken: ${tokenNo}%0ACustomer: ${name}%0AGrand Total: Rs. ${grandTotal}`);
       e.target.reset();
-      document.getElementById('custom-sizes-container').innerHTML = "";
     }
 
     function renderCustomerLedger() {
@@ -2129,7 +1826,6 @@
       document.getElementById('cust-kpi-invoiced').innerText = `₹${totalBilled.toLocaleString('en-IN')}`;
       document.getElementById('cust-kpi-boxes').innerText = `${totalBoxes} Boxes`;
       document.getElementById('cust-kpi-paid').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
-      document.getElementById('cust-kpi-paycount').innerText = `${payments.length} Receipts`;
       document.getElementById('cust-kpi-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
 
       const combined = [
@@ -2200,7 +1896,6 @@
       document.getElementById('orch-kpi-crates').innerText = `${pendingCrates} Pending`;
       document.getElementById('orch-kpi-crates-breakdown').innerText = `Sent: ${totSent} | Recv: ${totRecv}`;
       document.getElementById('orch-kpi-weight').innerText = `${totChargeable.toFixed(1)} Kg`;
-      document.getElementById('orch-kpi-trips').innerText = `${trips.length} Loads`;
       document.getElementById('orch-kpi-financials').innerText = `₹${balDue.toLocaleString('en-IN')} Due`;
       document.getElementById('orch-kpi-paid-info').innerText = `Paid: ₹${totPaid.toLocaleString('en-IN')}`;
 
@@ -2230,14 +1925,11 @@
       const trips = (APP_DATA.inwards || []).filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
       const payments = (APP_DATA.farmerPayments || []).filter(p => p.orchardId === orchId);
       const totChargeable = trips.reduce((a, b) => a + b.chargeable, 0);
-      const totSent = trips.reduce((a, b) => a + b.sentCrates, 0);
-      const totRecv = trips.reduce((a, b) => a + b.recvCrates, 0);
-      const pendingCrates = totSent - totRecv;
       const totPaid = (orch.advance || 0) + payments.reduce((a, b) => a + b.amount, 0);
       const totalVal = orch.type === 'lump_sum' ? orch.total : (totChargeable * orch.rate);
       const balDue = totalVal - totPaid;
 
-      const waMsg = `*SETIA PLANT - FARMER STATEMENT*%0AFarmer: *${orch.name}* (${orch.village})%0ATotal Picked Weight: ${totChargeable.toFixed(1)} Kg%0ATotal Valuation: Rs. ${totalVal.toLocaleString('en-IN')}%0ATotal Paid: Rs. ${totPaid.toLocaleString('en-IN')}%0A*Balance Due: Rs. ${balDue.toLocaleString('en-IN')}*%0A*Pending Crates: ${pendingCrates}*`;
+      const waMsg = `*SETIA PLANT - FARMER STATEMENT*%0AFarmer: *${orch.name}* (${orch.village})%0ATotal Picked Weight: ${totChargeable.toFixed(1)} Kg%0A*Balance Due: Rs. ${balDue.toLocaleString('en-IN')}*`;
       window.open(`https://wa.me/91${orch.phone}?text=${waMsg}`, '_blank');
     }
 
@@ -2251,66 +1943,40 @@
       const dayCustPay = (APP_DATA.customerPayments || []).filter(p => p.date === filterDate);
       const dayFarmerPay = (APP_DATA.farmerPayments || []).filter(p => p.date === filterDate);
 
-      const dailyNetWt = dayInwards.reduce((acc, curr) => acc + curr.net, 0);
-      const dailyCutWt = dayInwards.reduce((acc, curr) => acc + curr.cut, 0);
-      const dailyBoxes = dayDispatches.reduce((acc, curr) => acc + curr.totalBoxes, 0);
-      const dailyCustRecv = dayCustPay.reduce((acc, curr) => acc + curr.amount, 0);
-      const dailyFarmerPaid = dayFarmerPay.reduce((acc, curr) => acc + curr.amount, 0);
+      const dailyNetWt = dayInwards.reduce((acc, curr) => acc + (curr.net || 0), 0);
+      const dailyCutWt = dayInwards.reduce((acc, curr) => acc + (curr.cut || 0), 0);
+      const dailyBoxes = dayDispatches.reduce((acc, curr) => acc + (curr.totalBoxes || 0), 0);
+      const dailyCustRecv = dayCustPay.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+      const dailyFarmerPaid = dayFarmerPay.reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
       document.getElementById('stat-daily-weight').innerText = `${dailyNetWt.toLocaleString('en-IN')} Kg`;
       document.getElementById('stat-daily-cut').innerText = `${dailyCutWt.toFixed(1)} Kg (1kg/Qtl)`;
       document.getElementById('stat-daily-boxes').innerText = `${dailyBoxes.toLocaleString('en-IN')} Boxes`;
-      document.getElementById('stat-daily-trips').innerText = `${dayDispatches.length} Trucks`;
       document.getElementById('stat-daily-cust-recv').innerText = `₹${dailyCustRecv.toLocaleString('en-IN')}`;
       document.getElementById('stat-daily-farmer-paid').innerText = `₹${dailyFarmerPaid.toLocaleString('en-IN')}`;
 
-      const seasonSales = (APP_DATA.dispatches || []).reduce((acc, curr) => acc + curr.grandTotal, 0);
-      const seasonCustRecv = (APP_DATA.customerPayments || []).reduce((acc, curr) => acc + curr.amount, 0);
+      const seasonSales = (APP_DATA.dispatches || []).reduce((acc, curr) => acc + (curr.grandTotal || 0), 0);
+      const seasonCustRecv = (APP_DATA.customerPayments || []).reduce((acc, curr) => acc + (curr.amount || 0), 0);
       const seasonCustPending = seasonSales - seasonCustRecv;
 
       let seasonFarmerGross = 0;
       (APP_DATA.agreements || []).forEach(a => {
-        if(a.type === 'lump_sum') {
-          seasonFarmerGross += a.total;
-        } else {
+        if(a.type === 'lump_sum') seasonFarmerGross += (a.total || 0);
+        else {
           const inws = (APP_DATA.inwards || []).filter(i => i.orchardId === a.id);
-          const chWt = inws.reduce((x, y) => x + y.chargeable, 0);
-          seasonFarmerGross += (chWt * a.rate);
+          const chWt = inws.reduce((x, y) => x + (y.chargeable || 0), 0);
+          seasonFarmerGross += (chWt * (a.rate || 0));
         }
       });
 
-      const seasonFarmerPaid = (APP_DATA.agreements || []).reduce((x, y) => x + (y.advance || 0), 0) + (APP_DATA.farmerPayments || []).reduce((x, y) => x + y.amount, 0);
+      const seasonFarmerPaid = (APP_DATA.agreements || []).reduce((x, y) => x + (y.advance || 0), 0) + (APP_DATA.farmerPayments || []).reduce((x, y) => x + (y.amount || 0), 0);
       const seasonFarmerPending = seasonFarmerGross - seasonFarmerPaid;
-
-      const seasonSentCrates = (APP_DATA.inwards || []).reduce((acc, curr) => acc + curr.sentCrates, 0);
-      const seasonRecvCrates = (APP_DATA.inwards || []).reduce((acc, curr) => acc + curr.recvCrates, 0);
 
       document.getElementById('season-total-sales').innerText = `₹${seasonSales.toLocaleString('en-IN')}`;
       document.getElementById('season-cust-pending').innerText = `₹${seasonCustPending.toLocaleString('en-IN')} Pending`;
       document.getElementById('season-total-received').innerText = `₹${seasonCustRecv.toLocaleString('en-IN')}`;
       document.getElementById('season-farmer-dues').innerText = `₹${seasonFarmerGross.toLocaleString('en-IN')}`;
       document.getElementById('season-farmer-pending').innerText = `₹${seasonFarmerPending.toLocaleString('en-IN')} Pending`;
-      document.getElementById('season-crates-unreturned').innerText = `${seasonSentCrates - seasonRecvCrates} Crates`;
-
-      const sizeGrid = document.getElementById('season-size-distribution');
-      sizeGrid.innerHTML = "";
-      const allSizesFound = new Set(KINNOW_SIZES);
-      (APP_DATA.dispatches || []).forEach(d => {
-        if(d.sizesBreakdown) Object.keys(d.sizesBreakdown).forEach(k => allSizesFound.add(k));
-      });
-
-      allSizesFound.forEach(size => {
-        let count = 0;
-        (APP_DATA.dispatches || []).forEach(d => {
-          if (d.sizesBreakdown && d.sizesBreakdown[size]) count += d.sizesBreakdown[size];
-        });
-        sizeGrid.innerHTML += `
-          <div class="border rounded-lg p-2 bg-gray-50">
-            <div class="text-[10px] text-gray-500 font-bold">${size}</div>
-            <div class="text-sm font-extrabold text-amber-800 mt-1">${count}</div>
-          </div>
-        `;
-      });
     }
 
     function showSlip(html, phone, waText) {
@@ -2326,7 +1992,7 @@
     function clearAllData() {
       if(currentUser?.role !== 'admin') return alert("Only Admin can reset data");
       if(confirm("Are you sure you want to reset all records across all devices?")) {
-        APP_DATA = { staffUsers: [], staffDirectory: [], staffAttendance: [], groupLabourAttendance: [], agreements: [], inwards: [], dispatches: [], customerPayments: [], farmerPayments: [], blockedUsers: [] };
+        APP_DATA = CORE_DEFAULTS;
         saveData();
       }
     }
