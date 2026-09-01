@@ -3,16 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SETIA WAXING PLANT - Mandi & Plant Manager</title>
+  <title>SETIA WAXING PLANT - Mandi, Accounts & Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media print {
-      body * {
-        visibility: hidden !important;
-      }
-      #print-wrapper, #print-wrapper * {
-        visibility: visible !important;
-      }
+      body * { visibility: hidden !important; }
+      #print-wrapper, #print-wrapper * { visibility: visible !important; }
       #print-wrapper {
         position: fixed !important;
         left: 0 !important;
@@ -24,13 +20,8 @@
         display: block !important;
         z-index: 999999 !important;
       }
-      .no-print {
-        display: none !important;
-      }
-      @page {
-        size: auto;
-        margin: 8mm;
-      }
+      .no-print { display: none !important; }
+      @page { size: auto; margin: 8mm; }
     }
   </style>
 </head>
@@ -50,36 +41,84 @@
     </svg>
   </template>
 
-  <!-- 1. LOGIN SCREEN -->
+  <!-- 1. UNIVERSAL SINGLE LOGIN SCREEN (ADMIN / STAFF / FARMER / CUSTOMER) -->
   <div id="login-view" class="flex min-h-screen items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-200 text-center">
-      <div class="flex justify-center mb-3">
+    <div class="w-full max-w-md bg-white p-7 rounded-2xl shadow-xl border border-gray-200 text-center">
+      <div class="flex justify-center mb-2">
         <div id="login-logo-container"></div>
       </div>
-      <h2 class="text-2xl font-black text-amber-600 tracking-wider">SETIA WAXING PLANT</h2>
-      <p class="text-xs text-gray-500 mb-6 font-medium">Kinnow Mandi, Accounting & Labour Attendance</p>
-      
-      <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+      <h2 class="text-xl font-black text-amber-600 tracking-wider">SETIA WAXING PLANT</h2>
+      <p class="text-[11px] text-gray-500 mb-5 font-medium">Kinnow Mandi & Party Portal</p>
+
+      <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
         <div>
-          <label class="block text-xs font-semibold mb-1">Username / Staff ID</label>
-          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-sm outline-amber-600" placeholder="admin or staff username" />
+          <label class="block text-xs font-semibold mb-1">Username / Registered Mobile No.</label>
+          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="e.g. admin or 10-digit mobile" />
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">Password</label>
-          <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-sm outline-amber-600" placeholder="••••••••" />
+          <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600" placeholder="••••••••" />
         </div>
-        <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-900">
-          👑 Master Admin Login: <b>admin</b> / <b>admin123</b><br/>
-          (Staff accounts can be created inside by the Master Admin)
+        
+        <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-[11px] text-amber-900 space-y-1">
+          <div>👑 <b>Admin:</b> <code>admin</code> / <code>admin123</code></div>
+          <div>👨‍🌾 <b>Farmers & Customers:</b> Username & Password are both your <b>registered 10-digit mobile number</b>.</div>
         </div>
-        <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition shadow">
+
+        <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition text-xs shadow">
           Sign In
         </button>
       </form>
     </div>
   </div>
 
-  <!-- 2. MAIN APP -->
+  <!-- 2. FARMER / CUSTOMER PRIVATE PORTAL VIEW -->
+  <div id="party-portal-view" class="hidden min-h-screen flex flex-col">
+    <header class="bg-slate-900 text-white px-4 md:px-6 py-3 shadow flex justify-between items-center border-b-2 border-amber-500">
+      <div class="flex items-center gap-2.5">
+        <div id="party-logo-container"></div>
+        <div>
+          <h1 class="font-extrabold text-sm md:text-base text-amber-400 tracking-wider">SETIA WAXING PLANT</h1>
+          <p class="text-[10px] text-gray-300" id="party-header-welcome">Party Account</p>
+        </div>
+      </div>
+      <button onclick="logoutPortal()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold text-white">
+        Logout
+      </button>
+    </header>
+
+    <div class="max-w-4xl mx-auto w-full p-4 space-y-5">
+      <!-- Party Summary Banner -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700" id="party-portal-type">-</span>
+            <h2 class="text-lg font-black text-slate-900" id="party-portal-name">-</h2>
+            <p class="text-xs text-gray-500" id="party-portal-phone">-</p>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-gray-500 block">Balance Pending</span>
+            <h3 class="text-xl font-black" id="party-portal-balance">₹0</h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center" id="party-portal-kpi-grid"></div>
+      </div>
+
+      <!-- Party Transaction Ledger -->
+      <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700" id="party-table-title">Your Statement & History</h3>
+        <div class="overflow-x-auto border rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-gray-100 border-b font-bold text-gray-700" id="party-table-head"></thead>
+            <tbody id="party-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. MAIN ADMIN & STAFF APPLICATION -->
   <div id="app-view" class="hidden min-h-screen flex flex-col">
     <!-- Navbar -->
     <header class="bg-slate-900 text-white px-4 md:px-6 py-3 shadow flex justify-between items-center no-print sticky top-0 z-40 border-b-2 border-amber-500">
@@ -87,12 +126,12 @@
         <div id="header-logo-container"></div>
         <div>
           <h1 class="font-extrabold text-base md:text-lg text-amber-400 tracking-wider">SETIA WAXING PLANT</h1>
-          <p class="text-[11px] text-gray-300">Abohar Hub • Mandi & Staff Operations</p>
+          <p class="text-[11px] text-gray-300">Abohar Hub • Mandi Operations</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
         <span id="user-display" class="text-xs bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-full text-amber-300 font-semibold"></span>
-        <button onclick="logout()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold text-white">
+        <button onclick="logoutPortal()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold text-white">
           Logout
         </button>
       </div>
@@ -120,18 +159,20 @@
           3. Dispatch
         </button>
         <button onclick="switchTab('attendance')" id="tab-attendance" class="py-2.5 text-gray-500 hover:text-amber-700 bg-amber-50">
-          👥 Attendance & Labour
+          👥 Attendance
         </button>
         <button onclick="switchTab('admin-panel')" id="tab-admin-panel" class="py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black hidden">
-          👑 Master Admin & Staff Control
+          👑 Master Admin & Accounts Control
         </button>
       </div>
 
-      <!-- TAB: MASTER ADMIN PANEL (ONLY VISIBLE TO ADMIN) -->
+      <!-- TAB: MASTER ADMIN PANEL -->
       <div id="admin-panel-section" class="hidden space-y-6">
-        <div class="bg-amber-50 border-2 border-amber-400 p-5 rounded-xl shadow-sm">
-          <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
-          <p class="text-xs text-amber-800 mb-4">Create, manage and configure login credentials for your plant & mandi staff.</p>
+        <div class="bg-amber-50 border-2 border-amber-400 p-5 rounded-xl shadow-sm space-y-5">
+          <div>
+            <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
+            <p class="text-xs text-amber-800">Create staff logins and review auto-generated farmer & customer access accounts.</p>
+          </div>
 
           <!-- Add Staff Form -->
           <form onsubmit="createStaffAccount(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-white p-4 rounded-xl border border-amber-300">
@@ -154,9 +195,9 @@
             </div>
           </form>
 
-          <!-- Staff Table -->
-          <div class="mt-5">
-            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Active Staff Users List</h4>
+          <!-- Staff Accounts Table -->
+          <div>
+            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Active Staff Users</h4>
             <div class="overflow-x-auto bg-white rounded-xl border">
               <table class="w-full text-left text-xs">
                 <thead class="bg-gray-100 border-b font-bold text-gray-700">
@@ -172,32 +213,68 @@
               </table>
             </div>
           </div>
+
+          <!-- Registered Auto-Generated Party Logins -->
+          <div>
+            <h4 class="text-xs font-bold uppercase text-slate-700 mb-2">Auto-Generated Party Access List (Farmers & Customers)</h4>
+            <div class="overflow-x-auto bg-white rounded-xl border">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-gray-100 border-b font-bold text-gray-700">
+                  <tr>
+                    <th class="p-2.5">Party Type</th>
+                    <th class="p-2.5">Party Name</th>
+                    <th class="p-2.5">Login Username (Phone)</th>
+                    <th class="p-2.5">Password</th>
+                    <th class="p-2.5 text-right">Registered Date</th>
+                  </tr>
+                </thead>
+                <tbody id="party-accounts-table-body"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- TAB: ATTENDANCE & ORCHARD LABOUR MANAGEMENT -->
+      <!-- TAB: ATTENDANCE & LABOUR MANAGEMENT -->
       <div id="attendance-section" class="hidden space-y-6">
-        <!-- 1. Single Staff Attendance -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b">1. Staff Individual Attendance (ਸਟਾਫ਼ ਹਾਜ਼ਰੀ)</h3>
+          <h3 class="text-base font-bold text-slate-800 mb-2 pb-2 border-b">📋 Register New Staff Member (ਸਟਾਫ਼ ਸ਼ਾਮਲ ਕਰੋ)</h3>
+          <form onsubmit="registerQuickStaff(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label class="block font-semibold mb-1">Staff Member Name</label>
+              <input type="text" id="reg-staff-name" required class="w-full border rounded-lg p-2" placeholder="e.g. Gurpreet Singh" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Role / Designation</label>
+              <input type="text" id="reg-staff-role" class="w-full border rounded-lg p-2" placeholder="e.g. Machine Operator" />
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
+                + Add to Staff Directory
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+          <h3 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b">1. Staff Daily Attendance (ਰੋਜ਼ਾਨਾ ਹਾਜ਼ਰੀ)</h3>
           <form onsubmit="recordStaffAttendance(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
             <div>
-              <label class="block font-semibold mb-1">Select Staff Member</label>
-              <select id="att-staff-select" required class="w-full border rounded-lg p-2 bg-amber-50 font-medium">
-                <option value="">-- Choose Staff --</option>
-              </select>
+              <label class="block font-semibold mb-1">Staff Name</label>
+              <input list="staff-datalist" id="att-staff-input" required class="w-full border rounded-lg p-2 bg-amber-50 font-medium" placeholder="Select or type" />
+              <datalist id="staff-datalist"></datalist>
             </div>
             <div>
               <label class="block font-semibold mb-1">Status</label>
               <select id="att-staff-status" required class="w-full border rounded-lg p-2">
-                <option value="Present">Present (ਪੂਰਾ ਦਿਨ)</option>
-                <option value="Half Day">Half Day (ਅੱਧਾ ਦਿਨ)</option>
-                <option value="Absent">Absent (ਗ਼ੈਰ-ਹਾਜ਼ਰ)</option>
-                <option value="Leave">Leave (ਛੁੱਟੀ)</option>
+                <option value="Present">Present</option>
+                <option value="Half Day">Half Day</option>
+                <option value="Absent">Absent</option>
+                <option value="Leave">Leave</option>
               </select>
             </div>
             <div>
-              <label class="block font-semibold mb-1">Daily Wages / Salary ₹ (Optional)</label>
+              <label class="block font-semibold mb-1">Daily Wages ₹</label>
               <input type="number" id="att-staff-wage" class="w-full border rounded-lg p-2" placeholder="e.g. 500" />
             </div>
             <div>
@@ -206,36 +283,36 @@
             </div>
             <div class="flex items-end">
               <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
-                Save Staff Attendance
+                Save Attendance
               </button>
             </div>
           </form>
         </div>
 
-        <!-- 2. Group / Contractor Orchard Labour Attendance (e.g., Rani Model) -->
+        <!-- Group / Rani Model Labour -->
         <div class="bg-amber-50/70 p-5 rounded-xl border-2 border-amber-300 shadow-sm">
           <div class="flex justify-between items-center mb-3 pb-2 border-b border-amber-200">
             <div>
-              <h3 class="text-base font-black text-slate-900">2. Orchard Contractor & Group Labour Attendance</h3>
-              <p class="text-xs text-amber-900">Enter head count under contractor (e.g. Under Rani: 12 persons worked)</p>
+              <h3 class="text-base font-black text-slate-900">2. Contractor Group Labour Attendance (e.g. Rani Model)</h3>
+              <p class="text-xs text-amber-900">Enter number of labourers working under contractor</p>
             </div>
           </div>
           <form onsubmit="recordContractorLabour(event)" class="grid grid-cols-1 md:grid-cols-6 gap-3 text-xs">
             <div>
-              <label class="block font-bold mb-1">Contractor / Mukadam Name</label>
-              <input type="text" id="att-group-head" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Rani Mukadam / Billa" />
+              <label class="block font-bold mb-1">Contractor Name</label>
+              <input type="text" id="att-group-head" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Rani Mukadam" />
             </div>
             <div>
-              <label class="block font-bold mb-1">Persons Present (ਕੁੱਲ ਬੰਦੇ)</label>
+              <label class="block font-bold mb-1">Persons Present</label>
               <input type="number" id="att-group-count" required min="1" class="w-full border rounded-lg p-2 bg-white font-black text-amber-900" placeholder="e.g. 14" oninput="calculateGroupWage()" />
             </div>
             <div>
-              <label class="block font-bold mb-1">Wage Rate per Person ₹</label>
+              <label class="block font-bold mb-1">Wage per Head ₹</label>
               <input type="number" id="att-group-rate" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. 450" oninput="calculateGroupWage()" />
             </div>
             <div>
-              <label class="block font-bold mb-1">Orchard / Location</label>
-              <input type="text" id="att-group-orchard" class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Seed Farm Orchard" />
+              <label class="block font-bold mb-1">Location</label>
+              <input type="text" id="att-group-orchard" class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Seed Farm" />
             </div>
             <div>
               <label class="block font-bold mb-1">Date</label>
@@ -248,13 +325,12 @@
             </div>
           </form>
           <div class="mt-2 text-right text-xs font-bold text-amber-900">
-            Calculated Payout for Group: <span id="disp-group-total" class="text-sm font-black text-slate-900">₹0</span>
+            Calculated Payout: <span id="disp-group-total" class="text-sm font-black text-slate-900">₹0</span>
           </div>
         </div>
 
-        <!-- Attendance Records Viewer -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h4 class="text-xs font-bold uppercase text-slate-700 mb-3">Attendance & Labour History</h4>
+          <h4 class="text-xs font-bold uppercase text-slate-700 mb-3">Attendance History (Click Edit to change)</h4>
           <div class="overflow-x-auto border rounded-xl">
             <table class="w-full text-left text-xs">
               <thead class="bg-gray-100 border-b font-bold text-gray-700">
@@ -264,12 +340,69 @@
                   <th class="p-2.5">Name / Head</th>
                   <th class="p-2.5 text-center">Count / Status</th>
                   <th class="p-2.5">Rate / Details</th>
-                  <th class="p-2.5 text-right">Total Payable ₹</th>
+                  <th class="p-2.5 text-right">Total ₹</th>
+                  <th class="p-2.5 text-right">Action</th>
                 </tr>
               </thead>
               <tbody id="attendance-table-body"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- EDIT ATTENDANCE MODAL -->
+      <div id="edit-attendance-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 text-xs">
+          <h3 class="text-base font-bold text-slate-900 mb-3 pb-2 border-b" id="edit-modal-title">Edit Attendance</h3>
+          <form onsubmit="saveEditedAttendance(event)" class="space-y-3">
+            <input type="hidden" id="edit-att-id" />
+            <input type="hidden" id="edit-att-type" />
+            <div>
+              <label class="block font-semibold mb-1">Date</label>
+              <input type="date" id="edit-att-date" required class="w-full border rounded-lg p-2" />
+            </div>
+            <div id="edit-staff-fields">
+              <div>
+                <label class="block font-semibold mb-1">Staff Name</label>
+                <input type="text" id="edit-att-name" class="w-full border rounded-lg p-2" />
+              </div>
+              <div class="mt-2">
+                <label class="block font-semibold mb-1">Status</label>
+                <select id="edit-att-status" class="w-full border rounded-lg p-2">
+                  <option value="Present">Present</option>
+                  <option value="Half Day">Half Day</option>
+                  <option value="Absent">Absent</option>
+                  <option value="Leave">Leave</option>
+                </select>
+              </div>
+              <div class="mt-2">
+                <label class="block font-semibold mb-1">Daily Wages ₹</label>
+                <input type="number" id="edit-att-wage" class="w-full border rounded-lg p-2" />
+              </div>
+            </div>
+            <div id="edit-group-fields" class="hidden space-y-2">
+              <div>
+                <label class="block font-semibold mb-1">Contractor Name</label>
+                <input type="text" id="edit-att-head" class="w-full border rounded-lg p-2" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Labourers Present</label>
+                <input type="number" id="edit-att-count" class="w-full border rounded-lg p-2" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Rate per Person ₹</label>
+                <input type="number" id="edit-att-rate" class="w-full border rounded-lg p-2" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">Location</label>
+                <input type="text" id="edit-att-orchard" class="w-full border rounded-lg p-2" />
+              </div>
+            </div>
+            <div class="flex gap-2 pt-3 border-t">
+              <button type="submit" class="flex-1 bg-slate-900 text-amber-400 font-bold py-2 rounded-lg">Save Changes</button>
+              <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded-lg">Cancel</button>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -540,11 +673,11 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name</label>
-              <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Sunil Kumar (S.J.O)" />
+              <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Sunil Kumar" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">Mobile / WhatsApp</label>
-              <input type="tel" id="f-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm" placeholder="10-digit mobile" />
+              <label class="block text-xs font-semibold mb-1">Registered Mobile Number (Username & Password)</label>
+              <input type="tel" id="f-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Village / Location</label>
@@ -600,7 +733,7 @@
           </div>
 
           <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg shadow">
-            Save Orchard Deal & Generate SETIA Slip
+            Save Deal & Register Farmer Portal Access
           </button>
         </form>
       </div>
@@ -688,11 +821,11 @@
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label class="block text-xs font-semibold mb-1">Customer / Buyer Name</label>
-              <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Chifu Agritech / Sharma" />
+              <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Chifu Agritech" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">WhatsApp Phone</label>
-              <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm" placeholder="10-digit mobile" />
+              <label class="block text-xs font-semibold mb-1">Registered Mobile Number (Username & Password)</label>
+              <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Vehicle / Truck No</label>
@@ -704,7 +837,6 @@
             </div>
           </div>
 
-          <!-- Kinnow Size Breakdown Matrix -->
           <div class="mt-4">
             <div class="flex justify-between items-center mb-2">
               <h4 class="text-xs font-bold uppercase text-slate-700">Kinnow Size Matrix (Boxes & Rates)</h4>
@@ -712,12 +844,10 @@
                 + Add Extra Size
               </button>
             </div>
-            
             <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 text-center" id="kinnow-size-grid"></div>
             <div id="custom-sizes-container" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3"></div>
           </div>
 
-          <!-- Miscellaneous & Mandi Expenses Section -->
           <div class="border-t pt-4 bg-gray-50 p-4 rounded-xl space-y-3">
             <h4 class="text-xs font-bold uppercase text-slate-700">Freight & Miscellaneous Expenses (ਫੁਟਕਲ ਖ਼ਰਚੇ)</h4>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -748,7 +878,7 @@
           </div>
 
           <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg shadow">
-            Save & Generate SETIA Customer Slip
+            Save Invoice & Register Customer Portal Access
           </button>
         </form>
       </div>
@@ -780,9 +910,11 @@
     const KINNOW_SIZES = ["36", "42", "45", "54", "60", "72", "84", "96", "108"];
     let customSizeIndex = 0;
     let currentUser = null;
+    let currentPartySession = null;
 
-    let APP_DATA = JSON.parse(localStorage.getItem('SETIA_WAXING_PORTAL_V5')) || {
+    let APP_DATA = JSON.parse(localStorage.getItem('SETIA_WAXING_PORTAL_V8')) || {
       staffUsers: [],
+      staffDirectory: [],
       staffAttendance: [],
       groupLabourAttendance: [],
       agreements: [],
@@ -793,17 +925,19 @@
     };
 
     function saveData() {
-      localStorage.setItem('SETIA_WAXING_PORTAL_V5', JSON.stringify(APP_DATA));
+      localStorage.setItem('SETIA_WAXING_PORTAL_V8', JSON.stringify(APP_DATA));
       populateDropdowns();
       renderDashboard();
       renderAttendanceTable();
       renderStaffTable();
+      renderPartyAccountsTable();
     }
 
     window.onload = function() {
       const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
       document.getElementById('login-logo-container').innerHTML = logoSvg;
       document.getElementById('header-logo-container').innerHTML = logoSvg;
+      document.getElementById('party-logo-container').innerHTML = logoSvg;
 
       const grid = document.getElementById('kinnow-size-grid');
       grid.innerHTML = "";
@@ -825,6 +959,267 @@
       populateDropdowns();
     };
 
+    // --- UNIVERSAL AUTHENTICATION (NO OTP) ---
+    function handleUniversalLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('login-user').value.trim();
+      const p = document.getElementById('login-pass').value.trim();
+
+      // 1. Admin Login
+      if(u === "admin" && p === "admin123") {
+        currentUser = { name: "Master Admin", username: "admin", role: "admin" };
+        launchStaffPortal();
+        return;
+      }
+
+      // 2. Staff Login
+      const staff = APP_DATA.staffUsers.find(s => s.username === u && s.password === p);
+      if(staff) {
+        currentUser = { name: staff.name, username: staff.username, role: "staff" };
+        launchStaffPortal();
+        return;
+      }
+
+      // 3. Farmer Auto Login (Username = Phone, Password = Phone)
+      const farmer = APP_DATA.agreements.find(a => a.phone === u);
+      if(farmer && p === u) {
+        currentPartySession = { role: 'farmer', name: farmer.name, phone: u, data: farmer };
+        launchPartyPortal();
+        return;
+      }
+
+      // 4. Customer Auto Login (Username = Phone, Password = Phone)
+      const customer = APP_DATA.dispatches.find(d => d.phone === u);
+      if(customer && p === u) {
+        currentPartySession = { role: 'customer', name: customer.name, phone: u, data: customer };
+        launchPartyPortal();
+        return;
+      }
+
+      alert("Invalid login details.\n\n• For Admin/Staff: Enter your assigned username & password.\n• For Farmers/Customers: Your username and password are your registered 10-digit mobile number.");
+    }
+
+    function launchStaffPortal() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('party-portal-view').classList.add('hidden');
+      document.getElementById('app-view').classList.remove('hidden');
+      document.getElementById('user-display').innerText = `${currentUser.name} (${currentUser.role.toUpperCase()})`;
+
+      if(currentUser.role === 'admin') {
+        document.getElementById('tab-admin-panel').classList.remove('hidden');
+        document.getElementById('btn-reset-data').classList.remove('hidden');
+      } else {
+        document.getElementById('tab-admin-panel').classList.add('hidden');
+        document.getElementById('btn-reset-data').classList.add('hidden');
+      }
+
+      renderDashboard();
+      renderStaffTable();
+      renderPartyAccountsTable();
+      renderAttendanceTable();
+    }
+
+    function launchPartyPortal() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('app-view').classList.add('hidden');
+      document.getElementById('party-portal-view').classList.remove('hidden');
+      renderPartyPortalView();
+    }
+
+    function logoutPortal() {
+      currentUser = null;
+      currentPartySession = null;
+      document.getElementById('app-view').classList.add('hidden');
+      document.getElementById('party-portal-view').classList.add('hidden');
+      document.getElementById('login-view').classList.remove('hidden');
+      document.getElementById('login-user').value = "";
+      document.getElementById('login-pass').value = "";
+    }
+
+    function renderPartyPortalView() {
+      if(!currentPartySession) return;
+      const { role, name, phone } = currentPartySession;
+
+      document.getElementById('party-portal-name').innerText = name;
+      document.getElementById('party-portal-phone').innerText = `Registered Mobile: +91 ${phone}`;
+      document.getElementById('party-header-welcome').innerText = `${role.toUpperCase()} SELF-SERVICE`;
+      document.getElementById('party-portal-type').innerText = `${role.toUpperCase()} ACCOUNT`;
+
+      const kpiGrid = document.getElementById('party-portal-kpi-grid');
+      const thead = document.getElementById('party-table-head');
+      const tbody = document.getElementById('party-table-body');
+
+      if(role === 'farmer') {
+        const orchards = APP_DATA.agreements.filter(a => a.phone === phone);
+        const orchIds = orchards.map(o => o.id);
+        const trips = APP_DATA.inwards.filter(i => orchIds.includes(i.orchardId) || i.phone === phone);
+        const payments = APP_DATA.farmerPayments.filter(p => orchIds.includes(p.orchardId));
+
+        const totChargeable = trips.reduce((a,b) => a + b.chargeable, 0);
+        const totSent = trips.reduce((a,b) => a + b.sentCrates, 0);
+        const totRecv = trips.reduce((a,b) => a + b.recvCrates, 0);
+        const pendingCrates = totSent - totRecv;
+
+        let totalGross = 0;
+        orchards.forEach(o => {
+          if(o.type === 'lump_sum') totalGross += o.total;
+          else {
+            const orchTrips = trips.filter(t => t.orchardId === o.id);
+            totalGross += orchTrips.reduce((a,b) => a + b.totalTripAmt, 0);
+          }
+        });
+
+        const totalPaid = orchards.reduce((a,b) => a + (b.advance||0), 0) + payments.reduce((a,b) => a + b.amount, 0);
+        const balanceDue = totalGross - totalPaid;
+
+        document.getElementById('party-portal-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
+        document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-amber-800' : 'text-emerald-700'}`;
+
+        kpiGrid.innerHTML = `
+          <div class="p-3 bg-gray-50 rounded-xl border">
+            <span class="text-[10px] text-gray-500 font-bold block">Chargeable Fruit</span>
+            <span class="text-base font-black text-slate-800">${totChargeable.toFixed(1)} Kg</span>
+            <span class="text-[10px] text-gray-400 block">${trips.length} Loads</span>
+          </div>
+          <div class="p-3 bg-gray-50 rounded-xl border">
+            <span class="text-[10px] text-gray-500 font-bold block">Pending Crates</span>
+            <span class="text-base font-black text-red-600">${pendingCrates}</span>
+            <span class="text-[10px] text-gray-400 block">Sent: ${totSent} | Recv: ${totRecv}</span>
+          </div>
+          <div class="p-3 bg-gray-50 rounded-xl border">
+            <span class="text-[10px] text-gray-500 font-bold block">Total Valuation</span>
+            <span class="text-base font-black text-slate-800">₹${totalGross.toLocaleString('en-IN')}</span>
+          </div>
+          <div class="p-3 bg-gray-50 rounded-xl border">
+            <span class="text-[10px] text-gray-500 font-bold block">Total Received</span>
+            <span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span>
+          </div>
+        `;
+
+        thead.innerHTML = `
+          <tr>
+            <th class="p-2.5">Date</th>
+            <th class="p-2.5">Type</th>
+            <th class="p-2.5">Particulars</th>
+            <th class="p-2.5 text-right">Net Wt</th>
+            <th class="p-2.5 text-right">Chargeable Wt</th>
+            <th class="p-2.5 text-right">Trip Val ₹</th>
+            <th class="p-2.5 text-right">Paid Amt ₹</th>
+          </tr>
+        `;
+
+        const history = [
+          ...trips.map(t => ({ date: t.date, type: 'INWARD TRIP', desc: `Token ${t.tokenNo} (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
+          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
+        ].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        tbody.innerHTML = history.map(h => `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2.5">${h.date}</td>
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${h.type === 'PAYMENT' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${h.type}</span></td>
+            <td class="p-2.5 font-medium">${h.desc}</td>
+            <td class="p-2.5 text-right">${h.net > 0 ? h.net.toFixed(1) + ' Kg' : '-'}</td>
+            <td class="p-2.5 text-right font-bold text-slate-900">${h.chg > 0 ? h.chg.toFixed(1) + ' Kg' : '-'}</td>
+            <td class="p-2.5 text-right font-semibold text-slate-800">${h.val > 0 ? '₹' + h.val.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right font-bold text-emerald-700">${h.paid > 0 ? '₹' + h.paid.toLocaleString('en-IN') : '-'}</td>
+          </tr>
+        `).join('');
+
+      } else {
+        const dispatches = APP_DATA.dispatches.filter(d => d.phone === phone || d.name.toLowerCase() === name.toLowerCase());
+        const payments = APP_DATA.customerPayments.filter(p => p.customer.toLowerCase() === name.toLowerCase());
+
+        const totalBilled = dispatches.reduce((a,b) => a + b.grandTotal, 0);
+        const totalBoxes = dispatches.reduce((a,b) => a + b.totalBoxes, 0);
+        const totalPaid = payments.reduce((a,b) => a + b.amount, 0);
+        const balanceDue = totalBilled - totalPaid;
+
+        document.getElementById('party-portal-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
+        document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-red-700' : 'text-emerald-700'}`;
+
+        kpiGrid.innerHTML = `
+          <div class="p-3 bg-gray-50 rounded-xl border">
+            <span class="text-[10px] text-gray-500 font-bold block">Total Billed Sales</span>
+            <span class="text-base font-black text-slate-800">₹${totalBilled.toLocaleString('en-IN')}</span>
+          </div>
+          <div class="p-3 bg-gray-50 rounded-xl border">
+            <span class="text-[10px] text-gray-500 font-bold block">Boxes Purchased</span>
+            <span class="text-base font-black text-amber-700">${totalBoxes} Boxes</span>
+          </div>
+          <div class="p-3 bg-gray-50 rounded-xl border">
+            <span class="text-[10px] text-gray-500 font-bold block">Total Paid in Bank</span>
+            <span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span>
+          </div>
+          <div class="p-3 bg-gray-50 rounded-xl border">
+            <span class="text-[10px] text-gray-500 font-bold block">Pending Balance</span>
+            <span class="text-base font-black text-red-600">₹${balanceDue.toLocaleString('en-IN')}</span>
+          </div>
+        `;
+
+        thead.innerHTML = `
+          <tr>
+            <th class="p-2.5">Date</th>
+            <th class="p-2.5">Type</th>
+            <th class="p-2.5">Dispatch / Details</th>
+            <th class="p-2.5 text-center">Boxes</th>
+            <th class="p-2.5 text-right">Debit (Billed ₹)</th>
+            <th class="p-2.5 text-right">Credit (Paid ₹)</th>
+          </tr>
+        `;
+
+        const history = [
+          ...dispatches.map(d => ({ date: d.date, type: 'DISPATCH', desc: `Token ${d.tokenNo} (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
+          ...payments.map(p => ({ date: p.date, type: 'PAYMENT', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
+        ].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        tbody.innerHTML = history.map(h => `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2.5">${h.date}</td>
+            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${h.type === 'DISPATCH' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${h.type}</span></td>
+            <td class="p-2.5 font-medium">${h.desc}</td>
+            <td class="p-2.5 text-center font-bold">${h.boxes}</td>
+            <td class="p-2.5 text-right font-bold text-slate-900">${h.debit > 0 ? '₹' + h.debit.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right font-bold text-emerald-700">${h.credit > 0 ? '₹' + h.credit.toLocaleString('en-IN') : '-'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function renderPartyAccountsTable() {
+      const tbody = document.getElementById('party-accounts-table-body');
+      if(!tbody) return;
+
+      const partyRows = [];
+
+      APP_DATA.agreements.forEach(a => {
+        partyRows.push({ type: 'Farmer', name: a.name, phone: a.phone, date: a.date });
+      });
+
+      const custMap = new Map();
+      APP_DATA.dispatches.forEach(d => {
+        if(!custMap.has(d.phone)) {
+          custMap.set(d.phone, { type: 'Customer', name: d.name, phone: d.phone, date: d.date });
+        }
+      });
+      custMap.forEach(v => partyRows.push(v));
+
+      if(partyRows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">No parties registered yet. Create a deal or dispatch slip to auto-generate party logins.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = partyRows.map(p => `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.type === 'Farmer' ? 'bg-emerald-100 text-emerald-900' : 'bg-blue-100 text-blue-900'}">${p.type}</span></td>
+          <td class="p-2.5 font-bold text-slate-800">${p.name}</td>
+          <td class="p-2.5 font-mono font-bold text-amber-900">${p.phone}</td>
+          <td class="p-2.5 font-mono text-gray-500">${p.phone}</td>
+          <td class="p-2.5 text-right text-gray-500">${p.date}</td>
+        </tr>
+      `).join('');
+    }
+
+    // --- OTHER CORE ACTIONS ---
     function addCustomSizeRow() {
       customSizeIndex++;
       const container = document.getElementById('custom-sizes-container');
@@ -844,16 +1239,31 @@
       container.appendChild(div);
     }
 
+    function registerQuickStaff(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-staff-name').value.trim();
+      const role = document.getElementById('reg-staff-role').value.trim() || 'Staff';
+
+      if(APP_DATA.staffDirectory.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+        return alert("Staff member already registered!");
+      }
+
+      APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role });
+      saveData();
+      alert(`Staff member ${name} added to directory!`);
+      e.target.reset();
+    }
+
     function populateDropdowns() {
       const inwardSelect = document.getElementById('inward-orchard-select');
       const orchLedgerSelect = document.getElementById('orchard-ledger-select');
       const payFarmerSelect = document.getElementById('pay-farmer-select');
-      const attStaffSelect = document.getElementById('att-staff-select');
+      const staffDatalist = document.getElementById('staff-datalist');
 
       inwardSelect.innerHTML = `<option value="">-- Choose saved orchard to auto-fill details --</option>`;
       orchLedgerSelect.innerHTML = `<option value="">-- Choose an Orchard to view --</option>`;
       payFarmerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
-      attStaffSelect.innerHTML = `<option value="">-- Choose Staff --</option>`;
+      staffDatalist.innerHTML = "";
 
       APP_DATA.agreements.forEach((orch) => {
         const opt = `<option value="${orch.id}">${orch.name} (${orch.village})</option>`;
@@ -862,8 +1272,13 @@
         payFarmerSelect.innerHTML += opt;
       });
 
-      APP_DATA.staffUsers.forEach(u => {
-        attStaffSelect.innerHTML += `<option value="${u.name}">${u.name} (@${u.username})</option>`;
+      const allStaffNames = new Set([
+        ...APP_DATA.staffUsers.map(u => u.name),
+        ...APP_DATA.staffDirectory.map(d => d.name)
+      ]);
+
+      allStaffNames.forEach(name => {
+        staffDatalist.innerHTML += `<option value="${name}"></option>`;
       });
 
       const uniqueCusts = [...new Set(APP_DATA.dispatches.map(d => d.name.trim()))];
@@ -878,48 +1293,6 @@
         payCustSelect.innerHTML += opt;
         viewCustSelect.innerHTML += opt;
       });
-    }
-
-    function handleLogin(e) {
-      e.preventDefault();
-      const u = document.getElementById('login-user').value.trim();
-      const p = document.getElementById('login-pass').value.trim();
-
-      // Check Master Admin Credentials
-      if(u === "admin" && p === "admin123") {
-        currentUser = { name: "Master Admin", username: "admin", role: "admin" };
-      } else {
-        // Check Staff Accounts
-        const staff = APP_DATA.staffUsers.find(s => s.username === u && s.password === p);
-        if(staff) {
-          currentUser = { name: staff.name, username: staff.username, role: "staff" };
-        } else {
-          return alert("Invalid credentials. If staff, ask Master Admin to create your account.");
-        }
-      }
-
-      document.getElementById('login-view').classList.add('hidden');
-      document.getElementById('app-view').classList.remove('hidden');
-      document.getElementById('user-display').innerText = `${currentUser.name} (${currentUser.role.toUpperCase()})`;
-
-      // Admin only permissions
-      if(currentUser.role === 'admin') {
-        document.getElementById('tab-admin-panel').classList.remove('hidden');
-        document.getElementById('btn-reset-data').classList.remove('hidden');
-      } else {
-        document.getElementById('tab-admin-panel').classList.add('hidden');
-        document.getElementById('btn-reset-data').classList.add('hidden');
-      }
-
-      renderDashboard();
-      renderStaffTable();
-      renderAttendanceTable();
-    }
-
-    function logout() {
-      currentUser = null;
-      document.getElementById('app-view').classList.add('hidden');
-      document.getElementById('login-view').classList.remove('hidden');
     }
 
     function switchTab(tab) {
@@ -939,10 +1312,12 @@
       if(tab === 'customer-ledger') renderCustomerLedger();
       if(tab === 'orchards') renderSingleOrchardSummary();
       if(tab === 'attendance') renderAttendanceTable();
-      if(tab === 'admin-panel') renderStaffTable();
+      if(tab === 'admin-panel') {
+        renderStaffTable();
+        renderPartyAccountsTable();
+      }
     }
 
-    // --- ADMIN USER MANAGEMENT ---
     function createStaffAccount(e) {
       e.preventDefault();
       if(currentUser?.role !== 'admin') return alert("Only Admin can add staff");
@@ -986,22 +1361,14 @@
       `).join('');
     }
 
-    // --- ATTENDANCE MANAGEMENT ---
     function recordStaffAttendance(e) {
       e.preventDefault();
-      const staffName = document.getElementById('att-staff-select').value;
+      const staffName = document.getElementById('att-staff-input').value.trim();
       const status = document.getElementById('att-staff-status').value;
       const wage = Number(document.getElementById('att-staff-wage').value || 0);
       const date = document.getElementById('att-staff-date').value;
 
-      APP_DATA.staffAttendance.push({
-        id: 'att_' + Date.now(),
-        type: 'Single Staff',
-        name: staffName,
-        status,
-        wage,
-        date
-      });
+      APP_DATA.staffAttendance.push({ id: 'att_' + Date.now(), type: 'Single Staff', name: staffName, status, wage, date });
       saveData();
       alert(`Recorded attendance for ${staffName}: ${status}`);
       e.target.reset();
@@ -1024,16 +1391,7 @@
       const date = document.getElementById('att-group-date').value;
       const totalPayable = count * rate;
 
-      APP_DATA.groupLabourAttendance.push({
-        id: 'grp_' + Date.now(),
-        type: 'Orchard Contractor Group',
-        head,
-        count,
-        rate,
-        orchard,
-        date,
-        totalPayable
-      });
+      APP_DATA.groupLabourAttendance.push({ id: 'grp_' + Date.now(), type: 'Orchard Contractor Group', head, count, rate, orchard, date, totalPayable });
       saveData();
       alert(`Recorded ${count} persons under ${head}. Total: ₹${totalPayable.toLocaleString('en-IN')}`);
       e.target.reset();
@@ -1041,17 +1399,96 @@
       calculateGroupWage();
     }
 
+    function openEditAttendanceModal(id, cat) {
+      const modal = document.getElementById('edit-attendance-modal');
+      document.getElementById('edit-att-id').value = id;
+      document.getElementById('edit-att-type').value = cat;
+
+      if(cat === 'Single Staff') {
+        const item = APP_DATA.staffAttendance.find(x => x.id === id);
+        if(!item) return;
+        document.getElementById('edit-modal-title').innerText = `Edit Staff: ${item.name}`;
+        document.getElementById('edit-att-date').value = item.date;
+        document.getElementById('edit-att-name').value = item.name;
+        document.getElementById('edit-att-status').value = item.status;
+        document.getElementById('edit-att-wage').value = item.wage || 0;
+
+        document.getElementById('edit-staff-fields').classList.remove('hidden');
+        document.getElementById('edit-group-fields').classList.add('hidden');
+      } else {
+        const item = APP_DATA.groupLabourAttendance.find(x => x.id === id);
+        if(!item) return;
+        document.getElementById('edit-modal-title').innerText = `Edit Group: ${item.head}`;
+        document.getElementById('edit-att-date').value = item.date;
+        document.getElementById('edit-att-head').value = item.head;
+        document.getElementById('edit-att-count').value = item.count;
+        document.getElementById('edit-att-rate').value = item.rate;
+        document.getElementById('edit-att-orchard').value = item.orchard || '';
+
+        document.getElementById('edit-staff-fields').classList.add('hidden');
+        document.getElementById('edit-group-fields').classList.remove('hidden');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-attendance-modal').classList.add('hidden');
+    }
+
+    function saveEditedAttendance(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-att-id').value;
+      const cat = document.getElementById('edit-att-type').value;
+      const date = document.getElementById('edit-att-date').value;
+
+      if(cat === 'Single Staff') {
+        const item = APP_DATA.staffAttendance.find(x => x.id === id);
+        if(item) {
+          item.date = date;
+          item.name = document.getElementById('edit-att-name').value;
+          item.status = document.getElementById('edit-att-status').value;
+          item.wage = Number(document.getElementById('edit-att-wage').value || 0);
+        }
+      } else {
+        const item = APP_DATA.groupLabourAttendance.find(x => x.id === id);
+        if(item) {
+          item.date = date;
+          item.head = document.getElementById('edit-att-head').value;
+          item.count = Number(document.getElementById('edit-att-count').value || 0);
+          item.rate = Number(document.getElementById('edit-att-rate').value || 0);
+          item.orchard = document.getElementById('edit-att-orchard').value;
+          item.totalPayable = item.count * item.rate;
+        }
+      }
+
+      saveData();
+      closeEditModal();
+      alert("Attendance updated successfully!");
+    }
+
+    function deleteAttendance(id, cat) {
+      if(confirm("Delete this attendance record?")) {
+        if(cat === 'Single Staff') {
+          APP_DATA.staffAttendance = APP_DATA.staffAttendance.filter(x => x.id !== id);
+        } else {
+          APP_DATA.groupLabourAttendance = APP_DATA.groupLabourAttendance.filter(x => x.id !== id);
+        }
+        saveData();
+      }
+    }
+
     function renderAttendanceTable() {
       const tbody = document.getElementById('attendance-table-body');
       if(!tbody) return;
 
       const combined = [
-        ...APP_DATA.staffAttendance.map(s => ({ date: s.date, cat: 'Staff Individual', title: s.name, countOrStatus: s.status, detail: s.wage ? `₹${s.wage}/day` : '-', total: s.wage || 0 })),
-        ...APP_DATA.groupLabourAttendance.map(g => ({ date: g.date, cat: 'Contractor Group', title: `${g.head} (${g.orchard})`, countOrStatus: `${g.count} Persons`, detail: `@₹${g.rate}/head`, total: g.totalPayable }))
+        ...APP_DATA.staffAttendance.map(s => ({ id: s.id, date: s.date, cat: 'Single Staff', title: s.name, countOrStatus: s.status, detail: s.wage ? `₹${s.wage}/day` : '-', total: s.wage || 0 })),
+        ...APP_DATA.groupLabourAttendance.map(g => ({ id: g.id, date: g.date, cat: 'Contractor Group', title: `${g.head} (${g.orchard})`, countOrStatus: `${g.count} Persons`, detail: `@₹${g.rate}/head`, total: g.totalPayable }))
       ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
       if(combined.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-gray-400">No attendance entries recorded yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-gray-400">No attendance entries recorded yet.</td></tr>`;
         return;
       }
 
@@ -1063,11 +1500,14 @@
           <td class="p-2.5 text-center font-bold text-emerald-800">${r.countOrStatus}</td>
           <td class="p-2.5 text-gray-600">${r.detail}</td>
           <td class="p-2.5 text-right font-bold text-slate-900">₹${r.total.toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right space-x-2">
+            <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">✏️ Edit</button>
+            <button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+          </td>
         </tr>
       `).join('');
     }
 
-    // --- OTHER MANDI & LEDGER LOGIC ---
     function autoFillOrchardDetails() {
       const selId = document.getElementById('inward-orchard-select').value;
       if (!selId) {
@@ -1216,7 +1656,11 @@
             </div>
           </div>
           <div class="border border-black p-2.5 bg-gray-50 mb-3 space-y-1">${dealHTML}</div>
-          <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-4 text-center">
+          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">
+            🔐 <b>Farmer Online Portal Access:</b><br/>
+            Username: <b>${phone}</b> | Password: <b>${phone}</b>
+          </div>
+          <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-2 text-center">
             <div>
               <div class="font-bold text-xs mb-4">Farmer Signature</div>
               <div class="border-b border-black w-3/4 mx-auto"></div>
@@ -1231,7 +1675,7 @@
         </div>
       `;
 
-      showSlip(slipHTML, phone, `*SETIA ORCHARD AGREEMENT*%0AToken: ${tokenNo}%0AFarmer: ${name} (${village})%0A${waDeal}`);
+      showSlip(slipHTML, phone, `*SETIA ORCHARD AGREEMENT*%0AToken: ${tokenNo}%0AFarmer: ${name} (${village})%0A${waDeal}%0A%0A*Online Ledger Login:*%0AUser: ${phone} | Pass: ${phone}`);
       e.target.reset();
     }
 
@@ -1403,6 +1847,10 @@
               <span>Grand Total Payable:</span><span class="text-base text-amber-900">₹${grandTotal.toLocaleString('en-IN')}</span>
             </div>
           </div>
+          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">
+            🔐 <b>Customer Online Portal Access:</b><br/>
+            Username: <b>${phone}</b> | Password: <b>${phone}</b>
+          </div>
           <div class="grid grid-cols-2 gap-4 border-t-2 border-black pt-4 mt-2 text-center">
             <div><div class="font-bold text-xs mb-3">Loader Sign</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-600 mt-1">${loader}</p></div>
             <div><div class="font-bold text-xs mb-3">Supervisor Signature</div><div class="border-b border-black w-3/4 mx-auto"></div><p class="text-[10px] text-gray-800 font-bold mt-1">${supervisor}</p></div>
@@ -1410,7 +1858,7 @@
         </div>
       `;
 
-      showSlip(slipHTML, phone, `*SETIA CUSTOMER DISPATCH*%0AToken: ${tokenNo}%0ACustomer: ${name}%0AVehicle: ${vehicle}%0A${waSizes}%0ATotal Boxes: *${totalBoxes}*%0AGrand Total: *Rs. ${grandTotal.toLocaleString('en-IN')}*`);
+      showSlip(slipHTML, phone, `*SETIA CUSTOMER DISPATCH*%0AToken: ${tokenNo}%0ACustomer: ${name}%0AVehicle: ${vehicle}%0A${waSizes}%0ATotal Boxes: *${totalBoxes}*%0AGrand Total: *Rs. ${grandTotal.toLocaleString('en-IN')}*%0A%0A*Online Ledger Login:*%0AUser: ${phone} | Pass: ${phone}`);
       e.target.reset();
       document.getElementById('custom-sizes-container').innerHTML = "";
     }
@@ -1641,7 +2089,7 @@
     function clearAllData() {
       if(currentUser?.role !== 'admin') return alert("Only Admin can reset data");
       if(confirm("Are you sure you want to reset all records?")) {
-        APP_DATA = { staffUsers: [], staffAttendance: [], groupLabourAttendance: [], agreements: [], inwards: [], dispatches: [], customerPayments: [], farmerPayments: [] };
+        APP_DATA = { staffUsers: [], staffDirectory: [], staffAttendance: [], groupLabourAttendance: [], agreements: [], inwards: [], dispatches: [], customerPayments: [], farmerPayments: [] };
         saveData();
       }
     }
