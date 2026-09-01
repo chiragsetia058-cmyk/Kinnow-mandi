@@ -5,27 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SETIA WAXING PLANT - Mandi, Accounts & Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- FIREBASE SDK COMPAT -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
+
 <body class="bg-gray-100 min-h-screen text-gray-800 font-sans pb-16">
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyB5WhV0yPQNXqRkBMED2m_bo_BrscJorgg",
-      authDomain: "setia-waxing-plant.firebaseapp.com",
-      projectId: "setia-waxing-plant",
-      storageBucket: "setia-waxing-plant.firebasestorage.app",
-      messagingSenderId: "315233905244",
-      appId: "1:315233905244:web:0e7c82c6e6dbce08c45499",
-      measurementId: "G-47BSFE55LT"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
 
   <!-- SVG EMBLEM LOGO -->
   <template id="plant-logo-svg">
@@ -51,7 +33,7 @@
       <p class="text-[11px] text-gray-500 mb-2 font-medium">Kinnow Mandi & Party Portal</p>
       
       <div id="cloud-status-badge" class="mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
-        Connecting to Cloud...
+        Connecting to MongoDB Cloud...
       </div>
 
       <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
@@ -153,7 +135,7 @@
               <p class="text-xs text-amber-800">Manage user access permissions, add staff, and block/unblock accounts.</p>
             </div>
             <button onclick="forceSyncToCloud()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow">
-              ☁️ Force Push All Records to Cloud
+              ☁️ Force Push All Records to MongoDB
             </button>
           </div>
 
@@ -890,11 +872,11 @@
     let currentUser = null;
     let currentPartySession = null;
 
-    // ACTIVE DEFAULTS (CANNOT BE WIPED BY EMPTY CLOUD DOC)
+    // ACTIVE DEFAULTS (FALLBACK IF MONGODB IS UNINITIALIZED)
     const CORE_DEFAULTS = {
       staffUsers: [
         { id: 'st_1', name: 'Ramesh Kumar', username: 'ramesh', password: '1234', role: 'staff' },
-        { id: 'st_2', name: 'Test Staff', username: 'test', password: '1234', role: 'staff' }
+        { id: 'st_2', name: 'Chirag Setia', username: 'chirag', password: '1234', role: 'staff' }
       ],
       staffDirectory: [
         { id: 'sd_1', name: 'Ramesh Kumar', role: 'Plant Supervisor' },
@@ -949,72 +931,71 @@
       }
     }
 
-    function setupCloudListeners() {
+    // --- MONGODB ATLAS CLOUD SYNC ENGINE ---
+    async function fetchCloudData() {
       const badge = document.getElementById('cloud-status-badge');
+      try {
+        const res = await fetch('/api/state');
+        if (res.ok) {
+          const raw = await res.json();
+          if (raw && typeof raw === 'object' && Object.keys(raw).length > 0) {
+            APP_DATA = {
+              staffUsers: (raw.staffUsers && raw.staffUsers.length > 0) ? raw.staffUsers : (APP_DATA.staffUsers || CORE_DEFAULTS.staffUsers),
+              staffDirectory: (raw.staffDirectory && raw.staffDirectory.length > 0) ? raw.staffDirectory : (APP_DATA.staffDirectory || CORE_DEFAULTS.staffDirectory),
+              staffAttendance: raw.staffAttendance || [],
+              groupLabourAttendance: raw.groupLabourAttendance || [],
+              agreements: (raw.agreements && raw.agreements.length > 0) ? raw.agreements : (APP_DATA.agreements || CORE_DEFAULTS.agreements),
+              inwards: raw.inwards || [],
+              dispatches: (raw.dispatches && raw.dispatches.length > 0) ? raw.dispatches : (APP_DATA.dispatches || CORE_DEFAULTS.dispatches),
+              customerPayments: raw.customerPayments || [],
+              farmerPayments: raw.farmerPayments || [],
+              blockedUsers: raw.blockedUsers || []
+            };
 
-      db.collection("plant_data").doc("main_state").onSnapshot((doc) => {
-        if (doc.exists) {
-          const raw = doc.data();
-          // Self-heal: only use cloud arrays if they exist, otherwise keep core defaults
-          APP_DATA = {
-            staffUsers: (raw.staffUsers && raw.staffUsers.length > 0) ? raw.staffUsers : CORE_DEFAULTS.staffUsers,
-            staffDirectory: (raw.staffDirectory && raw.staffDirectory.length > 0) ? raw.staffDirectory : CORE_DEFAULTS.staffDirectory,
-            staffAttendance: raw.staffAttendance || [],
-            groupLabourAttendance: raw.groupLabourAttendance || [],
-            agreements: (raw.agreements && raw.agreements.length > 0) ? raw.agreements : CORE_DEFAULTS.agreements,
-            inwards: raw.inwards || [],
-            dispatches: (raw.dispatches && raw.dispatches.length > 0) ? raw.dispatches : CORE_DEFAULTS.dispatches,
-            customerPayments: raw.customerPayments || [],
-            farmerPayments: raw.farmerPayments || [],
-            blockedUsers: raw.blockedUsers || []
-          };
+            localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
 
-          // If the cloud was unpopulated or only had initialized:string, write our filled data into it
-          if (!raw.staffUsers || raw.staffUsers.length === 0) {
-            db.collection("plant_data").doc("main_state").set(APP_DATA);
+            if (badge) {
+              badge.innerText = "☁️ MongoDB Atlas Cloud Sync Active";
+              badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
+            }
+
+            populateDropdowns();
+            renderDashboard();
+            renderAttendanceTable();
+            renderStaffTable();
+            renderPartyAccountsTable();
+            if (currentPartySession) renderPartyPortalView();
           }
-
-          localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-          
-          if (badge) {
-            badge.innerText = "☁️ Firebase Cloud Sync Active";
-            badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
-          }
-
-          populateDropdowns();
-          renderDashboard();
-          renderAttendanceTable();
-          renderStaffTable();
-          renderPartyAccountsTable();
-          if (currentPartySession) renderPartyPortalView();
-        } else {
-          // Document missing: write core defaults immediately
-          APP_DATA = CORE_DEFAULTS;
-          saveData();
         }
-      }, (err) => {
-        console.error("Firestore sync error:", err);
-      });
+      } catch (err) {
+        console.warn("MongoDB cloud sync check:", err);
+      }
     }
 
-    function saveData() {
-      const payload = JSON.parse(JSON.stringify(APP_DATA));
+    async function saveData() {
       localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
-      
-      db.collection("plant_data").doc("main_state").set(payload)
-        .then(() => console.log("Cloud synced!"))
-        .catch(err => console.error("Cloud write failed:", err));
 
       populateDropdowns();
       renderDashboard();
       renderAttendanceTable();
       renderStaffTable();
       renderPartyAccountsTable();
+      if (currentPartySession) renderPartyPortalView();
+
+      try {
+        await fetch('/api/state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(APP_DATA)
+        });
+      } catch (err) {
+        console.error("MongoDB Atlas write failed:", err);
+      }
     }
 
-    function forceSyncToCloud() {
-      saveData();
-      alert("All local plant records successfully uploaded to Firebase Cloud Firestore!");
+    async function forceSyncToCloud() {
+      await saveData();
+      alert("All local plant records successfully uploaded and synced to MongoDB Atlas Cloud!");
     }
 
     window.onload = function() {
@@ -1041,7 +1022,10 @@
 
       resetToToday();
       populateDropdowns();
-      setupCloudListeners();
+      fetchCloudData();
+
+      // Multi-phone polling every 4 seconds to sync newly created data across all devices
+      setInterval(fetchCloudData, 4000);
     };
 
     function isUserBlocked(idOrPhone) {
@@ -1063,11 +1047,14 @@
       saveData();
     }
 
-    function handleUniversalLogin(e) {
+    async function handleUniversalLogin(e) {
       e.preventDefault();
       const rawU = (document.getElementById('login-user').value || "").trim();
       const p = (document.getElementById('login-pass').value || "").trim();
       const u = rawU.toLowerCase().replace('@', '');
+
+      // Refresh cloud data on attempt
+      await fetchCloudData();
 
       // 1. Master Admin (Instant authentication)
       if (u === "admin" && p === "Csetia@1122") {
