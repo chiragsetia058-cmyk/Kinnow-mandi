@@ -197,7 +197,7 @@
         </div>
       </div>
 
-      <!-- TAB: ATTENDANCE & LABOUR -->
+      <!-- TAB: ATTENDANCE & LABOUR (WITH DAY-TO-DAY DETAILED LEDGER) -->
       <div id="attendance-section" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
           <h3 class="text-base font-bold text-slate-800 mb-2 pb-2 border-b">📋 Register New Staff Member</h3>
@@ -251,7 +251,7 @@
           </form>
         </div>
 
-        <!-- CONTRACTOR GROUP LABOUR ATTENDANCE (MENS & WOMENS SPLIT) -->
+        <!-- CONTRACTOR GROUP LABOUR ATTENDANCE -->
         <div class="bg-amber-50/70 p-5 rounded-xl border-2 border-amber-300 shadow-sm">
           <div class="flex justify-between items-center mb-3 pb-2 border-b border-amber-200">
             <div>
@@ -316,12 +316,12 @@
           </form>
         </div>
 
-        <!-- FULL DETAIL DAY-TO-DAY ATTENDANCE LEDGER SECTION -->
+        <!-- 3. DAY-TO-DAY ATTENDANCE LEDGER SECTION -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
           <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
             <div>
               <h3 class="text-base font-bold text-slate-900">3. Day-to-Day Attendance Ledger & Statement</h3>
-              <p class="text-xs text-gray-500">Filter individual staff or contractor groups across custom date ranges or months</p>
+              <p class="text-xs text-gray-500">Filter individual staff or contractor groups across custom dates or months</p>
             </div>
             <div class="flex gap-2">
               <button onclick="printAttendanceLedger()" class="bg-slate-900 hover:bg-black text-amber-400 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow">
@@ -514,7 +514,7 @@
             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
               <p class="text-xs text-gray-500 font-medium">Kinnow Inward (Net)</p>
               <h3 class="text-xl font-bold text-gray-800 mt-1" id="stat-daily-weight">0 Kg</h3>
-              <p class="text-[11px] text-gray-400 mt-1" id="stat-daily-cut">0 Kg (1kg/Qtl Cut)</p>
+              <p class="text-[11px] text-gray-400 mt-1" id="stat-daily-cut">0 Kg Cut</p>
             </div>
             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
               <p class="text-xs text-gray-500 font-medium">Dispatched Boxes</p>
@@ -829,12 +829,12 @@
         </form>
       </div>
 
-      <!-- TAB 4: DAILY INWARD SLIP -->
+      <!-- TAB 4: DAILY INWARD SLIP (WITH 1 KG / 100 KG YES/NO TOGGLE) -->
       <div id="daily-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div class="flex justify-between items-center border-b pb-2 mb-4">
           <h3 class="text-base font-bold text-gray-800">Daily Orchard Inward (ਤੁੜਾਈ ਤੇ ਆਮਦ)</h3>
           <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-bold">
-            ⚡ Auto-Fill Enabled
+            ⚡ 1 Kg / 100 Kg Cut Toggle Active
           </span>
         </div>
 
@@ -864,29 +864,39 @@
             </div>
           </div>
 
-          <div class="bg-gray-50 p-4 rounded-lg border grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg border grid grid-cols-1 md:grid-cols-5 gap-3">
             <div>
               <label class="block text-xs font-semibold mb-1">Gross Weight (Kg)</label>
-              <input type="number" id="d-gross-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 4200" oninput="calculateDailyWeight()" />
+              <input type="number" id="d-gross-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="e.g. 4200" oninput="calculateDailyWeight()" />
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Tare (Empty Vehicle Kg)</label>
-              <input type="number" id="d-tare-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 1200" oninput="calculateDailyWeight()" />
+              <input type="number" id="d-tare-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="e.g. 1200" oninput="calculateDailyWeight()" />
             </div>
+            
+            <!-- 1 KG / 100 KG CUT TOGGLE (YES / NO) IN FARMER INWARD SLIP -->
+            <div>
+              <label class="block text-xs font-black text-amber-900 mb-1">Cut 1 Kg / 100 Kg? (ਕੱਟ)</label>
+              <select id="d-cut-choice" class="w-full border-2 border-amber-400 rounded-lg p-2 text-sm font-bold bg-white outline-none" onchange="calculateDailyWeight()">
+                <option value="yes" selected>✅ YES - Cut 1 Kg / 100 Kg</option>
+                <option value="no">❌ NO - Net Weight (0 Cut)</option>
+              </select>
+            </div>
+
             <div>
               <label class="block text-xs font-semibold mb-1">Rate per Kg ₹</label>
-              <input type="number" id="d-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm" placeholder="0" oninput="calculateDailyWeight()" />
+              <input type="number" id="d-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="0" oninput="calculateDailyWeight()" />
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Loader / Incharge</label>
-              <input type="text" id="d-loader" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Ramesh Loader" />
+              <input type="text" id="d-loader" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="e.g. Ramesh Loader" />
             </div>
           </div>
 
-          <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs flex justify-between flex-wrap gap-2">
-            <span>Net Weight: <b id="disp-net-wt">0</b> Kg</span>
-            <span>1 Kg/Quintal Cut: <b id="disp-cut-wt" class="text-red-600">0</b> Kg</span>
-            <span>Final Chargeable Weight: <b id="disp-final-wt" class="text-slate-900 font-bold">0</b> Kg</span>
+          <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs flex justify-between flex-wrap gap-2 font-medium">
+            <span>Gross - Tare Net: <b id="disp-net-wt">0</b> Kg</span>
+            <span id="disp-cut-desc" class="text-red-600 font-bold">1 Kg/100 Kg Cut: -0 Kg</span>
+            <span>Final Chargeable Weight: <b id="disp-final-wt" class="text-slate-900 font-black">0</b> Kg</span>
           </div>
 
           <div class="border-t pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -900,21 +910,21 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg">
+          <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg shadow">
             Record Trip & Generate SETIA Inward Slip
           </button>
         </form>
       </div>
 
-      <!-- TAB 5: CUSTOMER DISPATCH INVOICE (ENHANCED FOR VIKRI / BILLING & AUTOFILL & 1KG/100KG CUT) -->
+      <!-- TAB 5: CUSTOMER DISPATCH INVOICE (AUTOFILL + BILLING & VIKRI SIZES) -->
       <div id="customer-section" class="hidden space-y-6">
 
-        <!-- 1. CUSTOMER DIRECTORY PRE-REGISTRATION (POINT 1) -->
+        <!-- 1. CUSTOMER DIRECTORY PRE-REGISTRATION -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
           <div class="flex justify-between items-center pb-2 mb-3 border-b">
             <div>
               <h3 class="text-base font-bold text-slate-900">👤 Add New Customer Details First (Directory)</h3>
-              <p class="text-xs text-gray-500">Save buyer details here once to auto-fill into Vikri & Billing dispatch slips</p>
+              <p class="text-xs text-gray-500">Save buyer details once to autofill into Vikri & Billing dispatch slips</p>
             </div>
           </div>
           <form onsubmit="saveCustomerToDirectory(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
@@ -954,7 +964,7 @@
             </span>
           </div>
 
-          <!-- AUTOFILL SELECTION DROPDOWN (POINT 1) -->
+          <!-- AUTOFILL SELECTION DROPDOWN -->
           <div class="mb-5 bg-amber-50 p-3.5 rounded-xl border border-amber-200">
             <label class="block text-xs font-bold text-slate-900 mb-1">Select Customer to Autofill (ਸੇਵ ਕੀਤਾ ਗ੍ਰਾਹਕ ਚੁਣੋ)</label>
             <select id="autofill-cust-select" class="w-full border border-amber-300 rounded-lg p-2 text-sm bg-white font-medium outline-none" onchange="autoFillCustomerDetails()">
@@ -964,7 +974,7 @@
 
           <form onsubmit="generateCustomerSlip(event)" class="space-y-4">
             
-            <!-- CUSTOMER TYPE RADIO SELECTION: BILLING vs VIKRI (POINT 3) -->
+            <!-- CUSTOMER TYPE RADIO SELECTION: BILLING vs VIKRI -->
             <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-300 flex flex-wrap gap-4 items-center">
               <span class="text-xs font-black text-slate-900 uppercase">Dispatch Type:</span>
               <label class="flex items-center text-xs font-bold gap-2 cursor-pointer">
@@ -996,7 +1006,7 @@
               </div>
             </div>
 
-            <!-- KINNOW SIZE MATRIX: SIZES FOR BOTH, PRICE HIDDEN IN VIKRI (POINT 3) -->
+            <!-- KINNOW SIZE MATRIX: SIZES FOR BOTH, PRICE HIDDEN IN VIKRI -->
             <div class="mt-4">
               <div class="flex justify-between items-center mb-2">
                 <h4 class="text-xs font-bold uppercase text-slate-700" id="matrix-heading-title">Kinnow Size Matrix (Boxes & Rates)</h4>
@@ -1008,50 +1018,7 @@
               <div id="custom-sizes-container" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3"></div>
             </div>
 
-            <!-- WEIGHT SECTION WITH YES / NO 1KG CUT PER 100KG OPTION (POINT 4) -->
-            <div class="border-t pt-4 bg-amber-50/50 p-4 rounded-xl border border-amber-200 space-y-3">
-              <div class="flex flex-wrap justify-between items-center gap-2">
-                <h4 class="text-xs font-black uppercase text-slate-900">⚖️ Weight & 1 Kg Cut per 100 Kg Option</h4>
-                <label class="text-xs font-semibold flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" id="c-enable-wt" onchange="toggleCustomerWeightFields()" />
-                  <span>Enable Weight Slip Calculation</span>
-                </label>
-              </div>
-
-              <div id="cust-weight-fields" class="hidden space-y-3">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <div>
-                    <label class="block text-xs font-semibold mb-1">Gross Weight (Kg)</label>
-                    <input type="number" id="c-gross-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="e.g. 5000" oninput="calculateCustomerWeight()" />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold mb-1">Tare (Empty Vehicle Kg)</label>
-                    <input type="number" id="c-tare-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="e.g. 1500" oninput="calculateCustomerWeight()" />
-                  </div>
-                  <!-- YES / NO OPTION TO 1KG CUT PER 100KG (POINT 4) -->
-                  <div>
-                    <label class="block text-xs font-black text-amber-900 mb-1">Cut 1 Kg per 100 Kg? (ਕੱਟ ਲਾਉਣੀ ਹੈ?)</label>
-                    <select id="c-cut-choice" class="w-full border-2 border-amber-400 rounded-lg p-2 text-sm font-bold bg-white" onchange="calculateCustomerWeight()">
-                      <option value="yes" selected>✅ YES - Cut 1 Kg / 100 Kg</option>
-                      <option value="no">❌ NO - Total by Net Weight (0 Cut)</option>
-                    </select>
-                  </div>
-                  <div id="cust-weight-rate-container">
-                    <label class="block text-xs font-semibold mb-1">Rate per Kg ₹ (Optional)</label>
-                    <input type="number" id="c-wt-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="0" oninput="calculateCustomerWeight()" />
-                  </div>
-                </div>
-
-                <div class="p-3 bg-white rounded-lg border border-amber-200 text-xs flex justify-between flex-wrap gap-2 font-medium">
-                  <span>Gross - Tare Net: <b id="disp-c-net-wt">0</b> Kg</span>
-                  <span id="disp-c-cut-desc" class="text-red-600 font-bold">1 Kg/100 Kg Cut: -0 Kg</span>
-                  <span>Final Billable Weight: <b id="disp-c-final-wt" class="text-slate-900 font-black">0</b> Kg</span>
-                  <span id="disp-c-wt-val-wrap" class="font-bold text-emerald-800">Weight Valuation: ₹0</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- FREIGHT & EXPENSES SECTION (HIDDEN OR OPTIONAL IN VIKRI) -->
+            <!-- FREIGHT & EXPENSES SECTION (FOR BILLING CUSTOMERS) -->
             <div id="financial-expenses-section" class="border-t pt-4 bg-gray-50 p-4 rounded-xl space-y-3">
               <h4 class="text-xs font-bold uppercase text-slate-700">Freight & Miscellaneous Expenses (ਫੁਟਕਲ ਖ਼ਰਚੇ)</h4>
               <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -1117,7 +1084,7 @@
     let currentPartySession = null;
     let isSaving = false;
 
-    // ACTIVE DEFAULTS (CANNOT OVERWRITE USER DELETIONS)
+    // ACTIVE DEFAULTS
     const CORE_DEFAULTS = {
       staffUsers: [
         { id: 'st_1', name: 'Ramesh Kumar', username: 'ramesh', password: '1234', role: 'staff' },
@@ -1277,7 +1244,7 @@
       document.getElementById('att-staff-date').value = todayStr;
       document.getElementById('att-group-date').value = todayStr;
 
-      // Set default attendance ledger filters to current month
+      // Set default attendance ledger filters
       const curYearMonth = todayStr.substring(0, 7);
       document.getElementById('ledger-month-filter').value = curYearMonth;
       document.getElementById('ledger-from-date').value = `${curYearMonth}-01`;
@@ -1287,6 +1254,7 @@
       populateDropdowns();
       updateLedgerPersonDropdown();
       renderAttendanceLedger();
+      calculateDailyWeight();
       fetchCloudData();
 
       setInterval(fetchCloudData, 4000);
@@ -1307,7 +1275,7 @@
       });
     }
 
-    // --- POINT 1: CUSTOMER DIRECTORY REGISTRATION & AUTOFILL ---
+    // --- 1. CUSTOMER DIRECTORY REGISTRATION & AUTOFILL ---
     function saveCustomerToDirectory(e) {
       e.preventDefault();
       const name = document.getElementById('dir-cust-name').value.trim();
@@ -1360,73 +1328,49 @@
       }
     }
 
-    // --- POINT 3: SIZES IN VIKRI CUSTOMER (JUST SIZES, NO PRICE) ---
+    // --- 2. SIZES IN VIKRI CUSTOMER (JUST SIZES, NO PRICE) ---
     function toggleCustomerType() {
       const isVikri = document.querySelector('input[name="cust-dispatch-type"]:checked')?.value === 'Vikri';
       const matrixTitle = document.getElementById('matrix-heading-title');
       const finSection = document.getElementById('financial-expenses-section');
       const rateInputs = document.querySelectorAll('.size-rate-input');
-      const wtRateCont = document.getElementById('cust-weight-rate-container');
 
       if (isVikri) {
         matrixTitle.innerText = "Kinnow Size Matrix (Only Boxes / Sizes - No Price)";
         rateInputs.forEach(el => el.classList.add('hidden'));
         if (finSection) finSection.classList.add('hidden');
-        if (wtRateCont) wtRateCont.classList.add('hidden');
       } else {
         matrixTitle.innerText = "Kinnow Size Matrix (Boxes & Rates)";
         rateInputs.forEach(el => el.classList.remove('hidden'));
         if (finSection) finSection.classList.remove('hidden');
-        if (wtRateCont) wtRateCont.classList.remove('hidden');
       }
-      calculateCustomerWeight();
     }
 
-    // --- POINT 4: 1KG CUT PER 100KG OPTION (YES/NO) IN CUSTOMER DISPATCH ---
-    function toggleCustomerWeightFields() {
-      const enabled = document.getElementById('c-enable-wt').checked;
-      const fields = document.getElementById('cust-weight-fields');
-      if (enabled) {
-        fields.classList.remove('hidden');
-      } else {
-        fields.classList.add('hidden');
-        document.getElementById('c-gross-wt').value = "";
-        document.getElementById('c-tare-wt').value = "";
-        document.getElementById('c-wt-rate').value = "";
-      }
-      calculateCustomerWeight();
-    }
-
-    function calculateCustomerWeight() {
-      const enabled = document.getElementById('c-enable-wt').checked;
-      if (!enabled) return;
-
-      const gross = Number(document.getElementById('c-gross-wt').value || 0);
-      const tare = Number(document.getElementById('c-tare-wt').value || 0);
+    // --- 3. FARMER INWARD: 1 KG / 100 KG CUT TOGGLE (YES/NO) ---
+    function calculateDailyWeight() {
+      const gross = Number(document.getElementById('d-gross-wt').value || 0);
+      const tare = Number(document.getElementById('d-tare-wt').value || 0);
       const net = Math.max(0, gross - tare);
 
-      const applyCut = document.getElementById('c-cut-choice').value === 'yes';
+      const applyCut = document.getElementById('d-cut-choice').value === 'yes';
       const deduction = applyCut && net > 0 ? (net / 100) * 1 : 0;
       const finalWt = net - deduction;
 
-      const isVikri = document.querySelector('input[name="cust-dispatch-type"]:checked')?.value === 'Vikri';
-      const ratePerKg = isVikri ? 0 : Number(document.getElementById('c-wt-rate').value || 0);
-      const totalVal = ratePerKg > 0 ? (finalWt * ratePerKg) : 0;
-
-      document.getElementById('disp-c-net-wt').innerText = net.toFixed(1);
-      document.getElementById('disp-c-cut-desc').innerText = applyCut ? `1 Kg/100 Kg Cut: -${deduction.toFixed(1)} Kg` : `1 Kg/100 Kg Cut: NONE (0 Kg)`;
-      document.getElementById('disp-c-cut-desc').className = applyCut ? "text-red-600 font-bold" : "text-gray-500 font-bold";
-      document.getElementById('disp-c-final-wt').innerText = finalWt.toFixed(1);
-
-      const valWrap = document.getElementById('disp-c-wt-val-wrap');
-      if (isVikri || ratePerKg === 0) {
-        valWrap.innerText = `Final Chargeable: ${finalWt.toFixed(1)} Kg`;
+      document.getElementById('disp-net-wt').innerText = net.toFixed(1);
+      
+      const cutDescEl = document.getElementById('disp-cut-desc');
+      if (applyCut) {
+        cutDescEl.innerText = `1 Kg/100 Kg Cut: -${deduction.toFixed(1)} Kg`;
+        cutDescEl.className = "text-red-600 font-bold";
       } else {
-        valWrap.innerText = `Weight Valuation: ₹${totalVal.toLocaleString('en-IN')}`;
+        cutDescEl.innerText = `1 Kg/100 Kg Cut: NO CUT (0 Kg)`;
+        cutDescEl.className = "text-gray-500 font-bold";
       }
+
+      document.getElementById('disp-final-wt').innerText = finalWt.toFixed(1);
     }
 
-    // --- POINT 2: ATTENDANCE LEDGER WITH DAY-TO-DAY DETAILS, DATES & MONTHS ---
+    // --- 4. ATTENDANCE LEDGER WITH DAY-TO-DAY DETAILS, DATES & MONTHS ---
     function updateLedgerPersonDropdown() {
       const cat = document.getElementById('ledger-cat-filter').value;
       const personSel = document.getElementById('ledger-person-filter');
@@ -1778,11 +1722,11 @@
           <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Received</span><span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val ₹</th><th class="p-2.5 text-right">Paid Amt ₹</th><th class="p-2.5 text-right">Slip</th></tr>`;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Cut</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val ₹</th><th class="p-2.5 text-right">Paid Amt ₹</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
-          ...trips.map(t => ({ id: t.id, type: 'inward', date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
-          ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
+          ...trips.map(t => ({ id: t.id, type: 'inward', date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, cut: t.cut || 0, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
+          ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, cut: 0, chg: 0, val: 0, paid: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
@@ -1791,6 +1735,7 @@
             <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
             <td class="p-2.5 font-medium">${h.desc}</td>
             <td class="p-2.5 text-right">${h.net > 0 ? h.net.toFixed(1) + ' Kg' : '-'}</td>
+            <td class="p-2.5 text-right text-red-600 font-semibold">${h.cut > 0 ? '-' + h.cut.toFixed(1) + ' Kg' : (h.type==='inward' ? '0' : '-')}</td>
             <td class="p-2.5 text-right font-bold text-slate-900">${h.chg > 0 ? h.chg.toFixed(1) + ' Kg' : '-'}</td>
             <td class="p-2.5 text-right font-semibold text-slate-800">${h.val > 0 ? '₹' + h.val.toLocaleString('en-IN') : '-'}</td>
             <td class="p-2.5 text-right font-bold text-emerald-700">${h.paid > 0 ? '₹' + h.paid.toLocaleString('en-IN') : '-'}</td>
@@ -1830,7 +1775,7 @@
             <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
             <td class="p-2.5 font-medium">${h.desc}</td>
             <td class="p-2.5 text-center font-bold">${h.boxes}</td>
-            <td class="p-2.5 text-right font-bold text-slate-900">${h.debit > 0 ? '₹' + h.debit.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right font-bold text-slate-900">${h.debit > 0 ? '₹' + h.debit.toLocaleString('en-IN') : (h.desc.includes('Vikri') ? 'Sizes Only' : '-')}</td>
             <td class="p-2.5 text-right font-bold text-emerald-700">${h.credit > 0 ? '₹' + h.credit.toLocaleString('en-IN') : '-'}</td>
             <td class="p-2.5 text-right">${h.type === 'invoice' ? `<button onclick="reprintCustomerSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>` : '-'}</td>
           </tr>
@@ -1929,8 +1874,14 @@
             <div><label class="block font-semibold mb-1">Vehicle No.</label><input type="text" id="ee-inw-vehicle" value="${i.vehicle}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Gross Wt (Kg)</label><input type="number" step="0.1" id="ee-inw-gross" value="${i.gross}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Tare Wt (Kg)</label><input type="number" step="0.1" id="ee-inw-tare" value="${i.tare}" class="w-full border rounded p-1.5" required /></div>
+            <div>
+              <label class="block font-semibold mb-1">Cut 1 Kg/100 Kg?</label>
+              <select id="ee-inw-cut-choice" class="w-full border rounded p-1.5 font-bold">
+                <option value="yes" ${i.applyCut !== false ? 'selected' : ''}>YES - 1 Kg/100 Kg Cut</option>
+                <option value="no" ${i.applyCut === false ? 'selected' : ''}>NO - Net Weight (0 Cut)</option>
+              </select>
+            </div>
             <div><label class="block font-semibold mb-1">Rate ₹/Kg</label><input type="number" step="0.5" id="ee-inw-rate" value="${i.rate || 0}" class="w-full border rounded p-1.5" /></div>
-            <div><label class="block font-semibold mb-1">Chargeable Wt (Kg)</label><input type="number" step="0.1" id="ee-inw-chg" value="${i.chargeable}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Sent Crates</label><input type="number" id="ee-inw-sent" value="${i.sentCrates || 0}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Received Crates</label><input type="number" id="ee-inw-recv" value="${i.recvCrates || 0}" class="w-full border rounded p-1.5" /></div>
           </div>
@@ -1981,11 +1932,14 @@
           i.gross = Number(document.getElementById('ee-inw-gross').value || 0);
           i.tare = Number(document.getElementById('ee-inw-tare').value || 0);
           i.rate = Number(document.getElementById('ee-inw-rate').value || 0);
-          i.chargeable = Number(document.getElementById('ee-inw-chg').value || 0);
           i.sentCrates = Number(document.getElementById('ee-inw-sent').value || 0);
           i.recvCrates = Number(document.getElementById('ee-inw-recv').value || 0);
+          
+          const applyCut = document.getElementById('ee-inw-cut-choice').value === 'yes';
+          i.applyCut = applyCut;
           i.net = Math.max(0, i.gross - i.tare);
-          i.cut = (i.net / 100) * 1;
+          i.cut = applyCut ? (i.net / 100) * 1 : 0;
+          i.chargeable = i.net - i.cut;
           i.totalTripAmt = i.rate > 0 ? (i.chargeable * i.rate) : 0;
         }
       } else if(type === 'agreement') {
@@ -2033,7 +1987,7 @@
       saveData();
     }
 
-    // --- REPRINT CUSTOMER SLIP (WITH BOTH VIKRI SIZES & 1KG/100KG CUT LOGIC) ---
+    // --- REPRINT CUSTOMER SLIP (VIKRI VS BILLING) ---
     function reprintCustomerSlip(id) {
       const d = (APP_DATA.dispatches || []).find(x => x.id === id);
       if(!d) return alert("Slip not found");
@@ -2048,19 +2002,6 @@
           }).join('') + `</div>`;
       }
 
-      let weightBlockHTML = "";
-      if(d.weightInfo && d.weightInfo.enabled) {
-        const w = d.weightInfo;
-        weightBlockHTML = `
-          <div class="border border-black p-2.5 bg-gray-50 text-xs mb-2 space-y-1">
-            <div class="flex justify-between font-bold"><span>Gross / Tare Weight:</span><span>${w.gross} Kg / ${w.tare} Kg</span></div>
-            <div class="flex justify-between"><span>Net Weight:</span><span>${w.net.toFixed(1)} Kg</span></div>
-            <div class="flex justify-between text-red-600 font-bold"><span>1 Kg Cut per 100 Kg:</span><span>${w.applyCut ? `-${w.cut.toFixed(1)} Kg (Applied)` : `NO CUT (0 Kg)`}</span></div>
-            <div class="flex justify-between font-black border-t pt-1 text-slate-900 text-sm"><span>Final Chargeable Weight:</span><span>${w.finalChargeable.toFixed(1)} Kg</span></div>
-          </div>
-        `;
-      }
-
       const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
       const slipHTML = `
         <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
@@ -2068,7 +2009,7 @@
             <div class="w-16">${logoSvg}</div>
             <div class="text-center flex-1">
               <h1 class="text-xl font-black text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700">${isVikri ? 'Vikri Delivery Challan (Only Sizes)' : 'Official Customer Invoice'}</p>
+              <p class="text-[10px] uppercase font-bold text-gray-700">${isVikri ? 'Vikri Delivery Slip (Only Sizes)' : 'Official Customer Invoice'}</p>
             </div>
             <div class="text-right text-[11px] font-bold">
               <div>Token: <span class="font-mono text-amber-900">${d.tokenNo}</span></div>
@@ -2081,26 +2022,27 @@
             <div class="flex justify-between"><span>Vehicle No:</span><b>${d.vehicle}</b></div>
             <div class="flex justify-between"><span>Lot:</span><b>${d.lotNo || '-'}</b></div>
           </div>
-          ${weightBlockHTML}
           ${sizesHTML}
           <div class="border border-black p-2 bg-amber-50 mb-2 flex justify-between items-center">
             <span class="font-black text-sm">Total Dispatched: ${d.totalBoxes} Boxes</span>
-            ${!isVikri ? `<span class="font-black text-sm text-slate-900">Grand Total: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : `<span class="font-black text-xs text-amber-900">VIKRI NON-BILLED CHALLAN</span>`}
+            ${!isVikri ? `<span class="font-black text-sm text-slate-900">Grand Total: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : `<span class="font-black text-xs text-amber-900">VIKRI NON-BILLED SLIP</span>`}
           </div>
           <div class="text-[10px] text-gray-500 pt-2 border-t flex justify-between">
-            <span>${!isVikri ? `Freight: ₹${d.freight || 0} | Labour: ₹${d.labour || 0}` : `Delivered Sizes Verified`}</span>
+            <span>${!isVikri ? `Freight: ₹${d.freight || 0} | Labour: ₹${d.labour || 0}` : `Verified Dispatched Sizes`}</span>
             <span>Generated from SETIA Cloud Portal</span>
           </div>
         </div>
       `;
 
-      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0A${!isVikri ? `Grand Total: Rs. ${d.grandTotal}` : `Type: Vikri Sizes Challan`}`);
+      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0A${!isVikri ? `Grand Total: Rs. ${d.grandTotal}` : `Type: Vikri Sizes Slip`}`);
     }
 
+    // --- REPRINT FARMER INWARD SLIP (WITH 1 KG/100 KG YES/NO INDICATION) ---
     function reprintInwardSlip(id) {
       const i = (APP_DATA.inwards || []).find(x => x.id === id);
       if(!i) return alert("Slip not found");
 
+      const hasCut = i.applyCut !== false;
       const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
       const slipHTML = `
         <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
@@ -2120,8 +2062,14 @@
             <div class="flex justify-between"><span>Vehicle:</span><b>${i.vehicle}</b></div>
             <div class="flex justify-between"><span>Gross / Tare Wt:</span><span>${i.gross} Kg / ${i.tare} Kg</span></div>
             <div class="flex justify-between"><span>Net Weight:</span><span>${i.net.toFixed(1)} Kg</span></div>
-            <div class="flex justify-between text-red-600"><span>1 Kg/Quintal Cut:</span><span>-${i.cut.toFixed(1)} Kg</span></div>
-            <div class="flex justify-between text-base font-black border-t pt-1"><span>Chargeable Weight:</span><span>${i.chargeable.toFixed(1)} Kg</span></div>
+            <div class="flex justify-between ${hasCut ? 'text-red-600 font-bold' : 'text-gray-500 font-medium'}">
+              <span>1 Kg / 100 Kg Cut:</span>
+              <span>${hasCut ? `-${(i.cut || 0).toFixed(1)} Kg (Applied)` : `NO CUT (0 Kg)`}</span>
+            </div>
+            <div class="flex justify-between text-base font-black border-t pt-1">
+              <span>Chargeable Weight:</span>
+              <span>${i.chargeable.toFixed(1)} Kg</span>
+            </div>
           </div>
           <div class="border border-black p-2 bg-amber-50 flex justify-between font-bold text-xs mb-2">
             <span>Rate: ₹${i.rate || 0} / Kg</span>
@@ -2134,7 +2082,7 @@
         </div>
       `;
 
-      showSlip(slipHTML, i.phone, `*SETIA HARVEST INWARD SLIP*%0AToken: ${i.tokenNo}%0AFarmer: ${i.name}%0AChargeable: ${i.chargeable.toFixed(1)} Kg%0ARate: Rs. ${i.rate}/Kg`);
+      showSlip(slipHTML, i.phone, `*SETIA HARVEST INWARD SLIP*%0AToken: ${i.tokenNo}%0AFarmer: ${i.name}%0AChargeable: ${i.chargeable.toFixed(1)} Kg%0A1kg Cut: ${hasCut ? 'Yes' : 'No'}%0ARate: Rs. ${i.rate}/Kg`);
     }
 
     function reprintFarmerSlip(id) {
@@ -2484,18 +2432,6 @@
       document.getElementById('lump-sum-fields').classList.toggle('hidden', isPerKg);
     }
 
-    function calculateDailyWeight() {
-      const gross = Number(document.getElementById('d-gross-wt').value || 0);
-      const tare = Number(document.getElementById('d-tare-wt').value || 0);
-      const net = Math.max(0, gross - tare);
-      const deduction = net > 0 ? (net / 100) * 1 : 0;
-      const finalWt = net - deduction;
-
-      document.getElementById('disp-net-wt').innerText = net.toFixed(1);
-      document.getElementById('disp-cut-wt').innerText = deduction.toFixed(1);
-      document.getElementById('disp-final-wt').innerText = finalWt.toFixed(1);
-    }
-
     function recordCustomerPayment(e) {
       e.preventDefault();
       const customer = document.getElementById('pay-cust-select').value;
@@ -2579,6 +2515,7 @@
       e.target.reset();
     }
 
+    // --- DAILY INWARD GENERATOR (HANDLING 1 KG / 100 KG CUT YES/NO) ---
     function generateDailyInwardSlip(e) {
       e.preventDefault();
       const orchId = document.getElementById('d-orchard-id').value;
@@ -2596,32 +2533,47 @@
 
       const tokenNo = generatePartyToken('farmer', name, village);
       const net = Math.max(0, gross - tare);
-      const cut = (net / 100) * 1;
+
+      const applyCut = document.getElementById('d-cut-choice').value === 'yes';
+      const cut = applyCut && net > 0 ? (net / 100) * 1 : 0;
       const chargeable = net - cut;
       const totalTripAmt = rate > 0 ? (chargeable * rate) : 0;
 
+      const inwardRecord = { 
+        id: 'inw_' + Date.now(), 
+        orchardId: orchId, 
+        date: dateStr, 
+        tokenNo, 
+        name, 
+        phone, 
+        vehicle, 
+        loader, 
+        gross, 
+        tare, 
+        applyCut, 
+        net, 
+        cut, 
+        chargeable, 
+        rate, 
+        totalTripAmt, 
+        sentCrates, 
+        recvCrates 
+      };
+
       if(!APP_DATA.inwards) APP_DATA.inwards = [];
-      APP_DATA.inwards.push({ id: 'inw_' + Date.now(), orchardId: orchId, date: dateStr, tokenNo, name, phone, vehicle, loader, gross, tare, net, cut, chargeable, rate, totalTripAmt, sentCrates, recvCrates });
+      APP_DATA.inwards.push(inwardRecord);
       saveData();
 
-      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
-      const slipHTML = `
-        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
-          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
-            <div class="w-16">${logoSvg}</div>
-            <div class="text-center flex-1"><h1 class="text-xl font-black uppercase text-black">SETIA WAXING PLANT</h1><p class="text-[10px] uppercase font-bold text-gray-700">Inward Slip</p></div>
-          </div>
-          <div class="border border-black p-2 bg-gray-50 mb-2 font-bold">Chargeable Wt: <b>${chargeable.toFixed(1)} Kg</b> (@₹${rate}/Kg)</div>
-        </div>
-      `;
+      // Show formatted slip
+      reprintInwardSlip(inwardRecord.id);
 
-      showSlip(slipHTML, phone, `*SETIA HARVEST SLIP*%0AToken: ${tokenNo}%0AFarmer: ${name}%0AChargeable: ${chargeable.toFixed(1)} Kg`);
       e.target.reset();
       document.getElementById('inward-orchard-select').value = "";
+      document.getElementById('d-cut-choice').value = "yes";
       calculateDailyWeight();
     }
 
-    // --- GENERATE CUSTOMER SLIP WITH ENHANCED VIKRI & 1KG/100KG YES/NO LOGIC ---
+    // --- CUSTOMER DISPATCH GENERATOR ---
     function generateCustomerSlip(e) {
       e.preventDefault();
       const custType = document.querySelector('input[name="cust-dispatch-type"]:checked')?.value || 'Billing';
@@ -2658,7 +2610,6 @@
         }
       });
 
-      // Include any dynamic extra sizes
       for(let k = 1; k <= customSizeIndex; k++) {
         const nameEl = document.getElementById(`cust-size-name-${k}`);
         const qtyEl = document.getElementById(`cust-size-qty-${k}`);
@@ -2674,35 +2625,7 @@
         }
       }
 
-      // Weight & 1kg/100kg Cut calculations (Point 4)
-      const enableWt = document.getElementById('c-enable-wt').checked;
-      let weightInfo = null;
-      let weightValuation = 0;
-
-      if(enableWt) {
-        const gross = Number(document.getElementById('c-gross-wt').value || 0);
-        const tare = Number(document.getElementById('c-tare-wt').value || 0);
-        const net = Math.max(0, gross - tare);
-        const applyCut = document.getElementById('c-cut-choice').value === 'yes';
-        const cut = applyCut && net > 0 ? (net / 100) * 1 : 0;
-        const finalChargeable = net - cut;
-        const wtRate = isVikri ? 0 : Number(document.getElementById('c-wt-rate').value || 0);
-        weightValuation = wtRate > 0 ? (finalChargeable * wtRate) : 0;
-
-        weightInfo = {
-          enabled: true,
-          gross,
-          tare,
-          net,
-          applyCut,
-          cut,
-          finalChargeable,
-          wtRate,
-          weightValuation
-        };
-      }
-
-      const grandTotal = isVikri ? 0 : (totalAmount + weightValuation + freight + labour + packaging + misc);
+      const grandTotal = isVikri ? 0 : (totalAmount + freight + labour + packaging + misc);
 
       if(!APP_DATA.dispatches) APP_DATA.dispatches = [];
       const dispatchRecord = {
@@ -2723,13 +2646,12 @@
         totalBoxes,
         grandTotal,
         sizesBreakdown,
-        sizeRates,
-        weightInfo
+        sizeRates
       };
 
       APP_DATA.dispatches.push(dispatchRecord);
 
-      // Auto-add to directory if not present
+      // Auto-add to customer directory if not present
       if (!APP_DATA.customerDirectory) APP_DATA.customerDirectory = [];
       if (!APP_DATA.customerDirectory.some(c => (c.phone || '').toString().trim() === phone)) {
         APP_DATA.customerDirectory.push({ id: 'cd_' + Date.now(), name, phone, type: custType, vehicle });
@@ -2743,8 +2665,6 @@
       e.target.reset();
       buildKinnowSizeGrid();
       document.getElementById('custom-sizes-container').innerHTML = "";
-      document.getElementById('c-enable-wt').checked = false;
-      toggleCustomerWeightFields();
     }
 
     // --- FULL CUSTOMER LEDGER ---
@@ -2785,7 +2705,7 @@
           if(i.sizesBreakdown && Object.keys(i.sizesBreakdown).length > 0) {
             breakdownStr += " • " + Object.entries(i.sizesBreakdown).map(([sz, q]) => `${sz}: ${q}b`).join(', ');
           }
-          return { id: i.id, date: i.date, type: i.custType === 'Vikri' ? 'VIKRI CHALLAN' : 'INVOICE', tokenNo: i.tokenNo, desc: breakdownStr, debit: i.grandTotal || 0, credit: 0 };
+          return { id: i.id, date: i.date, type: i.custType === 'Vikri' ? 'VIKRI SLIP' : 'INVOICE', tokenNo: i.tokenNo, desc: breakdownStr, debit: i.grandTotal || 0, credit: 0 };
         }),
         ...payments.map(p => ({ id: p.id, date: p.date, type: 'PAYMENT', tokenNo: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, debit: 0, credit: p.amount }))
       ].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -2870,7 +2790,7 @@
 
       const history = [
         ...(orch.advance > 0 ? [{ id: orch.id, recordType: 'agreement', date: orch.date, type: 'ADVANCE TOKEN', tokenNo: orch.tokenNo, desc: `Token ${orch.tokenNo} (${orch.advBank || 'Bank/Cash'})`, inwardAmt: 0, paidAmt: orch.advance, crates: '-' }] : []),
-        ...trips.map(t => ({ id: t.id, recordType: 'inward', date: t.date, type: 'INWARD TRIP', tokenNo: t.tokenNo, desc: `Inward (${t.vehicle}) - ${t.chargeable.toFixed(1)} Kg @₹${t.rate}`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
+        ...trips.map(t => ({ id: t.id, recordType: 'inward', date: t.date, type: 'INWARD TRIP', tokenNo: t.tokenNo, desc: `Inward (${t.vehicle}) - ${t.chargeable.toFixed(1)} Kg @₹${t.rate} ${t.applyCut !== false ? '(1kg Cut)' : '(0 Cut)'}`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
         ...payments.map(p => ({ id: p.id, recordType: 'farmerPayment', date: p.date, type: 'BANK PAYMENT', tokenNo: '-', desc: `Paid: ${p.bank} (${p.ref})`, inwardAmt: 0, paidAmt: p.amount, crates: '-' }))
       ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -2931,7 +2851,7 @@
       const dailyFarmerPaid = dayFarmerPay.reduce((acc, curr) => acc + (curr.amount || 0), 0);
 
       document.getElementById('stat-daily-weight').innerText = `${dailyNetWt.toLocaleString('en-IN')} Kg`;
-      document.getElementById('stat-daily-cut').innerText = `${dailyCutWt.toFixed(1)} Kg (1kg/Qtl)`;
+      document.getElementById('stat-daily-cut').innerText = `${dailyCutWt.toFixed(1)} Kg Cut`;
       document.getElementById('stat-daily-boxes').innerText = `${dailyBoxes.toLocaleString('en-IN')} Boxes`;
       document.getElementById('stat-daily-cust-recv').innerText = `₹${dailyCustRecv.toLocaleString('en-IN')}`;
       document.getElementById('stat-daily-farmer-paid').innerText = `₹${dailyFarmerPaid.toLocaleString('en-IN')}`;
