@@ -197,11 +197,13 @@
         </div>
       </div>
 
-      <!-- TAB: ATTENDANCE & LABOUR (WITH DAY-TO-DAY DETAILED LEDGER) -->
+      <!-- TAB: ATTENDANCE & LABOUR -->
       <div id="attendance-section" class="hidden space-y-6">
+
+        <!-- 1. REGISTER NEW STAFF WITH SALARY (POINT 2) -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-800 mb-2 pb-2 border-b">📋 Register New Staff Member</h3>
-          <form onsubmit="registerQuickStaff(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <h3 class="text-base font-bold text-slate-800 mb-2 pb-2 border-b">📋 Register New Staff Member with Salary</h3>
+          <form onsubmit="registerQuickStaff(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Staff Member Name</label>
               <input type="text" id="reg-staff-name" required class="w-full border rounded-lg p-2" placeholder="e.g. Gurpreet Singh" />
@@ -209,6 +211,10 @@
             <div>
               <label class="block font-semibold mb-1">Role / Designation</label>
               <input type="text" id="reg-staff-role" class="w-full border rounded-lg p-2" placeholder="e.g. Machine Operator" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Monthly Salary ₹ (ਤਨਖ਼ਾਹ)</label>
+              <input type="number" id="reg-staff-salary" required min="0" class="w-full border rounded-lg p-2 font-bold text-slate-900" placeholder="e.g. 15000" />
             </div>
             <div class="flex items-end">
               <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
@@ -218,12 +224,13 @@
           </form>
         </div>
 
+        <!-- 2. STAFF DAILY ATTENDANCE -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
           <h3 class="text-base font-bold text-slate-800 mb-3 pb-2 border-b">1. Staff Daily Attendance</h3>
           <form onsubmit="recordStaffAttendance(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Staff Name</label>
-              <input list="staff-datalist" id="att-staff-input" required class="w-full border rounded-lg p-2 bg-amber-50 font-medium" placeholder="Select or type" />
+              <input list="staff-datalist" id="att-staff-input" required class="w-full border rounded-lg p-2 bg-amber-50 font-medium" placeholder="Select or type" oninput="autoFillStaffWage()" onchange="autoFillStaffWage()" />
               <datalist id="staff-datalist"></datalist>
             </div>
             <div>
@@ -236,8 +243,8 @@
               </select>
             </div>
             <div>
-              <label class="block font-semibold mb-1">Daily Wages ₹</label>
-              <input type="number" id="att-staff-wage" class="w-full border rounded-lg p-2" placeholder="e.g. 500" />
+              <label class="block font-semibold mb-1">Daily Wages ₹ (Auto from Salary)</label>
+              <input type="number" id="att-staff-wage" class="w-full border rounded-lg p-2 font-bold text-slate-900" placeholder="e.g. 500" />
             </div>
             <div>
               <label class="block font-semibold mb-1">Date</label>
@@ -251,16 +258,16 @@
           </form>
         </div>
 
-        <!-- CONTRACTOR GROUP LABOUR ATTENDANCE -->
+        <!-- 3. CONTRACTOR GROUP LABOUR ATTENDANCE (WITH PRESENT / HALF DAY / ABSENT) (POINT 1) -->
         <div class="bg-amber-50/70 p-5 rounded-xl border-2 border-amber-300 shadow-sm">
           <div class="flex justify-between items-center mb-3 pb-2 border-b border-amber-200">
             <div>
-              <h3 class="text-base font-black text-slate-900">2. Contractor Group Labour Attendance (Men & Women Rates)</h3>
-              <p class="text-xs text-amber-900">Enter men and women workers separately with distinct daily rates</p>
+              <h3 class="text-base font-black text-slate-900">2. Contractor Group Labour Attendance (Men & Women Rates + Status)</h3>
+              <p class="text-xs text-amber-900">Mark Present, Half Day, or Absent with automatic wage recalculation</p>
             </div>
           </div>
           <form onsubmit="recordContractorLabour(event)" class="space-y-3 text-xs">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div>
                 <label class="block font-bold mb-1">Contractor / Mukadam Name</label>
                 <input type="text" id="att-group-head" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Rani Mukadam" />
@@ -272,6 +279,15 @@
               <div>
                 <label class="block font-bold mb-1">Attendance Date</label>
                 <input type="date" id="att-group-date" required class="w-full border rounded-lg p-2 bg-white" />
+              </div>
+              <!-- STATUS FOR CONTRACTOR (POINT 1) -->
+              <div>
+                <label class="block font-black text-amber-950 mb-1">Attendance Status</label>
+                <select id="att-group-status" class="w-full border-2 border-amber-400 rounded-lg p-2 bg-white font-bold text-slate-900" onchange="calculateGroupWage()">
+                  <option value="Present" selected>✅ Full Day (Present)</option>
+                  <option value="Half Day">🌓 Half Day (50% Wages)</option>
+                  <option value="Absent">❌ Absent (0 Wages)</option>
+                </select>
               </div>
             </div>
 
@@ -316,11 +332,38 @@
           </form>
         </div>
 
-        <!-- 3. DAY-TO-DAY ATTENDANCE LEDGER SECTION -->
+        <!-- 4. STAFF SALARY SUMMARY CALCULATION CARD (POINT 2) -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
+          <div class="flex justify-between items-center border-b pb-2">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">💼 Staff Salary Statement (Calculated by Present Days)</h3>
+              <p class="text-xs text-gray-500">Auto-calculated: $\text{Payable} = (\text{Present} + 0.5 \times \text{HalfDay}) \times (\text{Monthly Salary} \div 30)$ for filtered dates</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto border rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-800 text-amber-300 font-bold">
+                <tr>
+                  <th class="p-2.5">Staff Name</th>
+                  <th class="p-2.5">Role</th>
+                  <th class="p-2.5 text-right">Base Monthly Salary ₹</th>
+                  <th class="p-2.5 text-center">Present Days</th>
+                  <th class="p-2.5 text-center">Half Days</th>
+                  <th class="p-2.5 text-center">Absent / Leave</th>
+                  <th class="p-2.5 text-center">Effective Days Worked</th>
+                  <th class="p-2.5 text-right">Net Calculated Salary ₹</th>
+                </tr>
+              </thead>
+              <tbody id="staff-salary-report-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 5. DAY-TO-DAY ATTENDANCE LEDGER SECTION -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
           <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
             <div>
-              <h3 class="text-base font-bold text-slate-900">3. Day-to-Day Attendance Ledger & Statement</h3>
+              <h3 class="text-base font-bold text-slate-900">4. Day-to-Day Attendance Ledger & Statement</h3>
               <p class="text-xs text-gray-500">Filter individual staff or contractor groups across custom dates or months</p>
             </div>
             <div class="flex gap-2">
@@ -397,7 +440,7 @@
                   <th class="p-2.5">Rate Particulars</th>
                   <th class="p-2.5 text-right">Day Amount ₹</th>
                   <th class="p-2.5 text-right">Cumulative Total ₹</th>
-                  <th class="p-2.5 text-right no-print">Actions</th>
+                  <th class="p-2.5 text-right no-print">Actions (Admin Only)</th>
                 </tr>
               </thead>
               <tbody id="attendance-ledger-tbody"></tbody>
@@ -444,6 +487,14 @@
               <div>
                 <label class="block font-semibold mb-1">Location</label>
                 <input type="text" id="edit-att-orchard" class="w-full border rounded-lg p-2" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1 text-amber-900 font-bold">Attendance Status</label>
+                <select id="edit-att-group-status" class="w-full border rounded p-1.5 font-bold">
+                  <option value="Present">Present</option>
+                  <option value="Half Day">Half Day</option>
+                  <option value="Absent">Absent</option>
+                </select>
               </div>
               <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2 rounded border">
                 <div>
@@ -1091,8 +1142,8 @@
         { id: 'st_2', name: 'Chirag Setia', username: 'chirag', password: '1234', role: 'staff' }
       ],
       staffDirectory: [
-        { id: 'sd_1', name: 'Ramesh Kumar', role: 'Plant Supervisor' },
-        { id: 'sd_2', name: 'Gurpreet Singh', role: 'Machine Operator' }
+        { id: 'sd_1', name: 'Ramesh Kumar', role: 'Plant Supervisor', salary: 18000 },
+        { id: 'sd_2', name: 'Gurpreet Singh', role: 'Machine Operator', salary: 15000 }
       ],
       customerDirectory: [
         { id: 'cd_1', name: 'Chifu Agritech', phone: '9658200058', type: 'Billing', vehicle: 'PB 15 XX 0000' },
@@ -1244,7 +1295,6 @@
       document.getElementById('att-staff-date').value = todayStr;
       document.getElementById('att-group-date').value = todayStr;
 
-      // Set default attendance ledger filters
       const curYearMonth = todayStr.substring(0, 7);
       document.getElementById('ledger-month-filter').value = curYearMonth;
       document.getElementById('ledger-from-date').value = `${curYearMonth}-01`;
@@ -1255,6 +1305,7 @@
       updateLedgerPersonDropdown();
       renderAttendanceLedger();
       calculateDailyWeight();
+      calculateGroupWage();
       fetchCloudData();
 
       setInterval(fetchCloudData, 4000);
@@ -1370,7 +1421,151 @@
       document.getElementById('disp-final-wt').innerText = finalWt.toFixed(1);
     }
 
-    // --- 4. ATTENDANCE LEDGER WITH DAY-TO-DAY DETAILS, DATES & MONTHS ---
+    // --- 4. STAFF SALARY REGISTRATION & AUTO-FILL WAGE (POINT 2) ---
+    function registerQuickStaff(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-staff-name').value.trim();
+      const role = document.getElementById('reg-staff-role').value.trim() || 'Staff';
+      const salary = Number(document.getElementById('reg-staff-salary').value || 0);
+
+      if(!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
+      APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role, salary });
+      saveData();
+      alert(`Staff member ${name} added with monthly salary ₹${salary.toLocaleString('en-IN')}!`);
+      e.target.reset();
+      updateLedgerPersonDropdown();
+      renderStaffSalaryReport();
+    }
+
+    function autoFillStaffWage() {
+      const name = (document.getElementById('att-staff-input').value || '').trim().toLowerCase();
+      if (!name) return;
+
+      const staff = (APP_DATA.staffDirectory || []).find(s => s.name.toLowerCase() === name);
+      if (staff && staff.salary > 0) {
+        const perDay = Math.round(staff.salary / 30);
+        document.getElementById('att-staff-wage').value = perDay;
+      }
+    }
+
+    // --- 5. CONTRACTOR LABOUR ATTENDANCE: PRESENT / HALF DAY / ABSENT (POINT 1) ---
+    function calculateGroupWage() {
+      const status = document.getElementById('att-group-status').value;
+      const menCount = Number(document.getElementById('att-group-men-count').value || 0);
+      const menRate = Number(document.getElementById('att-group-men-rate').value || 0);
+      const womenCount = Number(document.getElementById('att-group-women-count').value || 0);
+      const womenRate = Number(document.getElementById('att-group-women-rate').value || 0);
+
+      let total = (menCount * menRate) + (womenCount * womenRate);
+      let note = `(${menCount} Men @₹${menRate} + ${womenCount} Women @₹${womenRate})`;
+
+      if (status === 'Half Day') {
+        total = total * 0.5;
+        note += ` × 50% (Half Day)`;
+      } else if (status === 'Absent') {
+        total = 0;
+        note += ` × 0 (Absent)`;
+      }
+
+      document.getElementById('disp-group-total').innerText = `₹${total.toLocaleString('en-IN')}`;
+      document.getElementById('disp-group-breakdown').innerText = `${note} = ${menCount + womenCount} Total Workers`;
+    }
+
+    function recordContractorLabour(e) {
+      e.preventDefault();
+      const head = document.getElementById('att-group-head').value.trim();
+      const orchard = document.getElementById('att-group-orchard').value.trim() || "Plant";
+      const date = document.getElementById('att-group-date').value;
+      const status = document.getElementById('att-group-status').value;
+
+      const menCount = Number(document.getElementById('att-group-men-count').value || 0);
+      const menRate = Number(document.getElementById('att-group-men-rate').value || 0);
+      const womenCount = Number(document.getElementById('att-group-women-count').value || 0);
+      const womenRate = Number(document.getElementById('att-group-women-rate').value || 0);
+
+      const totalCount = menCount + womenCount;
+      if(totalCount <= 0 && status !== 'Absent') {
+        return alert("Please enter at least 1 worker (Men or Women).");
+      }
+
+      let totalPayable = (menCount * menRate) + (womenCount * womenRate);
+      if (status === 'Half Day') totalPayable = totalPayable * 0.5;
+      else if (status === 'Absent') totalPayable = 0;
+
+      if(!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
+      APP_DATA.groupLabourAttendance.push({
+        id: 'grp_' + Date.now(),
+        type: 'Contractor Group',
+        head,
+        orchard,
+        date,
+        status,
+        menCount,
+        menRate,
+        womenCount,
+        womenRate,
+        count: totalCount,
+        totalPayable
+      });
+
+      saveData();
+      alert(`Recorded attendance [${status}] for ${head} (Total ₹${totalPayable.toLocaleString('en-IN')})!`);
+      e.target.reset();
+      document.getElementById('att-group-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('att-group-status').value = 'Present';
+      document.getElementById('att-group-men-count').value = 0;
+      document.getElementById('att-group-women-count').value = 0;
+      document.getElementById('att-group-men-rate').value = 500;
+      document.getElementById('att-group-women-rate').value = 450;
+      calculateGroupWage();
+      renderAttendanceLedger();
+    }
+
+    // --- 6. STAFF SALARY REPORT ACCORDING TO PRESENT DAYS (POINT 2) ---
+    function renderStaffSalaryReport() {
+      const tbody = document.getElementById('staff-salary-report-tbody');
+      if (!tbody) return;
+
+      const fromDate = document.getElementById('ledger-from-date').value;
+      const toDate = document.getElementById('ledger-to-date').value;
+
+      let staffList = APP_DATA.staffDirectory || [];
+      if (staffList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-gray-400">No staff registered in directory yet.</td></tr>`;
+        return;
+      }
+
+      let attendanceRecords = (APP_DATA.staffAttendance || []);
+      if (fromDate) attendanceRecords = attendanceRecords.filter(r => r.date >= fromDate);
+      if (toDate) attendanceRecords = attendanceRecords.filter(r => r.date <= toDate);
+
+      tbody.innerHTML = staffList.map(st => {
+        const staffAtt = attendanceRecords.filter(a => a.name.trim().toLowerCase() === st.name.trim().toLowerCase());
+        const presentCount = staffAtt.filter(a => a.status === 'Present').length;
+        const halfDayCount = staffAtt.filter(a => a.status === 'Half Day').length;
+        const absentCount = staffAtt.filter(a => a.status === 'Absent' || a.status === 'Leave').length;
+
+        const effectiveDays = presentCount + (halfDayCount * 0.5);
+        const monthlySalary = Number(st.salary || 0);
+        const perDaySalary = monthlySalary > 0 ? (monthlySalary / 30) : 0;
+        const netCalculatedSalary = Math.round(effectiveDays * perDaySalary);
+
+        return `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2.5 font-bold text-slate-800">${st.name}</td>
+            <td class="p-2.5 text-gray-600">${st.role || 'Staff'}</td>
+            <td class="p-2.5 text-right font-semibold text-slate-900">₹${monthlySalary.toLocaleString('en-IN')}</td>
+            <td class="p-2.5 text-center font-bold text-emerald-700">${presentCount}</td>
+            <td class="p-2.5 text-center font-bold text-amber-600">${halfDayCount}</td>
+            <td class="p-2.5 text-center font-bold text-red-600">${absentCount}</td>
+            <td class="p-2.5 text-center font-black text-slate-900 bg-amber-50">${effectiveDays}</td>
+            <td class="p-2.5 text-right font-black text-emerald-800 text-sm">₹${netCalculatedSalary.toLocaleString('en-IN')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // --- 7. ATTENDANCE LEDGER & ADMIN-ONLY DELETE (POINT 3) ---
     function updateLedgerPersonDropdown() {
       const cat = document.getElementById('ledger-cat-filter').value;
       const personSel = document.getElementById('ledger-person-filter');
@@ -1415,6 +1610,7 @@
       const personFilter = document.getElementById('ledger-person-filter').value;
       const fromDate = document.getElementById('ledger-from-date').value;
       const toDate = document.getElementById('ledger-to-date').value;
+      const isAdmin = currentUser && currentUser.role === 'admin';
 
       let staffList = (APP_DATA.staffAttendance || []).map(s => ({
         id: s.id,
@@ -1436,7 +1632,7 @@
         cat: 'Contractor Group',
         name: g.head,
         location: g.orchard || 'Plant',
-        countStatus: `${g.menCount || 0} Men + ${g.womenCount || 0} Women (${g.count} Persons)`,
+        countStatus: `${g.status || 'Present'}: ${g.menCount || 0}M + ${g.womenCount || 0}W (${g.count} Persons)`,
         rateDetail: `Men: ₹${g.menRate || 0} | Women: ₹${g.womenRate || 0}`,
         amount: g.totalPayable,
         menCount: g.menCount || 0,
@@ -1488,8 +1684,8 @@
             <td class="p-2.5 text-right font-bold text-slate-900">₹${r.amount.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-right font-black text-emerald-700">₹${cumulative.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-right space-x-2 no-print">
-              <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">✏️</button>
-              <button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+              <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">✏️ Edit</button>
+              ${isAdmin ? `<button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">🗑️ Delete</button>` : `<span class="text-gray-400 text-[10px] italic">Admin Only</span>`}
             </td>
           </tr>
         `;
@@ -1504,10 +1700,31 @@
       document.getElementById('ledger-stat-group-heads').innerText = `${totalMen + totalWomen} Labour Heads`;
       document.getElementById('ledger-stat-mw-breakdown').innerText = `${totalMen} Men + ${totalWomen} Women`;
       document.getElementById('ledger-stat-total-wages').innerText = `₹${cumulative.toLocaleString('en-IN')}`;
+
+      renderStaffSalaryReport();
+    }
+
+    // --- 8. STRICT ADMIN-ONLY DELETION GUARD (POINT 3) ---
+    function deleteAttendance(id, cat) {
+      if (!currentUser || currentUser.role !== 'admin') {
+        return alert("Access Denied: Only Master Admin can delete attendance records.");
+      }
+
+      if(confirm("Master Admin Authorization: Permanently remove this attendance record?")) {
+        if(cat === 'Single Staff') {
+          APP_DATA.staffAttendance = (APP_DATA.staffAttendance || []).filter(x => x.id !== id);
+        } else {
+          APP_DATA.groupLabourAttendance = (APP_DATA.groupLabourAttendance || []).filter(x => x.id !== id);
+        }
+        saveData();
+        renderAttendanceLedger();
+        alert("Attendance record removed by Admin.");
+      }
     }
 
     function printAttendanceLedger() {
       const content = document.getElementById('ledger-printable-area').innerHTML;
+      const salaryTable = document.getElementById('staff-salary-report-tbody').innerHTML;
       const printWin = window.open('', '_blank', 'width=900,height=800');
       printWin.document.open();
       printWin.document.write(`
@@ -1529,6 +1746,99 @@
       const totalAmt = document.getElementById('ledger-stat-total-wages').innerText;
       const msg = `*SETIA WAXING PLANT - ATTENDANCE STATEMENT*%0APeriod: ${fromDate} to ${toDate}%0AAccount: ${person}%0A*Total Wages / Due: ${totalAmt}*`;
       window.open(`https://wa.me/?text=${msg}`, '_blank');
+    }
+
+    function openEditAttendanceModal(id, cat) {
+      const modal = document.getElementById('edit-attendance-modal');
+      document.getElementById('edit-att-id').value = id;
+      document.getElementById('edit-att-type').value = cat;
+
+      if(cat === 'Single Staff') {
+        const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
+        if(!item) return;
+        document.getElementById('edit-modal-title').innerText = `Edit Staff: ${item.name}`;
+        document.getElementById('edit-att-date').value = item.date;
+        document.getElementById('edit-att-name').value = item.name;
+        document.getElementById('edit-att-status').value = item.status;
+        document.getElementById('edit-att-wage').value = item.wage || 0;
+        document.getElementById('edit-staff-fields').classList.remove('hidden');
+        document.getElementById('edit-group-fields').classList.add('hidden');
+      } else {
+        const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
+        if(!item) return;
+        document.getElementById('edit-modal-title').innerText = `Edit Group: ${item.head}`;
+        document.getElementById('edit-att-date').value = item.date;
+        document.getElementById('edit-att-head').value = item.head;
+        document.getElementById('edit-att-orchard').value = item.orchard || '';
+        document.getElementById('edit-att-group-status').value = item.status || 'Present';
+        document.getElementById('edit-att-men-count').value = item.menCount || 0;
+        document.getElementById('edit-att-men-rate').value = item.menRate || 0;
+        document.getElementById('edit-att-women-count').value = item.womenCount || 0;
+        document.getElementById('edit-att-women-rate').value = item.womenRate || 0;
+        document.getElementById('edit-staff-fields').classList.add('hidden');
+        document.getElementById('edit-group-fields').classList.remove('hidden');
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-attendance-modal').classList.add('hidden');
+    }
+
+    function saveEditedAttendance(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-att-id').value;
+      const cat = document.getElementById('edit-att-type').value;
+      const date = document.getElementById('edit-att-date').value;
+
+      if(cat === 'Single Staff') {
+        const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
+        if(item) {
+          item.date = date;
+          item.name = document.getElementById('edit-att-name').value;
+          item.status = document.getElementById('edit-att-status').value;
+          item.wage = Number(document.getElementById('edit-att-wage').value || 0);
+        }
+      } else {
+        const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
+        if(item) {
+          item.date = date;
+          item.head = document.getElementById('edit-att-head').value;
+          item.orchard = document.getElementById('edit-att-orchard').value;
+          item.status = document.getElementById('edit-att-group-status').value;
+          item.menCount = Number(document.getElementById('edit-att-men-count').value || 0);
+          item.menRate = Number(document.getElementById('edit-att-men-rate').value || 0);
+          item.womenCount = Number(document.getElementById('edit-att-women-count').value || 0);
+          item.womenRate = Number(document.getElementById('edit-att-women-rate').value || 0);
+          item.count = item.menCount + item.womenCount;
+          
+          let total = (item.menCount * item.menRate) + (item.womenCount * item.womenRate);
+          if (item.status === 'Half Day') total = total * 0.5;
+          else if (item.status === 'Absent') total = 0;
+          item.totalPayable = total;
+        }
+      }
+
+      saveData();
+      closeEditModal();
+      alert("Attendance updated!");
+      renderAttendanceLedger();
+    }
+
+    function recordStaffAttendance(e) {
+      e.preventDefault();
+      const staffName = document.getElementById('att-staff-input').value.trim();
+      const status = document.getElementById('att-staff-status').value;
+      const wage = Number(document.getElementById('att-staff-wage').value || 0);
+      const date = document.getElementById('att-staff-date').value;
+
+      if(!APP_DATA.staffAttendance) APP_DATA.staffAttendance = [];
+      APP_DATA.staffAttendance.push({ id: 'att_' + Date.now(), type: 'Single Staff', name: staffName, status, wage, date });
+      saveData();
+      alert(`Attendance recorded for ${staffName}!`);
+      e.target.reset();
+      document.getElementById('att-staff-date').value = new Date().toISOString().split('T')[0];
+      renderAttendanceLedger();
     }
 
     function isUserBlocked(idOrPhone) {
@@ -1840,7 +2150,6 @@
       }).join('');
     }
 
-    // --- UNIVERSAL RECORD EDITING ---
     function openEditRecordModal(type, id) {
       const modal = document.getElementById('edit-record-modal');
       const title = document.getElementById('edit-record-title');
@@ -1987,7 +2296,6 @@
       saveData();
     }
 
-    // --- REPRINT CUSTOMER SLIP (VIKRI VS BILLING) ---
     function reprintCustomerSlip(id) {
       const d = (APP_DATA.dispatches || []).find(x => x.id === id);
       if(!d) return alert("Slip not found");
@@ -2037,7 +2345,6 @@
       showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0A${!isVikri ? `Grand Total: Rs. ${d.grandTotal}` : `Type: Vikri Sizes Slip`}`);
     }
 
-    // --- REPRINT FARMER INWARD SLIP (WITH 1 KG/100 KG YES/NO INDICATION) ---
     function reprintInwardSlip(id) {
       const i = (APP_DATA.inwards || []).find(x => x.id === id);
       if(!i) return alert("Slip not found");
@@ -2150,19 +2457,6 @@
       container.appendChild(div);
     }
 
-    function registerQuickStaff(e) {
-      e.preventDefault();
-      const name = document.getElementById('reg-staff-name').value.trim();
-      const role = document.getElementById('reg-staff-role').value.trim() || 'Staff';
-
-      if(!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
-      APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role });
-      saveData();
-      alert(`Staff member ${name} added!`);
-      e.target.reset();
-      updateLedgerPersonDropdown();
-    }
-
     function populateDropdowns() {
       const inwardSelect = document.getElementById('inward-orchard-select');
       const orchLedgerSelect = document.getElementById('orchard-ledger-select');
@@ -2247,156 +2541,6 @@
       alert(`Staff account @${username} created!`);
       e.target.reset();
       updateLedgerPersonDropdown();
-    }
-
-    function recordStaffAttendance(e) {
-      e.preventDefault();
-      const staffName = document.getElementById('att-staff-input').value.trim();
-      const status = document.getElementById('att-staff-status').value;
-      const wage = Number(document.getElementById('att-staff-wage').value || 0);
-      const date = document.getElementById('att-staff-date').value;
-
-      if(!APP_DATA.staffAttendance) APP_DATA.staffAttendance = [];
-      APP_DATA.staffAttendance.push({ id: 'att_' + Date.now(), type: 'Single Staff', name: staffName, status, wage, date });
-      saveData();
-      alert(`Attendance recorded for ${staffName}!`);
-      e.target.reset();
-      document.getElementById('att-staff-date').value = new Date().toISOString().split('T')[0];
-      renderAttendanceLedger();
-    }
-
-    function calculateGroupWage() {
-      const menCount = Number(document.getElementById('att-group-men-count').value || 0);
-      const menRate = Number(document.getElementById('att-group-men-rate').value || 0);
-      const womenCount = Number(document.getElementById('att-group-women-count').value || 0);
-      const womenRate = Number(document.getElementById('att-group-women-rate').value || 0);
-
-      const total = (menCount * menRate) + (womenCount * womenRate);
-      document.getElementById('disp-group-total').innerText = `₹${total.toLocaleString('en-IN')}`;
-      document.getElementById('disp-group-breakdown').innerText = `(${menCount} Men @₹${menRate} + ${womenCount} Women @₹${womenRate} = ${menCount + womenCount} Total)`;
-    }
-
-    function recordContractorLabour(e) {
-      e.preventDefault();
-      const head = document.getElementById('att-group-head').value.trim();
-      const orchard = document.getElementById('att-group-orchard').value.trim() || "Plant";
-      const date = document.getElementById('att-group-date').value;
-
-      const menCount = Number(document.getElementById('att-group-men-count').value || 0);
-      const menRate = Number(document.getElementById('att-group-men-rate').value || 0);
-      const womenCount = Number(document.getElementById('att-group-women-count').value || 0);
-      const womenRate = Number(document.getElementById('att-group-women-rate').value || 0);
-
-      const totalCount = menCount + womenCount;
-      if(totalCount <= 0) return alert("Please enter at least 1 worker (Men or Women).");
-
-      const totalPayable = (menCount * menRate) + (womenCount * womenRate);
-
-      if(!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
-      APP_DATA.groupLabourAttendance.push({
-        id: 'grp_' + Date.now(),
-        type: 'Contractor Group',
-        head,
-        orchard,
-        date,
-        menCount,
-        menRate,
-        womenCount,
-        womenRate,
-        count: totalCount,
-        totalPayable
-      });
-
-      saveData();
-      alert(`Recorded ${totalCount} persons (${menCount} Men, ${womenCount} Women) under ${head}!`);
-      e.target.reset();
-      document.getElementById('att-group-date').value = new Date().toISOString().split('T')[0];
-      document.getElementById('att-group-men-count').value = 0;
-      document.getElementById('att-group-women-count').value = 0;
-      document.getElementById('att-group-men-rate').value = 500;
-      document.getElementById('att-group-women-rate').value = 450;
-      calculateGroupWage();
-      renderAttendanceLedger();
-    }
-
-    function openEditAttendanceModal(id, cat) {
-      const modal = document.getElementById('edit-attendance-modal');
-      document.getElementById('edit-att-id').value = id;
-      document.getElementById('edit-att-type').value = cat;
-
-      if(cat === 'Single Staff') {
-        const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
-        if(!item) return;
-        document.getElementById('edit-modal-title').innerText = `Edit Staff: ${item.name}`;
-        document.getElementById('edit-att-date').value = item.date;
-        document.getElementById('edit-att-name').value = item.name;
-        document.getElementById('edit-att-status').value = item.status;
-        document.getElementById('edit-att-wage').value = item.wage || 0;
-        document.getElementById('edit-staff-fields').classList.remove('hidden');
-        document.getElementById('edit-group-fields').classList.add('hidden');
-      } else {
-        const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
-        if(!item) return;
-        document.getElementById('edit-modal-title').innerText = `Edit Group: ${item.head}`;
-        document.getElementById('edit-att-date').value = item.date;
-        document.getElementById('edit-att-head').value = item.head;
-        document.getElementById('edit-att-orchard').value = item.orchard || '';
-        document.getElementById('edit-att-men-count').value = item.menCount || 0;
-        document.getElementById('edit-att-men-rate').value = item.menRate || 0;
-        document.getElementById('edit-att-women-count').value = item.womenCount || 0;
-        document.getElementById('edit-att-women-rate').value = item.womenRate || 0;
-        document.getElementById('edit-staff-fields').classList.add('hidden');
-        document.getElementById('edit-group-fields').classList.remove('hidden');
-      }
-      modal.classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-      document.getElementById('edit-attendance-modal').classList.add('hidden');
-    }
-
-    function saveEditedAttendance(e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-att-id').value;
-      const cat = document.getElementById('edit-att-type').value;
-      const date = document.getElementById('edit-att-date').value;
-
-      if(cat === 'Single Staff') {
-        const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
-        if(item) {
-          item.date = date;
-          item.name = document.getElementById('edit-att-name').value;
-          item.status = document.getElementById('edit-att-status').value;
-          item.wage = Number(document.getElementById('edit-att-wage').value || 0);
-        }
-      } else {
-        const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
-        if(item) {
-          item.date = date;
-          item.head = document.getElementById('edit-att-head').value;
-          item.orchard = document.getElementById('edit-att-orchard').value;
-          item.menCount = Number(document.getElementById('edit-att-men-count').value || 0);
-          item.menRate = Number(document.getElementById('edit-att-men-rate').value || 0);
-          item.womenCount = Number(document.getElementById('edit-att-women-count').value || 0);
-          item.womenRate = Number(document.getElementById('edit-att-women-rate').value || 0);
-          item.count = item.menCount + item.womenCount;
-          item.totalPayable = (item.menCount * item.menRate) + (item.womenCount * item.womenRate);
-        }
-      }
-
-      saveData();
-      closeEditModal();
-      alert("Attendance updated!");
-      renderAttendanceLedger();
-    }
-
-    function deleteAttendance(id, cat) {
-      if(confirm("Delete this attendance record?")) {
-        if(cat === 'Single Staff') APP_DATA.staffAttendance = APP_DATA.staffAttendance.filter(x => x.id !== id);
-        else APP_DATA.groupLabourAttendance = APP_DATA.groupLabourAttendance.filter(x => x.id !== id);
-        saveData();
-        renderAttendanceLedger();
-      }
     }
 
     function autoFillOrchardDetails() {
@@ -2515,7 +2659,6 @@
       e.target.reset();
     }
 
-    // --- DAILY INWARD GENERATOR (HANDLING 1 KG / 100 KG CUT YES/NO) ---
     function generateDailyInwardSlip(e) {
       e.preventDefault();
       const orchId = document.getElementById('d-orchard-id').value;
@@ -2564,7 +2707,6 @@
       APP_DATA.inwards.push(inwardRecord);
       saveData();
 
-      // Show formatted slip
       reprintInwardSlip(inwardRecord.id);
 
       e.target.reset();
@@ -2573,7 +2715,6 @@
       calculateDailyWeight();
     }
 
-    // --- CUSTOMER DISPATCH GENERATOR ---
     function generateCustomerSlip(e) {
       e.preventDefault();
       const custType = document.querySelector('input[name="cust-dispatch-type"]:checked')?.value || 'Billing';
@@ -2651,15 +2792,12 @@
 
       APP_DATA.dispatches.push(dispatchRecord);
 
-      // Auto-add to customer directory if not present
       if (!APP_DATA.customerDirectory) APP_DATA.customerDirectory = [];
       if (!APP_DATA.customerDirectory.some(c => (c.phone || '').toString().trim() === phone)) {
         APP_DATA.customerDirectory.push({ id: 'cd_' + Date.now(), name, phone, type: custType, vehicle });
       }
 
       saveData();
-
-      // Show formatted slip
       reprintCustomerSlip(dispatchRecord.id);
 
       e.target.reset();
@@ -2667,7 +2805,6 @@
       document.getElementById('custom-sizes-container').innerHTML = "";
     }
 
-    // --- FULL CUSTOMER LEDGER ---
     function renderCustomerLedger() {
       const custName = document.getElementById('view-cust-select').value;
       const kpi = document.getElementById('cust-kpi-container');
