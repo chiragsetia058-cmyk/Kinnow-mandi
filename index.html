@@ -117,11 +117,11 @@
     <div class="max-w-6xl mx-auto w-full p-4 no-print">
       <div class="grid grid-cols-3 md:grid-cols-7 border-b border-gray-300 gap-1 mb-6 text-center text-xs font-bold">
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2.5 border-b-2 border-amber-600 text-amber-700">📊 Dashboard</button>
-        <button onclick="switchTab('customer-ledger')" id="tab-customer-ledger" class="py-2.5 text-gray-500 hover:text-amber-700">👤 Customer</button>
+        <button onclick="switchTab('customer-ledger')" id="tab-customer-ledger" class="py-2.5 text-gray-500 hover:text-amber-700">👤 Customer / Vikri</button>
         <button onclick="switchTab('orchards')" id="tab-orchards" class="py-2.5 text-gray-500 hover:text-amber-700">🌳 Farmer</button>
         <button onclick="switchTab('farmer')" id="tab-farmer" class="py-2.5 text-gray-500 hover:text-amber-700">1. New Deal</button>
         <button onclick="switchTab('daily')" id="tab-daily" class="py-2.5 text-gray-500 hover:text-amber-700">2. Inward</button>
-        <button onclick="switchTab('customer')" id="tab-customer" class="py-2.5 text-gray-500 hover:text-amber-700">3. Dispatch</button>
+        <button onclick="switchTab('customer')" id="tab-customer" class="py-2.5 text-gray-500 hover:text-amber-700">3. Outward Dispatch</button>
         <button onclick="switchTab('attendance')" id="tab-attendance" class="py-2.5 text-gray-500 hover:text-amber-700 bg-amber-50">👥 Attendance</button>
         <button onclick="switchTab('admin-panel')" id="tab-admin-panel" class="py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black hidden">👑 Master Admin Control</button>
       </div>
@@ -132,7 +132,7 @@
           <div class="flex flex-wrap justify-between items-center gap-3">
             <div>
               <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
-              <p class="text-xs text-amber-800">Manage user access permissions, add staff, and block/unblock accounts.</p>
+              <p class="text-xs text-amber-800">Manage user access permissions, add staff, block or permanently delete accounts.</p>
             </div>
             <button onclick="forceSyncToCloud()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow">
               ☁️ Force Push All Records to MongoDB
@@ -251,43 +251,69 @@
           </form>
         </div>
 
+        <!-- CONTRACTOR GROUP LABOUR ATTENDANCE (MEN & WOMEN SPLIT) -->
         <div class="bg-amber-50/70 p-5 rounded-xl border-2 border-amber-300 shadow-sm">
           <div class="flex justify-between items-center mb-3 pb-2 border-b border-amber-200">
             <div>
-              <h3 class="text-base font-black text-slate-900">2. Contractor Group Labour Attendance (Rani Model)</h3>
-              <p class="text-xs text-amber-900">Enter number of labourers working under contractor</p>
+              <h3 class="text-base font-black text-slate-900">2. Contractor Group Labour Attendance (Men & Women Rates)</h3>
+              <p class="text-xs text-amber-900">Enter men and women workers separately with distinct daily rates</p>
             </div>
           </div>
-          <form onsubmit="recordContractorLabour(event)" class="grid grid-cols-1 md:grid-cols-6 gap-3 text-xs">
-            <div>
-              <label class="block font-bold mb-1">Contractor Name</label>
-              <input type="text" id="att-group-head" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Rani Mukadam" />
+          <form onsubmit="recordContractorLabour(event)" class="space-y-3 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label class="block font-bold mb-1">Contractor / Mukadam Name</label>
+                <input type="text" id="att-group-head" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Rani Mukadam" />
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Location / Orchard</label>
+                <input type="text" id="att-group-orchard" class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Khuian Seed Farm" />
+              </div>
+              <div>
+                <label class="block font-bold mb-1">Attendance Date</label>
+                <input type="date" id="att-group-date" required class="w-full border rounded-lg p-2 bg-white" />
+              </div>
             </div>
-            <div>
-              <label class="block font-bold mb-1">Persons Present</label>
-              <input type="number" id="att-group-count" required min="1" class="w-full border rounded-lg p-2 bg-white font-black text-amber-900" placeholder="e.g. 14" oninput="calculateGroupWage()" />
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-3.5 rounded-xl border border-amber-200">
+              <div class="space-y-2 border-r md:pr-4">
+                <span class="font-black text-slate-800 uppercase text-[11px] block text-blue-800">👨 Men Labour</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block font-semibold mb-1">Men Count</label>
+                    <input type="number" id="att-group-men-count" min="0" value="0" class="w-full border rounded-lg p-2 font-bold" oninput="calculateGroupWage()" />
+                  </div>
+                  <div>
+                    <label class="block font-semibold mb-1">Rate / Man ₹</label>
+                    <input type="number" id="att-group-men-rate" min="0" value="500" class="w-full border rounded-lg p-2 font-bold" oninput="calculateGroupWage()" />
+                  </div>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <span class="font-black text-slate-800 uppercase text-[11px] block text-pink-800">👩 Women Labour</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block font-semibold mb-1">Women Count</label>
+                    <input type="number" id="att-group-women-count" min="0" value="0" class="w-full border rounded-lg p-2 font-bold" oninput="calculateGroupWage()" />
+                  </div>
+                  <div>
+                    <label class="block font-semibold mb-1">Rate / Woman ₹</label>
+                    <input type="number" id="att-group-women-rate" min="0" value="450" class="w-full border rounded-lg p-2 font-bold" oninput="calculateGroupWage()" />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <label class="block font-bold mb-1">Wage per Head ₹</label>
-              <input type="number" id="att-group-rate" required class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. 450" oninput="calculateGroupWage()" />
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Location</label>
-              <input type="text" id="att-group-orchard" class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Seed Farm" />
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Date</label>
-              <input type="date" id="att-group-date" required class="w-full border rounded-lg p-2 bg-white" />
-            </div>
-            <div class="flex items-end">
-              <button type="submit" class="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 rounded-lg shadow">
-                Save Group Labour
+
+            <div class="flex flex-wrap justify-between items-center pt-2">
+              <div class="text-xs font-bold text-amber-950">
+                Calculated Total: <span id="disp-group-total" class="text-base font-black text-slate-900 bg-amber-200 px-3 py-1 rounded-lg">₹0</span>
+                <span class="text-[11px] text-gray-500 ml-2" id="disp-group-breakdown">(0 Men + 0 Women = 0 Total)</span>
+              </div>
+              <button type="submit" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 px-6 rounded-lg shadow transition text-xs">
+                Save Group Labour Attendance
               </button>
             </div>
           </form>
-          <div class="mt-2 text-right text-xs font-bold text-amber-900">
-            Calculated Payout: <span id="disp-group-total" class="text-sm font-black text-slate-900">₹0</span>
-          </div>
         </div>
 
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
@@ -298,9 +324,9 @@
                 <tr>
                   <th class="p-2.5">Date</th>
                   <th class="p-2.5">Category</th>
-                  <th class="p-2.5">Name / Head</th>
-                  <th class="p-2.5 text-center">Count / Status</th>
-                  <th class="p-2.5">Rate / Details</th>
+                  <th class="p-2.5">Name / Contractor</th>
+                  <th class="p-2.5 text-center">Labour Breakdown</th>
+                  <th class="p-2.5">Rates / Details</th>
                   <th class="p-2.5 text-right">Total ₹</th>
                   <th class="p-2.5 text-right">Action</th>
                 </tr>
@@ -347,21 +373,112 @@
                 <input type="text" id="edit-att-head" class="w-full border rounded-lg p-2" />
               </div>
               <div>
-                <label class="block font-semibold mb-1">Labourers Present</label>
-                <input type="number" id="edit-att-count" class="w-full border rounded-lg p-2" />
-              </div>
-              <div>
-                <label class="block font-semibold mb-1">Rate per Person ₹</label>
-                <input type="number" id="edit-att-rate" class="w-full border rounded-lg p-2" />
-              </div>
-              <div>
                 <label class="block font-semibold mb-1">Location</label>
                 <input type="text" id="edit-att-orchard" class="w-full border rounded-lg p-2" />
+              </div>
+              <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2 rounded border">
+                <div>
+                  <label class="block font-semibold mb-1 text-blue-700">Men Count</label>
+                  <input type="number" id="edit-att-men-count" class="w-full border rounded p-1.5" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1 text-blue-700">Men Rate ₹</label>
+                  <input type="number" id="edit-att-men-rate" class="w-full border rounded p-1.5" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1 text-pink-700">Women Count</label>
+                  <input type="number" id="edit-att-women-count" class="w-full border rounded p-1.5" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1 text-pink-700">Women Rate ₹</label>
+                  <input type="number" id="edit-att-women-rate" class="w-full border rounded p-1.5" />
+                </div>
               </div>
             </div>
             <div class="flex gap-2 pt-3 border-t">
               <button type="submit" class="flex-1 bg-slate-900 text-amber-400 font-bold py-2 rounded-lg">Save Changes</button>
               <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded-lg">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- UNIVERSAL RECORD EDIT MODAL -->
+      <div id="edit-record-modal" class="hidden fixed inset-0 bg-black/75 flex items-center justify-center p-3 md:p-6 z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-5 text-xs overflow-y-auto max-h-[90vh]">
+          <div class="flex justify-between items-center border-b pb-2 mb-4">
+            <h3 class="text-base font-black text-slate-900" id="edit-record-title">Edit Record</h3>
+            <button onclick="closeEditRecordModal()" class="text-gray-400 hover:text-black font-bold text-base">✕</button>
+          </div>
+          <form id="universal-edit-form" onsubmit="handleUniversalRecordUpdate(event)" class="space-y-4">
+            <input type="hidden" id="eur-type" />
+            <input type="hidden" id="eur-id" />
+            <div id="eur-fields-container" class="space-y-3"></div>
+            <div class="flex gap-2 pt-3 border-t">
+              <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-lg shadow">
+                Save & Update Database
+              </button>
+              <button type="button" onclick="closeEditRecordModal()" class="px-5 py-2.5 border rounded-lg font-bold">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- SETTLE VIKRI CHITTHA MODAL -->
+      <div id="settle-vikri-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-3 md:p-6 z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-5 text-xs">
+          <div class="flex justify-between items-center border-b pb-2 mb-3">
+            <div>
+              <h3 class="text-base font-black text-amber-900">📝 Settle Mandi Vikri Report (ਆੜ੍ਹਤ ਵਿਕਰੀ ਚਿੱਠਾ)</h3>
+              <p class="text-[11px] text-gray-500" id="svm-truck-info">Truck - Lot</p>
+            </div>
+            <button onclick="closeSettleVikriModal()" class="text-gray-400 hover:text-black font-bold text-base">✕</button>
+          </div>
+          <form onsubmit="saveSettleVikriReport(event)" class="space-y-3">
+            <input type="hidden" id="svm-dispatch-id" />
+            <div>
+              <label class="block font-bold mb-1 text-slate-800">Gross Truck Sale Proceeds ₹ (ਕੁੱਲ ਵਿਕਰੀ ਰਕਮ)</label>
+              <input type="number" id="svm-gross" required class="w-full border-2 border-amber-400 rounded-lg p-2 font-black text-sm text-slate-900" placeholder="e.g. 385000" oninput="calculateModalVikriNet()" />
+            </div>
+            <div class="grid grid-cols-2 gap-3 bg-amber-50 p-3 rounded-xl border border-amber-200">
+              <div>
+                <label class="block font-bold mb-1">Aadtiya Commission %</label>
+                <input type="number" step="0.1" id="svm-comm-pct" value="6.0" class="w-full border rounded-lg p-1.5 font-bold" oninput="calculateModalVikriNet()" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1 text-red-700">Commission Deducted ₹</label>
+                <input type="number" id="svm-comm-amt" readonly class="w-full border rounded-lg p-1.5 bg-gray-100 font-bold text-red-700" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1 text-red-700">Less: Transport / Bhada ₹</label>
+                <input type="number" id="svm-freight" value="0" class="w-full border rounded-lg p-1.5" oninput="calculateModalVikriNet()" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1 text-red-700">Less: Mandi Labour ₹</label>
+                <input type="number" id="svm-labour" value="0" class="w-full border rounded-lg p-1.5" oninput="calculateModalVikriNet()" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1 text-red-700">Less: Misc Expenses ₹</label>
+                <input type="number" id="svm-misc" value="0" class="w-full border rounded-lg p-1.5" oninput="calculateModalVikriNet()" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1 text-emerald-700">Add: Crates Value / Credit ₹</label>
+                <input type="number" id="svm-crates" value="0" class="w-full border rounded-lg p-1.5 font-bold text-emerald-800" oninput="calculateModalVikriNet()" />
+              </div>
+            </div>
+            <div class="p-3 bg-slate-900 text-amber-400 rounded-xl flex justify-between items-center">
+              <span class="font-bold">Net Realized / Sold Amount:</span>
+              <span class="text-lg font-black" id="svm-net-display">₹0</span>
+            </div>
+            <div class="flex gap-2 pt-2">
+              <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-lg shadow">
+                Save Vikri Settlement
+              </button>
+              <button type="button" onclick="closeSettleVikriModal()" class="px-4 py-2.5 border rounded-lg font-bold">
+                Cancel
+              </button>
             </div>
           </form>
         </div>
@@ -415,7 +532,7 @@
           </div>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div class="border-r border-slate-700 pr-2">
-              <span class="text-xs text-gray-400">Total Billed Sales</span>
+              <span class="text-xs text-gray-400">Total Billed Sales (Direct + Vikri)</span>
               <p class="text-xl font-extrabold mt-1 text-amber-300" id="season-total-sales">₹0</p>
               <span class="text-[10px] text-gray-400" id="season-cust-pending">₹0 Uncollected</span>
             </div>
@@ -443,15 +560,15 @@
         </div>
       </div>
 
-      <!-- TAB 1: CUSTOMER MASTER LEDGER -->
+      <!-- TAB 1: CUSTOMER & VIKRI MASTER LEDGER -->
       <div id="customer-ledger-section" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">💳 Record Customer Payment Received</h3>
+          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">💳 Record Customer / Aadtiya Payment Received</h3>
           <form onsubmit="recordCustomerPayment(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
             <div>
-              <label class="block font-semibold mb-1">Customer</label>
+              <label class="block font-semibold mb-1">Customer / Aadtiya</label>
               <select id="pay-cust-select" required class="w-full border rounded-lg p-2 bg-amber-50 text-slate-900 font-medium">
-                <option value="">-- Choose Customer --</option>
+                <option value="">-- Choose Party --</option>
               </select>
             </div>
             <div>
@@ -477,12 +594,12 @@
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
           <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
             <div>
-              <h3 class="text-base font-bold text-gray-800">Customer Statement & Ledger</h3>
-              <p class="text-xs text-gray-500">Inspect dispatches, payments and pending balance</p>
+              <h3 class="text-base font-bold text-gray-800">Customer & Mandi Vikri Statement & Token Slips</h3>
+              <p class="text-xs text-gray-500">Every dispatch shows complete purchased sizes or Vikri deductions, with instant settlement & PDF download</p>
             </div>
             <div class="flex items-center gap-2">
               <select id="view-cust-select" class="border rounded-lg p-2 text-xs font-semibold bg-amber-50 text-slate-900 outline-none" onchange="renderCustomerLedger()">
-                <option value="">-- Select Customer to View --</option>
+                <option value="">-- Select Party to View --</option>
               </select>
               <button onclick="shareCustomerLedgerWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1">
                 💬 WhatsApp Ledger
@@ -492,7 +609,7 @@
 
           <div id="cust-kpi-container" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3">
             <div class="p-3.5 bg-gray-50 rounded-xl border">
-              <span class="text-xs text-gray-500 font-medium">Total Billed Sales</span>
+              <span class="text-xs text-gray-500 font-medium">Total Billed / Realized Sales</span>
               <h4 class="text-lg font-bold text-gray-800 mt-1" id="cust-kpi-invoiced">₹0</h4>
               <p class="text-[11px] text-gray-400" id="cust-kpi-boxes">0 Boxes</p>
             </div>
@@ -513,11 +630,12 @@
               <thead class="bg-gray-100 border-b text-gray-700 font-bold">
                 <tr>
                   <th class="p-2.5">Date</th>
-                  <th class="p-2.5">Type</th>
-                  <th class="p-2.5">Particulars / Bank</th>
+                  <th class="p-2.5">Token / City</th>
+                  <th class="p-2.5">Purchased Sizes / Mandi Vikri Chittha</th>
                   <th class="p-2.5 text-right">Debit (Billed ₹)</th>
                   <th class="p-2.5 text-right">Credit (Paid ₹)</th>
-                  <th class="p-2.5 text-right">Balance ₹</th>
+                  <th class="p-2.5 text-right">Balance (₹)</th>
+                  <th class="p-2.5 text-right">Slip & Controls</th>
                 </tr>
               </thead>
               <tbody id="cust-ledger-tbody"></tbody>
@@ -525,7 +643,7 @@
           </div>
 
           <div id="no-cust-placeholder" class="text-center py-8 text-gray-400 text-xs">
-            Select a customer from the dropdown above to view statement.
+            Select a party from the dropdown above to view purchase statement and token history.
           </div>
         </div>
       </div>
@@ -564,8 +682,8 @@
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
           <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
             <div>
-              <h3 class="text-base font-bold text-gray-800">Orchard Master Ledger & Crates Balance</h3>
-              <p class="text-xs text-gray-500">Inward weight, 1kg/qtl deductions, payments and crates count</p>
+              <h3 class="text-base font-bold text-gray-800">Orchard Master Ledger, Inward Loads & Slip Controls</h3>
+              <p class="text-xs text-gray-500">Check weights, crates and view or edit harvest slips directly from history</p>
             </div>
             <div class="flex items-center gap-2">
               <select id="orchard-ledger-select" class="border rounded-lg p-2 text-xs font-semibold bg-amber-50 text-slate-900 outline-none" onchange="renderSingleOrchardSummary()">
@@ -613,6 +731,7 @@
                       <th class="p-2.5 text-right">Inward Amt ₹</th>
                       <th class="p-2.5 text-right">Paid Amt ₹</th>
                       <th class="p-2.5 text-right">Crates In/Out</th>
+                      <th class="p-2.5 text-right">Slip & Controls</th>
                     </tr>
                   </thead>
                   <tbody id="orchard-trips-tbody"></tbody>
@@ -622,7 +741,7 @@
           </div>
           
           <div id="no-orchard-placeholder" class="text-center py-8 text-gray-400 text-xs">
-            Select an orchard from the dropdown to view its full statement.
+            Select an orchard from the dropdown to view its full statement and edit slips.
           </div>
         </div>
       </div>
@@ -776,71 +895,162 @@
         </form>
       </div>
 
-      <!-- TAB 5: CUSTOMER DISPATCH INVOICE -->
+      <!-- TAB 5: OUTWARD DISPATCH (DIRECT BILL OR MANDI VIKRI) -->
       <div id="customer-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 class="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Kinnow Dispatch Invoice (ਗ੍ਰਾਹਕ ਨਿਕਾਸੀ ਪਰਚੀ)</h3>
-        <form onsubmit="generateCustomerSlip(event)" class="space-y-4">
+        <div class="flex justify-between items-center border-b pb-2 mb-4">
+          <h3 class="text-base font-bold text-gray-800">Kinnow Outward Dispatch (ਗ੍ਰਾਹਕ ਬਿੱਲ / ਮੰਡੀ ਵਿਕਰੀ)</h3>
+          <span class="text-xs bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full font-bold">Dual Mode</span>
+        </div>
+
+        <!-- DISPATCH TYPE SELECTOR -->
+        <div class="bg-amber-50 p-3.5 rounded-xl border border-amber-300 mb-4">
+          <label class="block text-xs font-black text-slate-900 mb-2">Select Dispatch Mode (ਨਿਕਾਸੀ ਦੀ ਕਿਸਮ ਚੁਣੋ):</label>
+          <div class="flex flex-wrap gap-5 text-xs font-bold">
+            <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-amber-300 shadow-sm">
+              <input type="radio" name="dispatch-mode" value="direct" checked onchange="toggleDispatchMode()" />
+              <span>🏷️ Direct Sale / Fixed Bill (ਪੱਕਾ ਬਿੱਲ)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-2 rounded-lg border border-amber-300 shadow-sm">
+              <input type="radio" name="dispatch-mode" value="vikri" onchange="toggleDispatchMode()" />
+              <span class="text-amber-900">🚛 Mandi Vikri / Consignment (ਮੰਡੀ ਵਿਕਰੀ - ਸੂਰਤ/ਦਿੱਲੀ ਆੜ੍ਹਤ)</span>
+            </label>
+          </div>
+        </div>
+
+        <form onsubmit="generateDispatchEntry(event)" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label class="block text-xs font-semibold mb-1">Customer / Buyer Name</label>
-              <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Chifu Agritech" />
+              <label class="block text-xs font-semibold mb-1" id="lbl-party-name">Customer / Buyer Name</label>
+              <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Chifu Agritech / Surat Aadtiya" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">Registered Mobile Number</label>
-              <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
+              <label class="block text-xs font-semibold mb-1">Party Mobile Number</label>
+              <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile" />
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Vehicle / Truck No</label>
               <input type="text" id="c-vehicle" required class="w-full border rounded-lg p-2 text-sm" placeholder="PB 15 XX XXXX" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">Mandi / Lot No.</label>
-              <input type="text" id="c-lot-no" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. E879 / C-30" />
+              <label class="block text-xs font-semibold mb-1">Lot No. / Mandi City</label>
+              <input type="text" id="c-lot-no" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. E879 (Surat Mandi)" />
             </div>
           </div>
 
-          <div class="mt-4">
-            <div class="flex justify-between items-center mb-2">
-              <h4 class="text-xs font-bold uppercase text-slate-700">Kinnow Size Matrix (Boxes & Rates)</h4>
-              <button type="button" onclick="addCustomSizeRow()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs px-2.5 py-1 rounded font-bold border border-amber-300">
-                + Add Extra Size
-              </button>
-            </div>
-            <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 text-center" id="kinnow-size-grid"></div>
-            <div id="custom-sizes-container" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3"></div>
-          </div>
-
-          <div class="border-t pt-4 bg-gray-50 p-4 rounded-xl space-y-3">
-            <h4 class="text-xs font-bold uppercase text-slate-700">Freight & Miscellaneous Expenses (ਫੁਟਕਲ ਖ਼ਰਚੇ)</h4>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <div>
-                <label class="block text-xs font-semibold mb-1">Freight / Bhada ₹</label>
-                <input type="number" id="c-freight" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1">Labour / Loading ₹</label>
-                <input type="number" id="c-labour" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1">Packaging / Stencil ₹</label>
-                <input type="number" id="c-pack-charge" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1">Misc Expense ₹</label>
-                <input type="number" id="c-misc" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
-              </div>
-            </div>
+          <!-- SECTION A: DIRECT SALE (BOX SIZES & FIXED RATES) -->
+          <div id="direct-bill-container" class="space-y-4">
             <div>
-              <label class="block text-xs font-semibold mb-1">Supervisor & Loader Signer</label>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input type="text" id="c-supervisor" class="border rounded-lg p-2 text-sm" placeholder="Supervisor (e.g. Satish Reddy)" />
-                <input type="text" id="c-loader" class="border rounded-lg p-2 text-sm" placeholder="Loader / Dispatcher Name" />
+              <div class="flex justify-between items-center mb-2">
+                <h4 class="text-xs font-bold uppercase text-slate-700">Kinnow Size Matrix (Boxes & Fixed Rates)</h4>
+                <button type="button" onclick="addCustomSizeRow()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs px-2.5 py-1 rounded font-bold border border-amber-300">
+                  + Add Extra Size
+                </button>
+              </div>
+              <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 text-center" id="kinnow-size-grid"></div>
+              <div id="custom-sizes-container" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3"></div>
+            </div>
+
+            <div class="border-t pt-4 bg-gray-50 p-4 rounded-xl space-y-3">
+              <h4 class="text-xs font-bold uppercase text-slate-700">Freight & Miscellaneous Expenses (ਫੁਟਕਲ ਖ਼ਰਚੇ)</h4>
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold mb-1">Freight / Bhada ₹</label>
+                  <input type="number" id="c-freight" class="w-full border rounded-lg p-2" placeholder="0" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1">Labour / Loading ₹</label>
+                  <input type="number" id="c-labour" class="w-full border rounded-lg p-2" placeholder="0" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1">Packaging / Stencil ₹</label>
+                  <input type="number" id="c-pack-charge" class="w-full border rounded-lg p-2" placeholder="0" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1">Misc Expense ₹</label>
+                  <input type="number" id="c-misc" class="w-full border rounded-lg p-2" placeholder="0" />
+                </div>
               </div>
             </div>
+          </div>
+
+          <!-- SECTION B: MANDI VIKRI CHITTHA (CONSIGNMENT REPORT) -->
+          <div id="vikri-container" class="hidden space-y-4">
+            <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 space-y-3">
+              <div class="flex justify-between items-center">
+                <h4 class="text-xs font-black uppercase text-amber-900">Mandi Vikri Chittha Details (ਆੜ੍ਹਤ ਵਿਕਰੀ ਵੇਰਵਾ)</h4>
+                <label class="flex items-center gap-2 text-xs font-bold text-slate-800">
+                  <input type="checkbox" id="vikri-report-ready" onchange="toggleVikriReportFields()" />
+                  <span>Report Received Now? (ਚਿੱਠਾ ਆ ਗਿਆ ਹੈ?)</span>
+                </label>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-bold mb-1">Destination Mandi / City</label>
+                  <input type="text" id="v-city" class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Surat / Delhi / Ahmedabad" />
+                </div>
+                <div>
+                  <label class="block font-bold mb-1">Total Truck Boxes</label>
+                  <input type="number" id="v-total-boxes" class="w-full border rounded-lg p-2 bg-white font-bold" placeholder="e.g. 750" />
+                </div>
+                <div>
+                  <label class="block font-bold mb-1">Aadtiya / Commission Agent</label>
+                  <input type="text" id="v-aadtiya" class="w-full border rounded-lg p-2 bg-white" placeholder="e.g. Shree Ram Trading Co." />
+                </div>
+              </div>
+
+              <!-- Vikri Financial Calculations -->
+              <div id="vikri-calc-fields" class="hidden space-y-3 border-t border-amber-300 pt-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label class="block font-black text-slate-900 mb-1">Gross Truck Sale Proceeds ₹ (ਕੁੱਲ ਵਿਕਰੀ ਰਕਮ)</label>
+                    <input type="number" id="v-gross" class="w-full border-2 border-amber-400 rounded-lg p-2 font-black text-sm" placeholder="e.g. 385000" oninput="calculateVikriNetRealization()" />
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block font-bold mb-1">Aadtiya Comm %</label>
+                      <input type="number" step="0.1" id="v-comm-pct" value="6.0" class="w-full border rounded-lg p-2 font-bold" oninput="calculateVikriNetRealization()" />
+                    </div>
+                    <div>
+                      <label class="block font-semibold mb-1 text-red-700">Commission Amt ₹</label>
+                      <input type="number" id="v-comm-amt" readonly class="w-full border rounded-lg p-2 bg-gray-100 font-bold text-red-700" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                  <div>
+                    <label class="block font-semibold mb-1 text-red-700">Less: Transport / Bhada ₹</label>
+                    <input type="number" id="v-freight" value="0" class="w-full border rounded-lg p-2" oninput="calculateVikriNetRealization()" />
+                  </div>
+                  <div>
+                    <label class="block font-semibold mb-1 text-red-700">Less: Mandi Labour ₹</label>
+                    <input type="number" id="v-labour" value="0" class="w-full border rounded-lg p-2" oninput="calculateVikriNetRealization()" />
+                  </div>
+                  <div>
+                    <label class="block font-semibold mb-1 text-red-700">Less: Misc Expenses ₹</label>
+                    <input type="number" id="v-misc" value="0" class="w-full border rounded-lg p-2" oninput="calculateVikriNetRealization()" />
+                  </div>
+                  <div>
+                    <label class="block font-semibold mb-1 text-emerald-700">Add: Crates Value / Credit ₹</label>
+                    <input type="number" id="v-crates" value="0" class="w-full border rounded-lg p-2 font-bold text-emerald-800" oninput="calculateVikriNetRealization()" />
+                  </div>
+                </div>
+
+                <div class="p-3 bg-slate-900 text-amber-400 rounded-xl flex justify-between items-center text-xs">
+                  <span class="font-bold">Calculated Net Realized Sold Amount:</span>
+                  <span class="text-base font-black text-amber-300" id="v-net-display">₹0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <input type="text" id="c-supervisor" class="border rounded-lg p-2" placeholder="Supervisor Name (e.g. Satish Reddy)" />
+            <input type="text" id="c-loader" class="border rounded-lg p-2" placeholder="Loader / Dispatcher" />
           </div>
 
           <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg shadow">
-            Save Invoice & Register Customer Portal Access
+            Save Outward Dispatch & Generate SETIA Slip
           </button>
         </form>
       </div>
@@ -873,7 +1083,7 @@
     let currentPartySession = null;
     let isSaving = false;
 
-    // ACTIVE DEFAULTS (FALLBACK IF MONGODB IS UNINITIALIZED)
+    // ACTIVE DEFAULTS
     const CORE_DEFAULTS = {
       staffUsers: [
         { id: 'st_1', name: 'Ramesh Kumar', username: 'ramesh', password: '1234', role: 'staff' },
@@ -890,11 +1100,12 @@
       ],
       inwards: [],
       dispatches: [
-        { id: 'disp_1', tokenNo: 'TC-1', date: '2026-09-01', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, sizesBreakdown: { '36': 50 } }
+        { id: 'disp_1', isVikri: false, tokenNo: 'TC-1', date: '2026-09-01', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, sizesBreakdown: { '36': 50 }, sizeRates: { '36': 500 } }
       ],
       customerPayments: [],
       farmerPayments: [],
       blockedUsers: [],
+      deletedAccounts: [],
       lastUpdated: 0
     };
 
@@ -935,30 +1146,33 @@
 
     // --- MONGODB ATLAS CLOUD SYNC ENGINE ---
     async function fetchCloudData() {
-      if (isSaving) return; // Never overwrite while currently saving a local record
+      if (isSaving) return;
       const badge = document.getElementById('cloud-status-badge');
       try {
         const res = await fetch('/api/state');
         if (res.ok) {
           const raw = await res.json();
           if (raw && typeof raw === 'object' && Object.keys(raw).length > 0) {
-            
-            // If the incoming server state is older than local state, do not overwrite
             if (raw.lastUpdated && APP_DATA.lastUpdated && raw.lastUpdated < APP_DATA.lastUpdated) {
               return;
             }
 
+            const delAccounts = raw.deletedAccounts || APP_DATA.deletedAccounts || [];
+            const rawStaff = raw.staffUsers !== undefined ? raw.staffUsers : (APP_DATA.staffUsers || CORE_DEFAULTS.staffUsers);
+            const cleanStaff = rawStaff.filter(s => !delAccounts.includes((s.username || '').toLowerCase()));
+
             APP_DATA = {
-              staffUsers: (raw.staffUsers && raw.staffUsers.length > 0) ? raw.staffUsers : (APP_DATA.staffUsers || CORE_DEFAULTS.staffUsers),
-              staffDirectory: (raw.staffDirectory && raw.staffDirectory.length > 0) ? raw.staffDirectory : (APP_DATA.staffDirectory || CORE_DEFAULTS.staffDirectory),
+              staffUsers: cleanStaff,
+              staffDirectory: raw.staffDirectory || APP_DATA.staffDirectory || CORE_DEFAULTS.staffDirectory,
               staffAttendance: raw.staffAttendance || [],
               groupLabourAttendance: raw.groupLabourAttendance || [],
-              agreements: (raw.agreements && raw.agreements.length > 0) ? raw.agreements : (APP_DATA.agreements || CORE_DEFAULTS.agreements),
+              agreements: raw.agreements !== undefined ? raw.agreements : (APP_DATA.agreements || CORE_DEFAULTS.agreements),
               inwards: raw.inwards || [],
-              dispatches: (raw.dispatches && raw.dispatches.length > 0) ? raw.dispatches : (APP_DATA.dispatches || CORE_DEFAULTS.dispatches),
+              dispatches: raw.dispatches !== undefined ? raw.dispatches : (APP_DATA.dispatches || CORE_DEFAULTS.dispatches),
               customerPayments: raw.customerPayments || [],
               farmerPayments: raw.farmerPayments || [],
               blockedUsers: raw.blockedUsers || [],
+              deletedAccounts: delAccounts,
               lastUpdated: raw.lastUpdated || Date.now()
             };
 
@@ -1038,13 +1252,45 @@
       populateDropdowns();
       fetchCloudData();
 
-      // Multi-device background sync
       setInterval(fetchCloudData, 4000);
     };
+
+    function toggleDispatchMode() {
+      const isVikri = document.querySelector('input[name="dispatch-mode"]:checked').value === 'vikri';
+      document.getElementById('direct-bill-container').classList.toggle('hidden', isVikri);
+      document.getElementById('vikri-container').classList.toggle('hidden', !isVikri);
+      document.getElementById('lbl-party-name').innerText = isVikri ? "Aadtiya / Consignee Name" : "Customer / Buyer Name";
+    }
+
+    function toggleVikriReportFields() {
+      const isReady = document.getElementById('vikri-report-ready').checked;
+      document.getElementById('vikri-calc-fields').classList.toggle('hidden', !isReady);
+      if(isReady) calculateVikriNetRealization();
+    }
+
+    function calculateVikriNetRealization() {
+      const gross = Number(document.getElementById('v-gross').value || 0);
+      const commPct = Number(document.getElementById('v-comm-pct').value || 0);
+      const freight = Number(document.getElementById('v-freight').value || 0);
+      const labour = Number(document.getElementById('v-labour').value || 0);
+      const misc = Number(document.getElementById('v-misc').value || 0);
+      const crates = Number(document.getElementById('v-crates').value || 0);
+
+      const commAmt = (gross * commPct) / 100;
+      document.getElementById('v-comm-amt').value = Math.round(commAmt);
+
+      const netRealized = (gross - commAmt - freight - labour - misc) + crates;
+      document.getElementById('v-net-display').innerText = `₹${Math.round(netRealized).toLocaleString('en-IN')}`;
+    }
 
     function isUserBlocked(idOrPhone) {
       const clean = (idOrPhone || "").toString().trim().toLowerCase().replace('@', '');
       return (APP_DATA.blockedUsers || []).includes(clean);
+    }
+
+    function isUserDeleted(idOrPhone) {
+      const clean = (idOrPhone || "").toString().trim().toLowerCase().replace('@', '');
+      return (APP_DATA.deletedAccounts || []).includes(clean);
     }
 
     function toggleUserBlockStatus(idOrPhone, displayName) {
@@ -1061,24 +1307,55 @@
       saveData();
     }
 
+    function deleteStaffUser(id, username) {
+      if(confirm(`Permanently delete staff account @${username}?`)) {
+        if(!APP_DATA.deletedAccounts) APP_DATA.deletedAccounts = [];
+        APP_DATA.deletedAccounts.push(username.toLowerCase());
+        APP_DATA.staffUsers = (APP_DATA.staffUsers || []).filter(u => u.id !== id && u.username.toLowerCase() !== username.toLowerCase());
+        saveData();
+        alert(`Staff account @${username} permanently removed.`);
+      }
+    }
+
+    function deletePartyAccount(phone, partyName, partyType) {
+      if(confirm(`Permanently delete portal credentials for ${partyType}: ${partyName} (${phone})?`)) {
+        if(!APP_DATA.deletedAccounts) APP_DATA.deletedAccounts = [];
+        APP_DATA.deletedAccounts.push(phone.toString().trim());
+
+        if (partyType === 'Farmer') {
+          APP_DATA.agreements = (APP_DATA.agreements || []).filter(a => (a.phone || '').toString().trim() !== phone.toString().trim());
+        } else {
+          (APP_DATA.dispatches || []).forEach(d => {
+            if ((d.phone || '').toString().trim() === phone.toString().trim()) {
+              d.phone = "";
+            }
+          });
+        }
+
+        saveData();
+        alert(`${partyType} account for ${partyName} (${phone}) permanently deleted.`);
+      }
+    }
+
     async function handleUniversalLogin(e) {
       e.preventDefault();
       const rawU = (document.getElementById('login-user').value || "").trim();
       const p = (document.getElementById('login-pass').value || "").trim();
       const u = rawU.toLowerCase().replace('@', '');
 
-      // Refresh cloud data on attempt
       await fetchCloudData();
 
-      // 1. Master Admin (Instant authentication)
+      if (isUserDeleted(rawU) || isUserDeleted(u)) {
+        return alert("This account has been permanently removed.");
+      }
+
       if (u === "admin" && p === "Csetia@1122") {
         currentUser = { name: "Master Admin", username: "admin", role: "admin" };
         launchStaffPortal();
         return;
       }
 
-      // 2. Staff Accounts
-      const staffList = [...(APP_DATA.staffUsers || []), ...CORE_DEFAULTS.staffUsers];
+      const staffList = (APP_DATA.staffUsers || []).filter(s => !isUserDeleted(s.username));
       const staff = staffList.find(s => 
         ((s.username || "").toLowerCase().replace('@', '') === u || (s.name || "").toLowerCase() === u) && s.password === p
       );
@@ -1089,8 +1366,7 @@
         return;
       }
 
-      // 3. Farmer Portal
-      const farmerList = [...(APP_DATA.agreements || []), ...CORE_DEFAULTS.agreements];
+      const farmerList = (APP_DATA.agreements || []).filter(a => !isUserDeleted(a.phone));
       const farmer = farmerList.find(a => 
         (a.phone || "").toString().trim() === rawU || (a.name || "").toLowerCase().trim() === u
       );
@@ -1101,8 +1377,7 @@
         return;
       }
 
-      // 4. Customer Portal
-      const custList = [...(APP_DATA.dispatches || []), ...CORE_DEFAULTS.dispatches];
+      const custList = (APP_DATA.dispatches || []).filter(d => !isUserDeleted(d.phone));
       const customer = custList.find(d => 
         (d.phone || "").toString().trim() === rawU || (d.name || "").toLowerCase().trim() === u
       );
@@ -1113,7 +1388,7 @@
         return;
       }
 
-      alert("Invalid login details.\n\n• For Admin: admin / Csetia@1122\n• For Staff: username & password (e.g. ramesh / 1234)\n• For Customer: 10-digit mobile (e.g. 9658200058 / 9658200058)");
+      alert("Invalid login details.\n\n• For Admin: admin / Csetia@1122\n• For Staff: username & password\n• For Customer/Farmer: 10-digit registered mobile");
     }
 
     function launchStaffPortal() {
@@ -1199,11 +1474,11 @@
           <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Received</span><span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val ₹</th><th class="p-2.5 text-right">Paid Amt ₹</th></tr>`;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val ₹</th><th class="p-2.5 text-right">Paid Amt ₹</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
-          ...trips.map(t => ({ date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
-          ...payments.map(p => ({ date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
+          ...trips.map(t => ({ id: t.id, type: 'inward', date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
+          ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, chg: 0, val: 0, paid: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
@@ -1215,6 +1490,7 @@
             <td class="p-2.5 text-right font-bold text-slate-900">${h.chg > 0 ? h.chg.toFixed(1) + ' Kg' : '-'}</td>
             <td class="p-2.5 text-right font-semibold text-slate-800">${h.val > 0 ? '₹' + h.val.toLocaleString('en-IN') : '-'}</td>
             <td class="p-2.5 text-right font-bold text-emerald-700">${h.paid > 0 ? '₹' + h.paid.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right">${h.type === 'inward' ? `<button onclick="reprintInwardSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>` : '-'}</td>
           </tr>
         `).join('');
 
@@ -1237,11 +1513,11 @@
           <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Pending Balance</span><span class="text-base font-black text-red-600">₹${balanceDue.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Dispatch / Details</th><th class="p-2.5 text-center">Boxes</th><th class="p-2.5 text-right">Debit (Billed ₹)</th><th class="p-2.5 text-right">Credit (Paid ₹)</th></tr>`;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Dispatch / Details</th><th class="p-2.5 text-center">Boxes</th><th class="p-2.5 text-right">Debit (Billed ₹)</th><th class="p-2.5 text-right">Credit (Paid ₹)</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
-          ...dispatches.map(d => ({ date: d.date, token: d.tokenNo, desc: `Dispatch (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
-          ...payments.map(p => ({ date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
+          ...dispatches.map(d => ({ id: d.id, isVikri: d.isVikri, type: 'invoice', date: d.date, token: d.tokenNo, desc: d.isVikri ? `Mandi Vikri (${d.city || 'Mandi'}) - ${d.vehicle}` : `Dispatch (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
+          ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
@@ -1252,6 +1528,7 @@
             <td class="p-2.5 text-center font-bold">${h.boxes}</td>
             <td class="p-2.5 text-right font-bold text-slate-900">${h.debit > 0 ? '₹' + h.debit.toLocaleString('en-IN') : '-'}</td>
             <td class="p-2.5 text-right font-bold text-emerald-700">${h.credit > 0 ? '₹' + h.credit.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right">${h.type === 'invoice' ? (h.isVikri ? `<button onclick="reprintVikriSlip('${h.id}')" class="text-amber-800 font-bold hover:underline">📄 Vikri Slip</button>` : `<button onclick="reprintCustomerSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>`) : '-'}</td>
           </tr>
         `).join('');
       }
@@ -1260,7 +1537,8 @@
     function renderStaffTable() {
       const tbody = document.getElementById('staff-table-body');
       if(!tbody) return;
-      tbody.innerHTML = (APP_DATA.staffUsers || []).map(s => {
+      const cleanList = (APP_DATA.staffUsers || []).filter(s => !isUserDeleted(s.username));
+      tbody.innerHTML = cleanList.map(s => {
         const blocked = isUserBlocked(s.username);
         return `
           <tr class="border-b hover:bg-gray-50">
@@ -1270,7 +1548,7 @@
             <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${blocked ? 'Blocked' : 'Active'}</span></td>
             <td class="p-2.5 text-right space-x-2">
               <button onclick="toggleUserBlockStatus('${s.username}', '${s.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? '✅ Unblock' : '🚫 Block'}</button>
-              <button onclick="deleteStaffUser('${s.id}')" class="text-red-600 font-bold text-[11px] hover:underline">Delete</button>
+              <button onclick="deleteStaffUser('${s.id}', '${s.username}')" class="text-red-600 font-bold text-[11px] hover:underline">🗑️ Delete</button>
             </td>
           </tr>
         `;
@@ -1282,11 +1560,17 @@
       if(!tbody) return;
 
       const partyRows = [];
-      (APP_DATA.agreements || []).forEach(a => partyRows.push({ type: 'Farmer', name: a.name, phone: (a.phone || "").toString().trim() }));
+      (APP_DATA.agreements || []).forEach(a => {
+        const ph = (a.phone || "").toString().trim();
+        if(ph && !isUserDeleted(ph)) partyRows.push({ type: 'Farmer', name: a.name, phone: ph });
+      });
+
       const custMap = new Map();
       (APP_DATA.dispatches || []).forEach(d => {
         const ph = (d.phone || "").toString().trim();
-        if(!custMap.has(ph)) custMap.set(ph, { type: 'Customer', name: d.name, phone: ph });
+        if(ph && !isUserDeleted(ph) && !custMap.has(ph)) {
+          custMap.set(ph, { type: d.isVikri ? 'Mandi Aadtiya' : 'Customer', name: d.name, phone: ph });
+        }
       });
       custMap.forEach(v => partyRows.push(v));
 
@@ -1298,10 +1582,446 @@
             <td class="p-2.5 font-bold text-slate-800">${p.name}</td>
             <td class="p-2.5 font-mono font-bold text-amber-900">${p.phone}</td>
             <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${blocked ? 'Blocked' : 'Active'}</span></td>
-            <td class="p-2.5 text-right"><button onclick="toggleUserBlockStatus('${p.phone}', '${p.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? '✅ Unblock' : '🚫 Block'}</button></td>
+            <td class="p-2.5 text-right space-x-2">
+              <button onclick="toggleUserBlockStatus('${p.phone}', '${p.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? '✅ Unblock' : '🚫 Block'}</button>
+              <button onclick="deletePartyAccount('${p.phone}', '${p.name}', '${p.type}')" class="text-red-600 font-bold text-[11px] hover:underline">🗑️ Delete Account</button>
+            </td>
           </tr>
         `;
       }).join('');
+    }
+
+    // --- UNIVERSAL RECORD EDITING ---
+    function openEditRecordModal(type, id) {
+      const modal = document.getElementById('edit-record-modal');
+      const title = document.getElementById('edit-record-title');
+      const container = document.getElementById('eur-fields-container');
+      document.getElementById('eur-type').value = type;
+      document.getElementById('eur-id').value = id;
+
+      if(type === 'dispatch') {
+        const d = (APP_DATA.dispatches || []).find(x => x.id === id);
+        if(!d) return;
+
+        if(d.isVikri) {
+          title.innerText = `Edit Mandi Vikri Dispatch (${d.tokenNo})`;
+          container.innerHTML = `
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="block font-semibold mb-1">Aadtiya / Party</label><input type="text" id="ee-cust-name" value="${d.name}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Phone</label><input type="tel" id="ee-cust-phone" value="${d.phone || ''}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Vehicle No.</label><input type="text" id="ee-cust-vehicle" value="${d.vehicle}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Mandi City</label><input type="text" id="ee-cust-city" value="${d.city || ''}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Total Boxes</label><input type="number" id="ee-cust-boxes" value="${d.totalBoxes}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Gross Mandi Sale ₹</label><input type="number" id="ee-cust-gross" value="${d.grossSale || 0}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Commission %</label><input type="number" step="0.1" id="ee-cust-comm-pct" value="${d.commPct || 6}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Freight ₹</label><input type="number" id="ee-cust-freight" value="${d.freight || 0}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Mandi Labour ₹</label><input type="number" id="ee-cust-labour" value="${d.labour || 0}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Misc Expense ₹</label><input type="number" id="ee-cust-misc" value="${d.misc || 0}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Crates Credit ₹</label><input type="number" id="ee-cust-crates" value="${d.cratesCredit || 0}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Net Realized ₹</label><input type="number" id="ee-cust-total" value="${d.grandTotal || 0}" class="w-full border rounded p-1.5 font-black text-amber-800" required /></div>
+            </div>
+          `;
+        } else {
+          title.innerText = `Edit Customer Dispatch Invoice (${d.tokenNo})`;
+          container.innerHTML = `
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="block font-semibold mb-1">Customer Name</label><input type="text" id="ee-cust-name" value="${d.name}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Phone Number</label><input type="tel" id="ee-cust-phone" value="${d.phone || ''}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Vehicle No.</label><input type="text" id="ee-cust-vehicle" value="${d.vehicle}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Lot No.</label><input type="text" id="ee-cust-lot" value="${d.lotNo || ''}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Total Boxes</label><input type="number" id="ee-cust-boxes" value="${d.totalBoxes}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Grand Billed Total ₹</label><input type="number" id="ee-cust-total" value="${d.grandTotal}" class="w-full border rounded p-1.5" required /></div>
+              <div><label class="block font-semibold mb-1">Freight ₹</label><input type="number" id="ee-cust-freight" value="${d.freight || 0}" class="w-full border rounded p-1.5" /></div>
+              <div><label class="block font-semibold mb-1">Labour ₹</label><input type="number" id="ee-cust-labour" value="${d.labour || 0}" class="w-full border rounded p-1.5" /></div>
+            </div>
+          `;
+        }
+      } else if(type === 'inward') {
+        const i = (APP_DATA.inwards || []).find(x => x.id === id);
+        if(!i) return;
+        title.innerText = `Edit Harvest Inward Trip (${i.tokenNo})`;
+        container.innerHTML = `
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-semibold mb-1">Farmer Name</label><input type="text" id="ee-inw-farmer" value="${i.name}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Vehicle No.</label><input type="text" id="ee-inw-vehicle" value="${i.vehicle}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Gross Wt (Kg)</label><input type="number" step="0.1" id="ee-inw-gross" value="${i.gross}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Tare Wt (Kg)</label><input type="number" step="0.1" id="ee-inw-tare" value="${i.tare}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Rate ₹/Kg</label><input type="number" step="0.5" id="ee-inw-rate" value="${i.rate || 0}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Chargeable Wt (Kg)</label><input type="number" step="0.1" id="ee-inw-chg" value="${i.chargeable}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Sent Crates</label><input type="number" id="ee-inw-sent" value="${i.sentCrates || 0}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Received Crates</label><input type="number" id="ee-inw-recv" value="${i.recvCrates || 0}" class="w-full border rounded p-1.5" /></div>
+          </div>
+        `;
+      } else if(type === 'agreement') {
+        const a = (APP_DATA.agreements || []).find(x => x.id === id);
+        if(!a) return;
+        title.innerText = `Edit Farmer Deal Agreement (${a.tokenNo})`;
+        container.innerHTML = `
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-semibold mb-1">Farmer Name</label><input type="text" id="ee-agr-farmer" value="${a.name}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Phone</label><input type="tel" id="ee-agr-phone" value="${a.phone}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Village</label><input type="text" id="ee-agr-village" value="${a.village}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Advance Token Paid ₹</label><input type="number" id="ee-agr-advance" value="${a.advance || 0}" class="w-full border rounded p-1.5" /></div>
+            ${a.type === 'lump_sum' ? `<div><label class="block font-semibold mb-1">Total Lump Sum Value ₹</label><input type="number" id="ee-agr-total" value="${a.total || 0}" class="w-full border rounded p-1.5" /></div>` : `<div><label class="block font-semibold mb-1">Rate ₹ / Kg</label><input type="number" step="0.5" id="ee-agr-rate" value="${a.rate || 0}" class="w-full border rounded p-1.5" /></div>`}
+          </div>
+        `;
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeEditRecordModal() {
+      document.getElementById('edit-record-modal').classList.add('hidden');
+    }
+
+    function handleUniversalRecordUpdate(e) {
+      e.preventDefault();
+      const type = document.getElementById('eur-type').value;
+      const id = document.getElementById('eur-id').value;
+
+      if(type === 'dispatch') {
+        const d = (APP_DATA.dispatches || []).find(x => x.id === id);
+        if(d) {
+          d.name = document.getElementById('ee-cust-name').value.trim();
+          d.phone = document.getElementById('ee-cust-phone').value.trim();
+          d.vehicle = document.getElementById('ee-cust-vehicle').value.trim();
+          d.totalBoxes = Number(document.getElementById('ee-cust-boxes').value || 0);
+          d.grandTotal = Number(document.getElementById('ee-cust-total').value || 0);
+
+          if(d.isVikri) {
+            d.city = document.getElementById('ee-cust-city').value.trim();
+            d.grossSale = Number(document.getElementById('ee-cust-gross').value || 0);
+            d.commPct = Number(document.getElementById('ee-cust-comm-pct').value || 0);
+            d.freight = Number(document.getElementById('ee-cust-freight').value || 0);
+            d.labour = Number(document.getElementById('ee-cust-labour').value || 0);
+            d.misc = Number(document.getElementById('ee-cust-misc').value || 0);
+            d.cratesCredit = Number(document.getElementById('ee-cust-crates').value || 0);
+            d.commAmt = Math.round((d.grossSale * d.commPct) / 100);
+            d.isSettled = d.grandTotal > 0;
+          } else {
+            d.lotNo = document.getElementById('ee-cust-lot').value.trim();
+            d.freight = Number(document.getElementById('ee-cust-freight').value || 0);
+            d.labour = Number(document.getElementById('ee-cust-labour').value || 0);
+          }
+        }
+      } else if(type === 'inward') {
+        const i = (APP_DATA.inwards || []).find(x => x.id === id);
+        if(i) {
+          i.name = document.getElementById('ee-inw-farmer').value.trim();
+          i.vehicle = document.getElementById('ee-inw-vehicle').value.trim();
+          i.gross = Number(document.getElementById('ee-inw-gross').value || 0);
+          i.tare = Number(document.getElementById('ee-inw-tare').value || 0);
+          i.rate = Number(document.getElementById('ee-inw-rate').value || 0);
+          i.chargeable = Number(document.getElementById('ee-inw-chg').value || 0);
+          i.sentCrates = Number(document.getElementById('ee-inw-sent').value || 0);
+          i.recvCrates = Number(document.getElementById('ee-inw-recv').value || 0);
+          i.net = Math.max(0, i.gross - i.tare);
+          i.cut = (i.net / 100) * 1;
+          i.totalTripAmt = i.rate > 0 ? (i.chargeable * i.rate) : 0;
+        }
+      } else if(type === 'agreement') {
+        const a = (APP_DATA.agreements || []).find(x => x.id === id);
+        if(a) {
+          a.name = document.getElementById('ee-agr-farmer').value.trim();
+          a.phone = document.getElementById('ee-agr-phone').value.trim();
+          a.village = document.getElementById('ee-agr-village').value.trim();
+          a.advance = Number(document.getElementById('ee-agr-advance').value || 0);
+          if(a.type === 'lump_sum') {
+            a.total = Number(document.getElementById('ee-agr-total').value || 0);
+          } else {
+            a.rate = Number(document.getElementById('ee-agr-rate').value || 0);
+          }
+        }
+      }
+
+      saveData();
+      closeEditRecordModal();
+      alert("Record updated successfully!");
+      renderCustomerLedger();
+      renderSingleOrchardSummary();
+    }
+
+    function deleteRecord(type, id) {
+      if(!confirm("Are you sure you want to permanently delete this record?")) return;
+
+      if(type === 'dispatch') {
+        APP_DATA.dispatches = (APP_DATA.dispatches || []).filter(x => x.id !== id);
+        renderCustomerLedger();
+      } else if(type === 'custPayment') {
+        APP_DATA.customerPayments = (APP_DATA.customerPayments || []).filter(x => x.id !== id);
+        renderCustomerLedger();
+      } else if(type === 'inward') {
+        APP_DATA.inwards = (APP_DATA.inwards || []).filter(x => x.id !== id);
+        renderSingleOrchardSummary();
+      } else if(type === 'agreement') {
+        APP_DATA.agreements = (APP_DATA.agreements || []).filter(x => x.id !== id);
+        renderSingleOrchardSummary();
+      } else if(type === 'farmerPayment') {
+        APP_DATA.farmerPayments = (APP_DATA.farmerPayments || []).filter(x => x.id !== id);
+        renderSingleOrchardSummary();
+      }
+
+      saveData();
+    }
+
+    // --- SETTLE VIKRI REPORT MODAL HANDLERS ---
+    function openSettleVikriModal(id) {
+      const d = (APP_DATA.dispatches || []).find(x => x.id === id);
+      if(!d) return;
+
+      document.getElementById('svm-dispatch-id').value = id;
+      document.getElementById('svm-truck-info').innerText = `${d.name} (${d.city || 'Mandi'}) • Truck: ${d.vehicle} • ${d.totalBoxes} Boxes`;
+      document.getElementById('svm-gross').value = d.grossSale || '';
+      document.getElementById('svm-comm-pct').value = d.commPct || 6.0;
+      document.getElementById('svm-freight').value = d.freight || 0;
+      document.getElementById('svm-labour').value = d.labour || 0;
+      document.getElementById('svm-misc').value = d.misc || 0;
+      document.getElementById('svm-crates').value = d.cratesCredit || 0;
+
+      calculateModalVikriNet();
+      document.getElementById('settle-vikri-modal').classList.remove('hidden');
+    }
+
+    function closeSettleVikriModal() {
+      document.getElementById('settle-vikri-modal').classList.add('hidden');
+    }
+
+    function calculateModalVikriNet() {
+      const gross = Number(document.getElementById('svm-gross').value || 0);
+      const commPct = Number(document.getElementById('svm-comm-pct').value || 0);
+      const freight = Number(document.getElementById('svm-freight').value || 0);
+      const labour = Number(document.getElementById('svm-labour').value || 0);
+      const misc = Number(document.getElementById('svm-misc').value || 0);
+      const crates = Number(document.getElementById('svm-crates').value || 0);
+
+      const commAmt = (gross * commPct) / 100;
+      document.getElementById('svm-comm-amt').value = Math.round(commAmt);
+
+      const netRealized = (gross - commAmt - freight - labour - misc) + crates;
+      document.getElementById('svm-net-display').innerText = `₹${Math.round(netRealized).toLocaleString('en-IN')}`;
+    }
+
+    function saveSettleVikriReport(e) {
+      e.preventDefault();
+      const id = document.getElementById('svm-dispatch-id').value;
+      const d = (APP_DATA.dispatches || []).find(x => x.id === id);
+      if(!d) return;
+
+      const gross = Number(document.getElementById('svm-gross').value || 0);
+      const commPct = Number(document.getElementById('svm-comm-pct').value || 0);
+      const freight = Number(document.getElementById('svm-freight').value || 0);
+      const labour = Number(document.getElementById('svm-labour').value || 0);
+      const misc = Number(document.getElementById('svm-misc').value || 0);
+      const crates = Number(document.getElementById('svm-crates').value || 0);
+
+      const commAmt = Math.round((gross * commPct) / 100);
+      const net = Math.round((gross - commAmt - freight - labour - misc) + crates);
+
+      d.grossSale = gross;
+      d.commPct = commPct;
+      d.commAmt = commAmt;
+      d.freight = freight;
+      d.labour = labour;
+      d.misc = misc;
+      d.cratesCredit = crates;
+      d.grandTotal = net;
+      d.isSettled = true;
+
+      saveData();
+      closeSettleVikriModal();
+      alert(`Vikri report saved! Net sold realization of ₹${net.toLocaleString('en-IN')} recorded in ledger.`);
+      renderCustomerLedger();
+    }
+
+    // --- REPRINT VIKRI SLIP (CHITTHA) ---
+    function reprintVikriSlip(id) {
+      const d = (APP_DATA.dispatches || []).find(x => x.id === id);
+      if(!d) return alert("Slip not found");
+
+      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
+      const slipHTML = `
+        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
+          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
+            <div class="w-16">${logoSvg}</div>
+            <div class="text-center flex-1">
+              <h1 class="text-xl font-black text-black">SETIA WAXING PLANT</h1>
+              <p class="text-[10px] uppercase font-bold text-amber-800">Mandi Vikri Chittha / Account Sales (ਮੰਡੀ ਵਿਕਰੀ ਪਰਚੀ)</p>
+            </div>
+            <div class="text-right text-[11px] font-bold">
+              <div>Token: <span class="font-mono text-amber-900">${d.tokenNo}</span></div>
+              <div>Date: ${d.date}</div>
+            </div>
+          </div>
+          <div class="border border-black p-2.5 mb-2 bg-gray-50 space-y-1">
+            <div class="flex justify-between"><span>Aadtiya / Consignee:</span><b>${d.name}</b></div>
+            <div class="flex justify-between"><span>Mandi / City:</span><b>${d.city || '-'}</b></div>
+            <div class="flex justify-between"><span>Truck / Vehicle No:</span><b>${d.vehicle}</b></div>
+            <div class="flex justify-between"><span>Total Kinnow Boxes:</span><b>${d.totalBoxes} Boxes</b></div>
+          </div>
+          
+          ${d.isSettled ? `
+            <div class="border border-black p-2.5 bg-amber-50 space-y-1.5 mb-2">
+              <div class="flex justify-between text-sm font-black border-b pb-1">
+                <span>Gross Truck Sale (ਕੁੱਲ ਵਿਕਰੀ):</span>
+                <span>₹${(d.grossSale || 0).toLocaleString('en-IN')}</span>
+              </div>
+              <div class="flex justify-between text-red-700">
+                <span>Less: Commission (${d.commPct || 6}%):</span>
+                <span>-₹${(d.commAmt || 0).toLocaleString('en-IN')}</span>
+              </div>
+              <div class="flex justify-between text-red-700">
+                <span>Less: Transport / Bhada:</span>
+                <span>-₹${(d.freight || 0).toLocaleString('en-IN')}</span>
+              </div>
+              <div class="flex justify-between text-red-700">
+                <span>Less: Mandi Labour / Unloading:</span>
+                <span>-₹${(d.labour || 0).toLocaleString('en-IN')}</span>
+              </div>
+              <div class="flex justify-between text-red-700">
+                <span>Less: Misc Mandi Expense:</span>
+                <span>-₹${(d.misc || 0).toLocaleString('en-IN')}</span>
+              </div>
+              <div class="flex justify-between text-emerald-800 font-bold border-t pt-1">
+                <span>Add: Crates Value / Credit:</span>
+                <span>+₹${(d.cratesCredit || 0).toLocaleString('en-IN')}</span>
+              </div>
+              <div class="flex justify-between text-base font-black border-t-2 border-black pt-1.5 text-slate-950">
+                <span>Net Sold Amount (ਸ਼ੁੱਧ ਰਕਮ):</span>
+                <span>₹${(d.grandTotal || 0).toLocaleString('en-IN')}</span>
+              </div>
+            </div>
+          ` : `
+            <div class="p-4 border-2 border-dashed border-amber-400 bg-amber-50 text-center text-amber-900 font-bold my-2 rounded-lg">
+              ⏳ Consignment Report Pending (ਚਿੱਠਾ ਅਜੇ ਬਾਕੀ ਹੈ)<br />
+              <span class="text-[11px] font-normal">This truck has been dispatched to ${d.city || 'Mandi'}. Final sale values will update once the Aadtiya report is submitted.</span>
+            </div>
+          `}
+
+          <div class="text-[10px] text-gray-500 pt-2 border-t flex justify-between">
+            <span>Status: <b>${d.isSettled ? 'SETTLED' : 'IN TRANSIT / PENDING REPORT'}</b></span>
+            <span>Abohar Hub • Mandi Operations</span>
+          </div>
+        </div>
+      `;
+
+      showSlip(slipHTML, d.phone, `*SETIA MANDI VIKRI REPORT*%0AToken: ${d.tokenNo}%0AParty: ${d.name} (${d.city || 'Mandi'})%0ABoxes: ${d.totalBoxes}%0AGross: Rs. ${d.grossSale || 0}%0A*Net Realized: Rs. ${d.grandTotal || 0}*`);
+    }
+
+    // --- REPRINT DIRECT INVOICE SLIP ---
+    function reprintCustomerSlip(id) {
+      const d = (APP_DATA.dispatches || []).find(x => x.id === id);
+      if(!d) return alert("Slip not found");
+
+      let sizesHTML = "";
+      if(d.sizesBreakdown && Object.keys(d.sizesBreakdown).length > 0) {
+        sizesHTML = `<div class="grid grid-cols-4 gap-2 my-2 border p-2 bg-slate-50 text-[11px]">` + 
+          Object.entries(d.sizesBreakdown).map(([sz, qty]) => `<div>Size <b>${sz}</b>: ${qty} Boxes</div>`).join('') + `</div>`;
+      }
+
+      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
+      const slipHTML = `
+        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
+          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
+            <div class="w-16">${logoSvg}</div>
+            <div class="text-center flex-1">
+              <h1 class="text-xl font-black text-black">SETIA WAXING PLANT</h1>
+              <p class="text-[10px] uppercase font-bold text-gray-700">Customer Invoice (ਪੱਕਾ ਬਿੱਲ)</p>
+            </div>
+            <div class="text-right text-[11px] font-bold">
+              <div>Token: <span class="font-mono text-amber-900">${d.tokenNo}</span></div>
+              <div>Date: ${d.date}</div>
+            </div>
+          </div>
+          <div class="border border-black p-2.5 mb-2 bg-gray-50 space-y-1">
+            <div class="flex justify-between"><span>Customer:</span><b>${d.name}</b></div>
+            <div class="flex justify-between"><span>Mobile:</span><b>+91 ${d.phone || '-'}</b></div>
+            <div class="flex justify-between"><span>Vehicle No:</span><b>${d.vehicle}</b></div>
+            <div class="flex justify-between"><span>Lot:</span><b>${d.lotNo || '-'}</b></div>
+          </div>
+          ${sizesHTML}
+          <div class="border border-black p-2 bg-amber-50 mb-2 flex justify-between items-center">
+            <span class="font-black text-sm">Total Dispatched: ${d.totalBoxes} Boxes</span>
+            <span class="font-black text-sm text-slate-900">Grand Total: ₹${d.grandTotal.toLocaleString('en-IN')}</span>
+          </div>
+          <div class="text-[10px] text-gray-500 pt-2 border-t flex justify-between">
+            <span>Freight: ₹${d.freight || 0} | Labour: ₹${d.labour || 0}</span>
+            <span>Generated from SETIA Cloud Portal</span>
+          </div>
+        </div>
+      `;
+
+      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0AGrand Total: Rs. ${d.grandTotal}`);
+    }
+
+    function reprintInwardSlip(id) {
+      const i = (APP_DATA.inwards || []).find(x => x.id === id);
+      if(!i) return alert("Slip not found");
+
+      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
+      const slipHTML = `
+        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
+          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
+            <div class="w-16">${logoSvg}</div>
+            <div class="text-center flex-1">
+              <h1 class="text-xl font-black uppercase text-black">SETIA WAXING PLANT</h1>
+              <p class="text-[10px] uppercase font-bold text-gray-700">Harvest Inward Slip (ਤੁੜਾਈ ਪਰਚੀ)</p>
+            </div>
+            <div class="text-right text-[11px] font-bold">
+              <div>Token: <span class="font-mono text-amber-900">${i.tokenNo}</span></div>
+              <div>Date: ${i.date}</div>
+            </div>
+          </div>
+          <div class="border border-black p-2.5 bg-gray-50 space-y-1 mb-2">
+            <div class="flex justify-between"><span>Farmer / Orchard:</span><b>${i.name}</b></div>
+            <div class="flex justify-between"><span>Vehicle:</span><b>${i.vehicle}</b></div>
+            <div class="flex justify-between"><span>Gross / Tare Wt:</span><span>${i.gross} Kg / ${i.tare} Kg</span></div>
+            <div class="flex justify-between"><span>Net Weight:</span><span>${i.net.toFixed(1)} Kg</span></div>
+            <div class="flex justify-between text-red-600"><span>1 Kg/Quintal Cut:</span><span>-${i.cut.toFixed(1)} Kg</span></div>
+            <div class="flex justify-between text-base font-black border-t pt-1"><span>Chargeable Weight:</span><span>${i.chargeable.toFixed(1)} Kg</span></div>
+          </div>
+          <div class="border border-black p-2 bg-amber-50 flex justify-between font-bold text-xs mb-2">
+            <span>Rate: ₹${i.rate || 0} / Kg</span>
+            <span>Trip Valuation: ₹${(i.totalTripAmt || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div class="text-[10px] text-gray-500 pt-2 border-t flex justify-between">
+            <span>Crates: Sent ${i.sentCrates || 0} / Received ${i.recvCrates || 0}</span>
+            <span>SETIA Mandi Hub</span>
+          </div>
+        </div>
+      `;
+
+      showSlip(slipHTML, i.phone, `*SETIA HARVEST INWARD SLIP*%0AToken: ${i.tokenNo}%0AFarmer: ${i.name}%0AChargeable: ${i.chargeable.toFixed(1)} Kg%0ARate: Rs. ${i.rate}/Kg`);
+    }
+
+    function reprintFarmerSlip(id) {
+      const a = (APP_DATA.agreements || []).find(x => x.id === id);
+      if(!a) return alert("Agreement not found");
+
+      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
+      const slipHTML = `
+        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
+          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
+            <div class="w-16">${logoSvg}</div>
+            <div class="text-center flex-1">
+              <h1 class="text-xl font-black uppercase text-black">SETIA WAXING PLANT</h1>
+              <p class="text-[10px] uppercase font-bold text-gray-700">Orchard Purchase Agreement</p>
+            </div>
+            <div class="text-right text-[11px] font-bold">
+              <div>Token: <span class="font-mono text-amber-900">${a.tokenNo}</span></div>
+              <div>Date: ${a.date}</div>
+            </div>
+          </div>
+          <div class="border border-black p-2.5 bg-gray-50 space-y-1 mb-2">
+            <div class="flex justify-between"><span>Farmer Name:</span><b>${a.name}</b></div>
+            <div class="flex justify-between"><span>Village:</span><b>${a.village}</b></div>
+            <div class="flex justify-between"><span>Phone:</span><b>+91 ${a.phone}</b></div>
+            <div class="flex justify-between"><span>Deal Type:</span><b>${a.type === 'lump_sum' ? 'Full Orchard / Lump Sum' : 'Per Kg Basis'}</b></div>
+            ${a.type === 'lump_sum' ? `<div class="flex justify-between font-black text-sm"><span>Total Valuation:</span><span>₹${(a.total || 0).toLocaleString('en-IN')}</span></div>` : `<div class="flex justify-between font-black text-sm"><span>Agreed Rate:</span><span>₹${a.rate} / Kg</span></div>`}
+            <div class="flex justify-between text-emerald-800 font-bold border-t pt-1"><span>Advance Token Paid:</span><span>₹${(a.advance || 0).toLocaleString('en-IN')}</span></div>
+          </div>
+        </div>
+      `;
+
+      showSlip(slipHTML, a.phone, `*SETIA ORCHARD AGREEMENT*%0AToken: ${a.tokenNo}%0AFarmer: ${a.name}`);
     }
 
     function triggerDirectPrint() {
@@ -1309,7 +2029,7 @@
       if (!slipContent) return alert("No slip content to print");
 
       const printWin = window.open('', '_blank', 'width=800,height=900');
-      if (!printWin) return alert("Please allow popups in Safari to print.");
+      if (!printWin) return alert("Please allow popups in browser to print.");
 
       printWin.document.open();
       printWin.document.write(`
@@ -1380,8 +2100,8 @@
       const payCustSelect = document.getElementById('pay-cust-select');
       const viewCustSelect = document.getElementById('view-cust-select');
 
-      if(payCustSelect) payCustSelect.innerHTML = `<option value="">-- Choose Customer --</option>`;
-      if(viewCustSelect) viewCustSelect.innerHTML = `<option value="">-- Select Customer --</option>`;
+      if(payCustSelect) payCustSelect.innerHTML = `<option value="">-- Choose Customer / Party --</option>`;
+      if(viewCustSelect) viewCustSelect.innerHTML = `<option value="">-- Select Party to View --</option>`;
 
       uniqueCusts.forEach(c => {
         const opt = `<option value="${c}">${c}</option>`;
@@ -1426,13 +2146,6 @@
       e.target.reset();
     }
 
-    function deleteStaffUser(id) {
-      if(confirm("Delete this staff account?")) {
-        APP_DATA.staffUsers = APP_DATA.staffUsers.filter(u => u.id !== id);
-        saveData();
-      }
-    }
-
     function recordStaffAttendance(e) {
       e.preventDefault();
       const staffName = document.getElementById('att-staff-input').value.trim();
@@ -1449,26 +2162,55 @@
     }
 
     function calculateGroupWage() {
-      const count = Number(document.getElementById('att-group-count').value || 0);
-      const rate = Number(document.getElementById('att-group-rate').value || 0);
-      document.getElementById('disp-group-total').innerText = `₹${(count * rate).toLocaleString('en-IN')}`;
+      const menCount = Number(document.getElementById('att-group-men-count').value || 0);
+      const menRate = Number(document.getElementById('att-group-men-rate').value || 0);
+      const womenCount = Number(document.getElementById('att-group-women-count').value || 0);
+      const womenRate = Number(document.getElementById('att-group-women-rate').value || 0);
+
+      const total = (menCount * menRate) + (womenCount * womenRate);
+      document.getElementById('disp-group-total').innerText = `₹${total.toLocaleString('en-IN')}`;
+      document.getElementById('disp-group-breakdown').innerText = `(${menCount} Men @₹${menRate} + ${womenCount} Women @₹${womenRate} = ${menCount + womenCount} Total)`;
     }
 
     function recordContractorLabour(e) {
       e.preventDefault();
-      const head = document.getElementById('att-group-head').value;
-      const count = Number(document.getElementById('att-group-count').value || 0);
-      const rate = Number(document.getElementById('att-group-rate').value || 0);
-      const orchard = document.getElementById('att-group-orchard').value || "Plant";
+      const head = document.getElementById('att-group-head').value.trim();
+      const orchard = document.getElementById('att-group-orchard').value.trim() || "Plant";
       const date = document.getElementById('att-group-date').value;
-      const totalPayable = count * rate;
+
+      const menCount = Number(document.getElementById('att-group-men-count').value || 0);
+      const menRate = Number(document.getElementById('att-group-men-rate').value || 0);
+      const womenCount = Number(document.getElementById('att-group-women-count').value || 0);
+      const womenRate = Number(document.getElementById('att-group-women-rate').value || 0);
+
+      const totalCount = menCount + womenCount;
+      if(totalCount <= 0) return alert("Please enter at least 1 worker (Men or Women).");
+
+      const totalPayable = (menCount * menRate) + (womenCount * womenRate);
 
       if(!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
-      APP_DATA.groupLabourAttendance.push({ id: 'grp_' + Date.now(), type: 'Contractor Group', head, count, rate, orchard, date, totalPayable });
+      APP_DATA.groupLabourAttendance.push({
+        id: 'grp_' + Date.now(),
+        type: 'Contractor Group',
+        head,
+        orchard,
+        date,
+        menCount,
+        menRate,
+        womenCount,
+        womenRate,
+        count: totalCount,
+        totalPayable
+      });
+
       saveData();
-      alert(`Recorded ${count} persons under ${head}!`);
+      alert(`Recorded ${totalCount} persons (${menCount} Men, ${womenCount} Women) under ${head}!`);
       e.target.reset();
       document.getElementById('att-group-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('att-group-men-count').value = 0;
+      document.getElementById('att-group-women-count').value = 0;
+      document.getElementById('att-group-men-rate').value = 500;
+      document.getElementById('att-group-women-rate').value = 450;
       calculateGroupWage();
     }
 
@@ -1493,9 +2235,11 @@
         document.getElementById('edit-modal-title').innerText = `Edit Group: ${item.head}`;
         document.getElementById('edit-att-date').value = item.date;
         document.getElementById('edit-att-head').value = item.head;
-        document.getElementById('edit-att-count').value = item.count;
-        document.getElementById('edit-att-rate').value = item.rate;
         document.getElementById('edit-att-orchard').value = item.orchard || '';
+        document.getElementById('edit-att-men-count').value = item.menCount || 0;
+        document.getElementById('edit-att-men-rate').value = item.menRate || 0;
+        document.getElementById('edit-att-women-count').value = item.womenCount || 0;
+        document.getElementById('edit-att-women-rate').value = item.womenRate || 0;
         document.getElementById('edit-staff-fields').classList.add('hidden');
         document.getElementById('edit-group-fields').classList.remove('hidden');
       }
@@ -1525,10 +2269,13 @@
         if(item) {
           item.date = date;
           item.head = document.getElementById('edit-att-head').value;
-          item.count = Number(document.getElementById('edit-att-count').value || 0);
-          item.rate = Number(document.getElementById('edit-att-rate').value || 0);
           item.orchard = document.getElementById('edit-att-orchard').value;
-          item.totalPayable = item.count * item.rate;
+          item.menCount = Number(document.getElementById('edit-att-men-count').value || 0);
+          item.menRate = Number(document.getElementById('edit-att-men-rate').value || 0);
+          item.womenCount = Number(document.getElementById('edit-att-women-count').value || 0);
+          item.womenRate = Number(document.getElementById('edit-att-women-rate').value || 0);
+          item.count = item.menCount + item.womenCount;
+          item.totalPayable = (item.menCount * item.menRate) + (item.womenCount * item.womenRate);
         }
       }
 
@@ -1538,7 +2285,7 @@
     }
 
     function deleteAttendance(id, cat) {
-      if(confirm("Delete this entry?")) {
+      if(confirm("Delete this attendance record?")) {
         if(cat === 'Single Staff') APP_DATA.staffAttendance = APP_DATA.staffAttendance.filter(x => x.id !== id);
         else APP_DATA.groupLabourAttendance = APP_DATA.groupLabourAttendance.filter(x => x.id !== id);
         saveData();
@@ -1551,7 +2298,15 @@
 
       const combined = [
         ...(APP_DATA.staffAttendance || []).map(s => ({ id: s.id, date: s.date, cat: 'Single Staff', title: s.name, countOrStatus: s.status, detail: s.wage ? `₹${s.wage}/day` : '-', total: s.wage || 0 })),
-        ...(APP_DATA.groupLabourAttendance || []).map(g => ({ id: g.id, date: g.date, cat: 'Contractor Group', title: `${g.head} (${g.orchard})`, countOrStatus: `${g.count} Persons`, detail: `@₹${g.rate}/head`, total: g.totalPayable }))
+        ...(APP_DATA.groupLabourAttendance || []).map(g => ({
+          id: g.id,
+          date: g.date,
+          cat: 'Contractor Group',
+          title: `${g.head} (${g.orchard || 'Plant'})`,
+          countOrStatus: `${g.menCount || 0}M + ${g.womenCount || 0}W (${g.count} Total)`,
+          detail: `Men: ₹${g.menRate || 0} | Women: ₹${g.womenRate || 0}`,
+          total: g.totalPayable
+        }))
       ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
       if(combined.length === 0) {
@@ -1745,59 +2500,134 @@
       calculateDailyWeight();
     }
 
-    function generateCustomerSlip(e) {
+    // --- OUTWARD DISPATCH HANDLER (DIRECT INVOICE OR MANDI VIKRI) ---
+    function generateDispatchEntry(e) {
       e.preventDefault();
+      const isVikri = document.querySelector('input[name="dispatch-mode"]:checked').value === 'vikri';
       const name = document.getElementById('c-name').value.trim();
       const phone = (document.getElementById('c-phone').value || "").toString().trim();
       const vehicle = document.getElementById('c-vehicle').value.trim();
-      const lotNo = document.getElementById('c-lot-no').value || "E879";
+      const lotNo = document.getElementById('c-lot-no').value.trim() || "E879";
       const supervisor = document.getElementById('c-supervisor').value || "Supervisor";
       const loader = document.getElementById('c-loader').value || "Loader";
-
-      const freight = Number(document.getElementById('c-freight').value || 0);
-      const labour = Number(document.getElementById('c-labour').value || 0);
-      const packaging = Number(document.getElementById('c-pack-charge').value || 0);
-      const misc = Number(document.getElementById('c-misc').value || 0);
-
-      const tokenNo = generatePartyToken('customer', name);
       const dateStr = new Date().toISOString().split('T')[0];
 
-      let totalBoxes = 0;
-      let totalAmount = 0;
-      let sizesBreakdown = {};
+      const tokenNo = generatePartyToken('customer', name);
+      const dispId = 'disp_' + Date.now();
 
-      KINNOW_SIZES.forEach(size => {
-        const qty = Number(document.getElementById(`size-qty-${size}`).value || 0);
-        const rate = Number(document.getElementById(`size-rate-${size}`).value || 0);
-        if(qty > 0) {
-          totalBoxes += qty;
-          totalAmount += (qty * rate);
-          sizesBreakdown[size] = qty;
+      if(isVikri) {
+        const city = document.getElementById('v-city').value.trim() || lotNo;
+        const totalBoxes = Number(document.getElementById('v-total-boxes').value || 0);
+        const isReportReady = document.getElementById('vikri-report-ready').checked;
+
+        let grossSale = 0;
+        let commPct = 6.0;
+        let commAmt = 0;
+        let freight = 0;
+        let labour = 0;
+        let misc = 0;
+        let cratesCredit = 0;
+        let netSoldAmount = 0;
+
+        if(isReportReady) {
+          grossSale = Number(document.getElementById('v-gross').value || 0);
+          commPct = Number(document.getElementById('v-comm-pct').value || 6.0);
+          commAmt = Math.round((grossSale * commPct) / 100);
+          freight = Number(document.getElementById('v-freight').value || 0);
+          labour = Number(document.getElementById('v-labour').value || 0);
+          misc = Number(document.getElementById('v-misc').value || 0);
+          cratesCredit = Number(document.getElementById('v-crates').value || 0);
+          netSoldAmount = Math.round((grossSale - commAmt - freight - labour - misc) + cratesCredit);
         }
-      });
 
-      const grandTotal = totalAmount + (freight + labour + packaging + misc);
+        const newVikri = {
+          id: dispId,
+          tokenNo,
+          date: dateStr,
+          isVikri: true,
+          name,
+          phone,
+          vehicle,
+          city,
+          lotNo,
+          totalBoxes,
+          isSettled: isReportReady && netSoldAmount > 0,
+          grossSale,
+          commPct,
+          commAmt,
+          freight,
+          labour,
+          misc,
+          cratesCredit,
+          grandTotal: netSoldAmount, // Realized sales amount credited to party ledger
+          supervisor,
+          loader
+        };
 
-      if(!APP_DATA.dispatches) APP_DATA.dispatches = [];
-      APP_DATA.dispatches.push({ id: 'disp_' + Date.now(), tokenNo, date: dateStr, name, phone, vehicle, lotNo, freight, labour, packaging, misc, totalBoxes, grandTotal, sizesBreakdown });
-      saveData();
+        if(!APP_DATA.dispatches) APP_DATA.dispatches = [];
+        APP_DATA.dispatches.push(newVikri);
+        saveData();
 
-      const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
-      const slipHTML = `
-        <div class="border-2 border-black p-4 text-xs font-sans bg-white leading-relaxed">
-          <div class="flex justify-between items-center border-b-2 border-black pb-2 mb-2">
-            <div class="w-16">${logoSvg}</div>
-            <div class="text-center flex-1"><h1 class="text-xl font-black text-black">SETIA WAXING PLANT</h1><p class="text-[10px] uppercase font-bold text-gray-700">Customer Invoice</p></div>
-          </div>
-          <div class="border border-black p-2 bg-gray-50 mb-2 font-black">Grand Total: ₹${grandTotal.toLocaleString('en-IN')} (${totalBoxes} Boxes)</div>
-          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">🔐 Customer Portal Access: Username: <b>${phone}</b> | Password: <b>${phone}</b></div>
-        </div>
-      `;
+        reprintVikriSlip(dispId);
+        e.target.reset();
+        toggleDispatchMode();
 
-      showSlip(slipHTML, phone, `*SETIA CUSTOMER DISPATCH*%0AToken: ${tokenNo}%0ACustomer: ${name}%0AGrand Total: Rs. ${grandTotal}`);
-      e.target.reset();
+      } else {
+        // Direct Invoice Sale
+        const freight = Number(document.getElementById('c-freight').value || 0);
+        const labour = Number(document.getElementById('c-labour').value || 0);
+        const packaging = Number(document.getElementById('c-pack-charge').value || 0);
+        const misc = Number(document.getElementById('c-misc').value || 0);
+
+        let totalBoxes = 0;
+        let totalAmount = 0;
+        let sizesBreakdown = {};
+        let sizeRates = {};
+
+        KINNOW_SIZES.forEach(size => {
+          const qty = Number(document.getElementById(`size-qty-${size}`).value || 0);
+          const rate = Number(document.getElementById(`size-rate-${size}`).value || 0);
+          if(qty > 0) {
+            totalBoxes += qty;
+            totalAmount += (qty * rate);
+            sizesBreakdown[size] = qty;
+            sizeRates[size] = rate;
+          }
+        });
+
+        const grandTotal = totalAmount + (freight + labour + packaging + misc);
+
+        const newDirectDispatch = {
+          id: dispId,
+          tokenNo,
+          date: dateStr,
+          isVikri: false,
+          name,
+          phone,
+          vehicle,
+          lotNo,
+          freight,
+          labour,
+          packaging,
+          misc,
+          totalBoxes,
+          grandTotal,
+          sizesBreakdown,
+          sizeRates,
+          supervisor,
+          loader
+        };
+
+        if(!APP_DATA.dispatches) APP_DATA.dispatches = [];
+        APP_DATA.dispatches.push(newDirectDispatch);
+        saveData();
+
+        reprintCustomerSlip(dispId);
+        e.target.reset();
+      }
     }
 
+    // --- FULL CUSTOMER & MANDI VIKRI LEDGER ---
     function renderCustomerLedger() {
       const custName = document.getElementById('view-cust-select').value;
       const kpi = document.getElementById('cust-kpi-container');
@@ -1819,9 +2649,9 @@
       const invoices = (APP_DATA.dispatches || []).filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
       const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
 
-      const totalBilled = invoices.reduce((a, b) => a + b.grandTotal, 0);
-      const totalBoxes = invoices.reduce((a, b) => a + b.totalBoxes, 0);
-      const totalPaid = payments.reduce((a, b) => a + b.amount, 0);
+      const totalBilled = invoices.reduce((a, b) => a + (b.grandTotal || 0), 0);
+      const totalBoxes = invoices.reduce((a, b) => a + (b.totalBoxes || 0), 0);
+      const totalPaid = payments.reduce((a, b) => a + (b.amount || 0), 0);
       const balanceDue = totalBilled - totalPaid;
 
       document.getElementById('cust-kpi-invoiced').innerText = `₹${totalBilled.toLocaleString('en-IN')}`;
@@ -1830,8 +2660,45 @@
       document.getElementById('cust-kpi-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
 
       const combined = [
-        ...invoices.map(i => ({ date: i.date, type: 'INVOICE', desc: `Token ${i.tokenNo} (${i.vehicle}) - ${i.totalBoxes} Boxes`, debit: i.grandTotal, credit: 0 })),
-        ...payments.map(p => ({ date: p.date, type: 'PAYMENT', desc: `Bank: ${p.bank} (${p.ref})`, debit: 0, credit: p.amount }))
+        ...invoices.map(i => {
+          let breakdownStr = "";
+          if(i.isVikri) {
+            breakdownStr = `Mandi Vikri: ${i.city || 'Mandi'} (${i.vehicle}) • ${i.totalBoxes} Boxes`;
+            if(i.isSettled) {
+              breakdownStr += ` • Gross: ₹${(i.grossSale || 0).toLocaleString('en-IN')} less Comm & Bhada`;
+            } else {
+              breakdownStr += ` • ⏳ Pending Chittha Report`;
+            }
+          } else {
+            breakdownStr = `${i.totalBoxes} Boxes (${i.vehicle})`;
+            if(i.sizesBreakdown && Object.keys(i.sizesBreakdown).length > 0) {
+              breakdownStr += " • " + Object.entries(i.sizesBreakdown).map(([sz, q]) => `${sz}: ${q}b`).join(', ');
+            }
+          }
+          return {
+            id: i.id,
+            date: i.date,
+            isVikri: i.isVikri,
+            isSettled: i.isSettled,
+            type: i.isVikri ? 'VIKRI' : 'INVOICE',
+            tokenNo: i.tokenNo,
+            city: i.city || '',
+            desc: breakdownStr,
+            debit: i.grandTotal || 0,
+            credit: 0
+          };
+        }),
+        ...payments.map(p => ({
+          id: p.id,
+          date: p.date,
+          isVikri: false,
+          type: 'PAYMENT',
+          tokenNo: '-',
+          city: '',
+          desc: `Bank Deposit: ${p.bank} (${p.ref})`,
+          debit: 0,
+          credit: p.amount || 0
+        }))
       ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
       let running = 0;
@@ -1839,12 +2706,35 @@
         running += (row.debit - row.credit);
         return `
           <tr class="border-b hover:bg-gray-50">
-            <td class="p-2.5">${row.date}</td>
-            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${row.type === 'INVOICE' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${row.type}</span></td>
-            <td class="p-2.5 font-medium">${row.desc}</td>
-            <td class="p-2.5 text-right font-semibold text-gray-800">${row.debit > 0 ? '₹' + row.debit.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 font-medium">${row.date}</td>
+            <td class="p-2.5 font-mono font-bold text-amber-900">
+              ${row.tokenNo}
+              ${row.city ? `<span class="block text-[10px] text-gray-400 font-sans">${row.city}</span>` : ''}
+            </td>
+            <td class="p-2.5">
+              <span class="font-bold text-slate-800 block">${row.desc}</span>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="text-[10px] px-1.5 py-0.2 rounded font-bold uppercase ${row.type === 'VIKRI' ? 'bg-amber-100 text-amber-900' : row.type === 'INVOICE' ? 'bg-blue-100 text-blue-900' : 'bg-emerald-100 text-emerald-900'}">${row.type}</span>
+                ${row.isVikri && !row.isSettled ? `<span class="text-[10px] bg-red-100 text-red-800 px-1.5 rounded font-bold">Unsettled Chittha</span>` : ''}
+              </div>
+            </td>
+            <td class="p-2.5 text-right font-semibold text-gray-800">${row.debit > 0 ? '₹' + row.debit.toLocaleString('en-IN') : (row.isVikri && !row.isSettled ? '<span class="text-gray-400">Pending</span>' : '-')}</td>
             <td class="p-2.5 text-right font-semibold text-emerald-700">${row.credit > 0 ? '₹' + row.credit.toLocaleString('en-IN') : '-'}</td>
             <td class="p-2.5 text-right font-bold ${running > 0 ? 'text-red-600' : 'text-emerald-700'}">₹${running.toLocaleString('en-IN')}</td>
+            <td class="p-2.5 text-right space-x-2">
+              ${row.isVikri ? `
+                ${!row.isSettled ? `<button onclick="openSettleVikriModal('${row.id}')" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-0.5 rounded font-bold text-[11px] shadow">📝 Enter Chittha</button>` : ''}
+                <button onclick="reprintVikriSlip('${row.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>
+                <button onclick="openEditRecordModal('dispatch', '${row.id}')" class="text-amber-700 font-bold hover:underline">✏️</button>
+                <button onclick="deleteRecord('dispatch', '${row.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+              ` : row.type === 'INVOICE' ? `
+                <button onclick="reprintCustomerSlip('${row.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>
+                <button onclick="openEditRecordModal('dispatch', '${row.id}')" class="text-amber-700 font-bold hover:underline">✏️</button>
+                <button onclick="deleteRecord('dispatch', '${row.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+              ` : `
+                <button onclick="deleteRecord('custPayment', '${row.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+              `}
+            </td>
           </tr>
         `;
       }).join('');
@@ -1855,12 +2745,12 @@
       if(!custName) return alert("Select customer first");
       const invoices = (APP_DATA.dispatches || []).filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
       const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
-      const totalBilled = invoices.reduce((a, b) => a + b.grandTotal, 0);
-      const totalPaid = payments.reduce((a, b) => a + b.amount, 0);
+      const totalBilled = invoices.reduce((a, b) => a + (b.grandTotal || 0), 0);
+      const totalPaid = payments.reduce((a, b) => a + (b.amount || 0), 0);
       const balanceDue = totalBilled - totalPaid;
       const custPhone = invoices.length > 0 ? invoices[0].phone : "";
 
-      const waMsg = `*SETIA PLANT - STATEMENT*%0ACustomer: *${custName}*%0ATotal Invoiced: Rs. ${totalBilled.toLocaleString('en-IN')}%0ATotal Paid: Rs. ${totalPaid.toLocaleString('en-IN')}%0A*Pending Balance: Rs. ${balanceDue.toLocaleString('en-IN')}*`;
+      const waMsg = `*SETIA PLANT - STATEMENT*%0ACustomer: *${custName}*%0ATotal Realized / Invoiced: Rs. ${totalBilled.toLocaleString('en-IN')}%0ATotal Paid: Rs. ${totalPaid.toLocaleString('en-IN')}%0A*Pending Balance: Rs. ${balanceDue.toLocaleString('en-IN')}*`;
       window.open(`https://wa.me/91${custPhone}?text=${waMsg}`, '_blank');
     }
 
@@ -1901,20 +2791,32 @@
       document.getElementById('orch-kpi-paid-info').innerText = `Paid: ₹${totPaid.toLocaleString('en-IN')}`;
 
       const history = [
-        ...(orch.advance > 0 ? [{ date: orch.date, type: 'ADVANCE TOKEN', desc: `Token ${orch.tokenNo} (${orch.advBank || 'Bank/Cash'})`, inwardAmt: 0, paidAmt: orch.advance, crates: '-' }] : []),
-        ...trips.map(t => ({ date: t.date, type: 'INWARD TRIP', desc: `Token ${t.tokenNo} (${t.vehicle}) - ${t.chargeable.toFixed(1)} Kg`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
-        ...payments.map(p => ({ date: p.date, type: 'BANK PAYMENT', desc: `Paid: ${p.bank} (${p.ref})`, inwardAmt: 0, paidAmt: p.amount, crates: '-' }))
+        ...(orch.advance > 0 ? [{ id: orch.id, recordType: 'agreement', date: orch.date, type: 'ADVANCE TOKEN', tokenNo: orch.tokenNo, desc: `Token ${orch.tokenNo} (${orch.advBank || 'Bank/Cash'})`, inwardAmt: 0, paidAmt: orch.advance, crates: '-' }] : []),
+        ...trips.map(t => ({ id: t.id, recordType: 'inward', date: t.date, type: 'INWARD TRIP', tokenNo: t.tokenNo, desc: `Inward (${t.vehicle}) - ${t.chargeable.toFixed(1)} Kg @₹${t.rate}`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
+        ...payments.map(p => ({ id: p.id, recordType: 'farmerPayment', date: p.date, type: 'BANK PAYMENT', tokenNo: '-', desc: `Paid: ${p.bank} (${p.ref})`, inwardAmt: 0, paidAmt: p.amount, crates: '-' }))
       ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
       const tbody = document.getElementById('orchard-trips-tbody');
       tbody.innerHTML = history.map(h => `
         <tr class="border-b hover:bg-gray-50">
-          <td class="p-2.5">${h.date}</td>
-          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${h.type.includes('PAYMENT') || h.type.includes('ADVANCE') ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">${h.type}</span></td>
+          <td class="p-2.5 font-medium">${h.date}</td>
+          <td class="p-2.5 font-mono font-bold text-amber-900">${h.tokenNo}</td>
           <td class="p-2.5 font-medium">${h.desc}</td>
           <td class="p-2.5 text-right font-semibold text-gray-800">${h.inwardAmt > 0 ? '₹' + h.inwardAmt.toLocaleString('en-IN') : '-'}</td>
           <td class="p-2.5 text-right font-semibold text-emerald-700">${h.paidAmt > 0 ? '₹' + h.paidAmt.toLocaleString('en-IN') : '-'}</td>
           <td class="p-2.5 text-right font-medium">${h.crates}</td>
+          <td class="p-2.5 text-right space-x-2">
+            ${h.recordType === 'inward' ? `
+              <button onclick="reprintInwardSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>
+              <button onclick="openEditRecordModal('inward', '${h.id}')" class="text-amber-600 font-bold hover:underline">✏️ Edit</button>
+              <button onclick="deleteRecord('inward', '${h.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+            ` : h.recordType === 'agreement' ? `
+              <button onclick="reprintFarmerSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>
+              <button onclick="openEditRecordModal('agreement', '${h.id}')" class="text-amber-600 font-bold hover:underline">✏️ Edit</button>
+            ` : `
+              <button onclick="deleteRecord('farmerPayment', '${h.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+            `}
+          </td>
         </tr>
       `).join('');
     }
