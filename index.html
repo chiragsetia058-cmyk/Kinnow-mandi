@@ -871,6 +871,7 @@
     let customSizeIndex = 0;
     let currentUser = null;
     let currentPartySession = null;
+    let isSaving = false;
 
     // ACTIVE DEFAULTS (FALLBACK IF MONGODB IS UNINITIALIZED)
     const CORE_DEFAULTS = {
@@ -893,7 +894,8 @@
       ],
       customerPayments: [],
       farmerPayments: [],
-      blockedUsers: []
+      blockedUsers: [],
+      lastUpdated: 0
     };
 
     let APP_DATA = JSON.parse(localStorage.getItem('SETIA_WAXING_PORTAL_V10')) || CORE_DEFAULTS;
@@ -933,12 +935,19 @@
 
     // --- MONGODB ATLAS CLOUD SYNC ENGINE ---
     async function fetchCloudData() {
+      if (isSaving) return; // Never overwrite while currently saving a local record
       const badge = document.getElementById('cloud-status-badge');
       try {
         const res = await fetch('/api/state');
         if (res.ok) {
           const raw = await res.json();
           if (raw && typeof raw === 'object' && Object.keys(raw).length > 0) {
+            
+            // If the incoming server state is older than local state, do not overwrite
+            if (raw.lastUpdated && APP_DATA.lastUpdated && raw.lastUpdated < APP_DATA.lastUpdated) {
+              return;
+            }
+
             APP_DATA = {
               staffUsers: (raw.staffUsers && raw.staffUsers.length > 0) ? raw.staffUsers : (APP_DATA.staffUsers || CORE_DEFAULTS.staffUsers),
               staffDirectory: (raw.staffDirectory && raw.staffDirectory.length > 0) ? raw.staffDirectory : (APP_DATA.staffDirectory || CORE_DEFAULTS.staffDirectory),
@@ -949,7 +958,8 @@
               dispatches: (raw.dispatches && raw.dispatches.length > 0) ? raw.dispatches : (APP_DATA.dispatches || CORE_DEFAULTS.dispatches),
               customerPayments: raw.customerPayments || [],
               farmerPayments: raw.farmerPayments || [],
-              blockedUsers: raw.blockedUsers || []
+              blockedUsers: raw.blockedUsers || [],
+              lastUpdated: raw.lastUpdated || Date.now()
             };
 
             localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
@@ -973,6 +983,8 @@
     }
 
     async function saveData() {
+      isSaving = true;
+      APP_DATA.lastUpdated = Date.now();
       localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
 
       populateDropdowns();
@@ -990,6 +1002,8 @@
         });
       } catch (err) {
         console.error("MongoDB Atlas write failed:", err);
+      } finally {
+        setTimeout(() => { isSaving = false; }, 2500);
       }
     }
 
@@ -1024,7 +1038,7 @@
       populateDropdowns();
       fetchCloudData();
 
-      // Multi-phone polling every 4 seconds to sync newly created data across all devices
+      // Multi-device background sync
       setInterval(fetchCloudData, 4000);
     };
 
