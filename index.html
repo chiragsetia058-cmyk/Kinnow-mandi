@@ -39,7 +39,7 @@
       <form onsubmit="handleUniversalLogin(event)" class="space-y-4 text-left">
         <div>
           <label class="block text-xs font-semibold mb-1">Username / Registered Mobile No.</label>
-          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600 font-medium" placeholder="admin, staff username or 10-digit mobile" />
+          <input type="text" id="login-user" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600 font-medium" placeholder="Username or 10-digit registered mobile" />
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">Password</label>
@@ -2113,7 +2113,7 @@
         return;
       }
 
-      alert("Invalid login details.\n\n• For Admin: admin / Csetia@1122\n• For Staff: username & password\n• For Customer/Farmer: 10-digit registered mobile");
+      alert("Invalid login details. Please check your username/mobile number and password.");
     }
 
     function launchStaffPortal() {
