@@ -200,7 +200,7 @@
       <!-- TAB: ATTENDANCE & LABOUR -->
       <div id="attendance-section" class="hidden space-y-6">
 
-        <!-- 1. REGISTER NEW STAFF WITH SALARY & SAVED DIRECTORY (WITH ADMIN-ONLY REMOVAL) -->
+        <!-- 1. REGISTER NEW STAFF WITH SALARY & SAVED DIRECTORY -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
           <h3 class="text-base font-bold text-slate-800 pb-2 border-b">📋 Register New Staff Member with Salary</h3>
           <form onsubmit="registerQuickStaff(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
@@ -223,11 +223,11 @@
             </div>
           </form>
 
-          <!-- SAVED STAFF MEMBERS DIRECTORY ROSTER WITH ADMIN-ONLY REMOVE OPTION -->
+          <!-- SAVED STAFF MEMBERS DIRECTORY ROSTER -->
           <div class="border-t pt-3 space-y-2">
             <div class="flex justify-between items-center">
               <h4 class="text-xs font-bold uppercase text-slate-700">Saved Staff Members Directory</h4>
-              <span class="text-[10px] text-amber-800 bg-amber-100 px-2 py-0.5 rounded font-bold">Admin Managed</span>
+              <span class="text-[10px] text-amber-800 bg-amber-100 px-2 py-0.5 rounded font-bold">Staff & Labour Roster</span>
             </div>
             <div class="overflow-x-auto border rounded-xl">
               <table class="w-full text-left text-xs">
@@ -280,7 +280,7 @@
           </form>
         </div>
 
-        <!-- 3. CONTRACTOR GROUP LABOUR ATTENDANCE (WITH PRESENT / HALF DAY / ABSENT) -->
+        <!-- 3. CONTRACTOR GROUP LABOUR ATTENDANCE -->
         <div class="bg-amber-50/70 p-5 rounded-xl border-2 border-amber-300 shadow-sm">
           <div class="flex justify-between items-center mb-3 pb-2 border-b border-amber-200">
             <div>
@@ -358,7 +358,7 @@
           <div class="flex justify-between items-center border-b pb-2">
             <div>
               <h3 class="text-base font-bold text-slate-900">💼 Staff Salary Statement (Calculated by Present Days)</h3>
-              <p class="text-xs text-gray-500">Auto-calculated: $\text{Payable} = (\text{Present} + 0.5 \times \text{HalfDay}) \times (\text{Monthly Salary} \div 30)$ for filtered dates</p>
+              <p class="text-xs text-gray-500">Auto-calculated: Payable = (Present + 0.5 × HalfDay) × (Monthly Salary ÷ 30) for filtered dates</p>
             </div>
           </div>
           <div class="overflow-x-auto border rounded-xl">
@@ -901,7 +901,7 @@
         </form>
       </div>
 
-      <!-- TAB 4: DAILY INWARD SLIP (WITH 1 KG / 100 KG YES/NO TOGGLE) -->
+      <!-- TAB 4: DAILY INWARD SLIP -->
       <div id="daily-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div class="flex justify-between items-center border-b pb-2 mb-4">
           <h3 class="text-base font-bold text-gray-800">Daily Orchard Inward (ਤੁੜਾਈ ਤੇ ਆਮਦ)</h3>
@@ -946,7 +946,6 @@
               <input type="number" id="d-tare-wt" step="0.1" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="e.g. 1200" oninput="calculateDailyWeight()" />
             </div>
             
-            <!-- 1 KG / 100 KG CUT TOGGLE (YES / NO) IN FARMER INWARD SLIP -->
             <div>
               <label class="block text-xs font-black text-amber-900 mb-1">Cut 1 Kg / 100 Kg? (ਕੱਟ)</label>
               <select id="d-cut-choice" class="w-full border-2 border-amber-400 rounded-lg p-2 text-sm font-bold bg-white outline-none" onchange="calculateDailyWeight()">
@@ -988,7 +987,7 @@
         </form>
       </div>
 
-      <!-- TAB 5: CUSTOMER DISPATCH INVOICE (AUTOFILL + BILLING & VIKRI SIZES) -->
+      <!-- TAB 5: CUSTOMER DISPATCH INVOICE -->
       <div id="customer-section" class="hidden space-y-6">
 
         <!-- 1. CUSTOMER DIRECTORY PRE-REGISTRATION -->
@@ -1036,7 +1035,6 @@
             </span>
           </div>
 
-          <!-- AUTOFILL SELECTION DROPDOWN -->
           <div class="mb-5 bg-amber-50 p-3.5 rounded-xl border border-amber-200">
             <label class="block text-xs font-bold text-slate-900 mb-1">Select Customer to Autofill (ਸੇਵ ਕੀਤਾ ਗ੍ਰਾਹਕ ਚੁਣੋ)</label>
             <select id="autofill-cust-select" class="w-full border border-amber-300 rounded-lg p-2 text-sm bg-white font-medium outline-none" onchange="autoFillCustomerDetails()">
@@ -1045,8 +1043,6 @@
           </div>
 
           <form onsubmit="generateCustomerSlip(event)" class="space-y-4">
-            
-            <!-- CUSTOMER TYPE RADIO SELECTION: BILLING vs VIKRI -->
             <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-300 flex flex-wrap gap-4 items-center">
               <span class="text-xs font-black text-slate-900 uppercase">Dispatch Type:</span>
               <label class="flex items-center text-xs font-bold gap-2 cursor-pointer">
@@ -1078,7 +1074,6 @@
               </div>
             </div>
 
-            <!-- KINNOW SIZE MATRIX: SIZES FOR BOTH, PRICE HIDDEN IN VIKRI -->
             <div class="mt-4">
               <div class="flex justify-between items-center mb-2">
                 <h4 class="text-xs font-bold uppercase text-slate-700" id="matrix-heading-title">Kinnow Size Matrix (Boxes & Rates)</h4>
@@ -1090,7 +1085,6 @@
               <div id="custom-sizes-container" class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3"></div>
             </div>
 
-            <!-- FREIGHT & EXPENSES SECTION (FOR BILLING CUSTOMERS) -->
             <div id="financial-expenses-section" class="border-t pt-4 bg-gray-50 p-4 rounded-xl space-y-3">
               <h4 class="text-xs font-bold uppercase text-slate-700">Freight & Miscellaneous Expenses (ਫੁਟਕਲ ਖ਼ਰਚੇ)</h4>
               <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -1164,7 +1158,8 @@
       ],
       staffDirectory: [
         { id: 'sd_1', name: 'Ramesh Kumar', role: 'Plant Supervisor', salary: 18000 },
-        { id: 'sd_2', name: 'Gurpreet Singh', role: 'Machine Operator', salary: 15000 }
+        { id: 'sd_2', name: 'Gurpreet Singh', role: 'Machine Operator', salary: 15000 },
+        { id: 'sd_3', name: 'Chirag Setia', role: 'Staff Operations', salary: 18000 }
       ],
       customerDirectory: [
         { id: 'cd_1', name: 'Chifu Agritech', phone: '9658200058', type: 'Billing', vehicle: 'PB 15 XX 0000' },
@@ -1183,10 +1178,46 @@
       farmerPayments: [],
       blockedUsers: [],
       deletedAccounts: [],
+      deletedStaffFromDir: [],
       lastUpdated: 0
     };
 
     let APP_DATA = JSON.parse(localStorage.getItem('SETIA_WAXING_PORTAL_V10')) || CORE_DEFAULTS;
+
+    // Synchronize staff directory with any newly created staff accounts or attendance entries
+    function syncStaffDirectory() {
+      if (!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
+      const delFromDir = APP_DATA.deletedStaffFromDir || [];
+
+      (APP_DATA.staffUsers || []).forEach(u => {
+        if (u.name && !isUserDeleted(u.username || u.name) && !delFromDir.includes(u.name.trim().toLowerCase())) {
+          const exists = APP_DATA.staffDirectory.some(d => d.name.trim().toLowerCase() === u.name.trim().toLowerCase());
+          if (!exists) {
+            APP_DATA.staffDirectory.push({
+              id: 'sd_sync_' + (u.id || Math.random()),
+              name: u.name.trim(),
+              role: u.role === 'admin' ? 'Administrator' : 'Staff',
+              salary: 18000
+            });
+          }
+        }
+      });
+
+      (APP_DATA.staffAttendance || []).forEach(a => {
+        if (a.name && !delFromDir.includes(a.name.trim().toLowerCase())) {
+          const exists = APP_DATA.staffDirectory.some(d => d.name.trim().toLowerCase() === a.name.trim().toLowerCase());
+          if (!exists) {
+            const wage = Number(a.wage || 0);
+            APP_DATA.staffDirectory.push({
+              id: 'sd_att_' + Math.random(),
+              name: a.name.trim(),
+              role: 'Staff',
+              salary: wage > 0 ? (wage * 30) : 15000
+            });
+          }
+        }
+      });
+    }
 
     function generatePartyToken(type, name, locationOrSecondName = "") {
       const cleanName = (name || "").trim();
@@ -1242,18 +1273,20 @@
               staffUsers: cleanStaff,
               staffDirectory: raw.staffDirectory || APP_DATA.staffDirectory || CORE_DEFAULTS.staffDirectory,
               customerDirectory: raw.customerDirectory || APP_DATA.customerDirectory || CORE_DEFAULTS.customerDirectory,
-              staffAttendance: raw.staffAttendance || [],
-              groupLabourAttendance: raw.groupLabourAttendance || [],
+              staffAttendance: raw.staffAttendance || APP_DATA.staffAttendance || [],
+              groupLabourAttendance: raw.groupLabourAttendance || APP_DATA.groupLabourAttendance || [],
               agreements: raw.agreements !== undefined ? raw.agreements : (APP_DATA.agreements || CORE_DEFAULTS.agreements),
-              inwards: raw.inwards || [],
+              inwards: raw.inwards || APP_DATA.inwards || [],
               dispatches: raw.dispatches !== undefined ? raw.dispatches : (APP_DATA.dispatches || CORE_DEFAULTS.dispatches),
-              customerPayments: raw.customerPayments || [],
-              farmerPayments: raw.farmerPayments || [],
-              blockedUsers: raw.blockedUsers || [],
+              customerPayments: raw.customerPayments || APP_DATA.customerPayments || [],
+              farmerPayments: raw.farmerPayments || APP_DATA.farmerPayments || [],
+              blockedUsers: raw.blockedUsers || APP_DATA.blockedUsers || [],
               deletedAccounts: delAccounts,
+              deletedStaffFromDir: raw.deletedStaffFromDir || APP_DATA.deletedStaffFromDir || [],
               lastUpdated: raw.lastUpdated || Date.now()
             };
 
+            syncStaffDirectory();
             localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
 
             if (badge) {
@@ -1278,6 +1311,7 @@
     async function saveData() {
       isSaving = true;
       APP_DATA.lastUpdated = Date.now();
+      syncStaffDirectory();
       localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
 
       populateDropdowns();
@@ -1295,13 +1329,16 @@
           body: JSON.stringify(APP_DATA)
         });
       } catch (err) {
-        console.error("MongoDB Atlas write failed:", err);
+        console.warn("MongoDB Atlas write check:", err);
       } finally {
         setTimeout(() => { isSaving = false; }, 2500);
       }
     }
 
     async function forceSyncToCloud() {
+      if (!currentUser || currentUser.role !== 'admin') {
+        return alert("Access Denied: Only Master Admin can trigger cloud sync.");
+      }
       await saveData();
       alert("All local plant records successfully uploaded and synced to MongoDB Atlas Cloud!");
     }
@@ -1323,6 +1360,7 @@
       document.getElementById('ledger-from-date').value = `${curYearMonth}-01`;
       document.getElementById('ledger-to-date').value = todayStr;
 
+      syncStaffDirectory();
       resetToToday();
       populateDropdowns();
       updateLedgerPersonDropdown();
@@ -1452,11 +1490,26 @@
       const role = document.getElementById('reg-staff-role').value.trim() || 'Staff';
       const salary = Number(document.getElementById('reg-staff-salary').value || 0);
 
-      if(!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
-      APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role, salary });
+      if (!name) return;
+
+      if (!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
+
+      if (APP_DATA.deletedStaffFromDir) {
+        APP_DATA.deletedStaffFromDir = APP_DATA.deletedStaffFromDir.filter(n => n !== name.toLowerCase());
+      }
+
+      const existingIndex = APP_DATA.staffDirectory.findIndex(s => s.name.trim().toLowerCase() === name.toLowerCase());
+      if (existingIndex >= 0) {
+        APP_DATA.staffDirectory[existingIndex].role = role;
+        APP_DATA.staffDirectory[existingIndex].salary = salary;
+      } else {
+        APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role, salary });
+      }
+
       saveData();
-      alert(`Staff member ${name} added with monthly salary ₹${salary.toLocaleString('en-IN')}!`);
+      alert(`Staff member ${name} added to Directory with monthly salary ₹${salary.toLocaleString('en-IN')}!`);
       e.target.reset();
+      populateDropdowns();
       updateLedgerPersonDropdown();
       renderSavedStaffDirectory();
       renderStaffSalaryReport();
@@ -1466,6 +1519,7 @@
       const tbody = document.getElementById('saved-staff-directory-tbody');
       if (!tbody) return;
 
+      syncStaffDirectory();
       const isAdmin = currentUser && currentUser.role === 'admin';
       const list = APP_DATA.staffDirectory || [];
 
@@ -1498,7 +1552,10 @@
       }
 
       if (confirm(`Master Admin Authorization: Permanently remove "${name}" from saved staff directory?`)) {
-        APP_DATA.staffDirectory = (APP_DATA.staffDirectory || []).filter(s => s.id !== id);
+        if (!APP_DATA.deletedStaffFromDir) APP_DATA.deletedStaffFromDir = [];
+        APP_DATA.deletedStaffFromDir.push(name.trim().toLowerCase());
+
+        APP_DATA.staffDirectory = (APP_DATA.staffDirectory || []).filter(s => s.id !== id && s.name.trim().toLowerCase() !== name.trim().toLowerCase());
         saveData();
         renderSavedStaffDirectory();
         renderStaffSalaryReport();
@@ -1519,7 +1576,7 @@
       }
     }
 
-    // --- 5. CONTRACTOR LABOUR ATTENDANCE: PRESENT / HALF DAY / ABSENT ---
+    // --- 5. CONTRACTOR LABOUR ATTENDANCE ---
     function calculateGroupWage() {
       const status = document.getElementById('att-group-status').value;
       const menCount = Number(document.getElementById('att-group-men-count').value || 0);
@@ -1555,7 +1612,7 @@
       const womenRate = Number(document.getElementById('att-group-women-rate').value || 0);
 
       const totalCount = menCount + womenCount;
-      if(totalCount <= 0 && status !== 'Absent') {
+      if (totalCount <= 0 && status !== 'Absent') {
         return alert("Please enter at least 1 worker (Men or Women).");
       }
 
@@ -1563,7 +1620,7 @@
       if (status === 'Half Day') totalPayable = totalPayable * 0.5;
       else if (status === 'Absent') totalPayable = 0;
 
-      if(!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
+      if (!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
       APP_DATA.groupLabourAttendance.push({
         id: 'grp_' + Date.now(),
         type: 'Contractor Group',
@@ -1600,6 +1657,7 @@
       const fromDate = document.getElementById('ledger-from-date').value;
       const toDate = document.getElementById('ledger-to-date').value;
 
+      syncStaffDirectory();
       let staffList = APP_DATA.staffDirectory || [];
       if (staffList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" class="p-3 text-center text-gray-400">No staff registered in directory yet.</td></tr>`;
@@ -1636,7 +1694,7 @@
       }).join('');
     }
 
-    // --- 7. ATTENDANCE LEDGER & ADMIN-ONLY DELETE ---
+    // --- 7. ATTENDANCE LEDGER & CONTROLS ---
     function updateLedgerPersonDropdown() {
       const cat = document.getElementById('ledger-cat-filter').value;
       const personSel = document.getElementById('ledger-person-filter');
@@ -1649,7 +1707,9 @@
           ...(APP_DATA.staffAttendance || []).map(a => a.name)
         ]);
         staffNames.forEach(name => {
-          personSel.innerHTML += `<option value="Staff:${name}">Staff: ${name}</option>`;
+          if (name && name.trim()) {
+            personSel.innerHTML += `<option value="Staff:${name.trim()}">Staff: ${name.trim()}</option>`;
+          }
         });
       }
 
@@ -1658,7 +1718,9 @@
           ...(APP_DATA.groupLabourAttendance || []).map(g => g.head)
         ]);
         contractorHeads.forEach(head => {
-          personSel.innerHTML += `<option value="Group:${head}">Contractor: ${head}</option>`;
+          if (head && head.trim()) {
+            personSel.innerHTML += `<option value="Group:${head.trim()}">Contractor: ${head.trim()}</option>`;
+          }
         });
       }
     }
@@ -1776,14 +1838,14 @@
       renderSavedStaffDirectory();
     }
 
-    // --- 8. STRICT ADMIN-ONLY DELETION GUARD ---
+    // --- 8. ATTENDANCE ACTIONS & REGISTRATION ---
     function deleteAttendance(id, cat) {
       if (!currentUser || currentUser.role !== 'admin') {
         return alert("Access Denied: Only Master Admin can delete attendance records.");
       }
 
-      if(confirm("Master Admin Authorization: Permanently remove this attendance record?")) {
-        if(cat === 'Single Staff') {
+      if (confirm("Master Admin Authorization: Permanently remove this attendance record?")) {
+        if (cat === 'Single Staff') {
           APP_DATA.staffAttendance = (APP_DATA.staffAttendance || []).filter(x => x.id !== id);
         } else {
           APP_DATA.groupLabourAttendance = (APP_DATA.groupLabourAttendance || []).filter(x => x.id !== id);
@@ -1824,9 +1886,9 @@
       document.getElementById('edit-att-id').value = id;
       document.getElementById('edit-att-type').value = cat;
 
-      if(cat === 'Single Staff') {
+      if (cat === 'Single Staff') {
         const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
-        if(!item) return;
+        if (!item) return;
         document.getElementById('edit-modal-title').innerText = `Edit Staff: ${item.name}`;
         document.getElementById('edit-att-date').value = item.date;
         document.getElementById('edit-att-name').value = item.name;
@@ -1836,7 +1898,7 @@
         document.getElementById('edit-group-fields').classList.add('hidden');
       } else {
         const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
-        if(!item) return;
+        if (!item) return;
         document.getElementById('edit-modal-title').innerText = `Edit Group: ${item.head}`;
         document.getElementById('edit-att-date').value = item.date;
         document.getElementById('edit-att-head').value = item.head;
@@ -1862,9 +1924,9 @@
       const cat = document.getElementById('edit-att-type').value;
       const date = document.getElementById('edit-att-date').value;
 
-      if(cat === 'Single Staff') {
+      if (cat === 'Single Staff') {
         const item = (APP_DATA.staffAttendance || []).find(x => x.id === id);
-        if(item) {
+        if (item) {
           item.date = date;
           item.name = document.getElementById('edit-att-name').value;
           item.status = document.getElementById('edit-att-status').value;
@@ -1872,7 +1934,7 @@
         }
       } else {
         const item = (APP_DATA.groupLabourAttendance || []).find(x => x.id === id);
-        if(item) {
+        if (item) {
           item.date = date;
           item.head = document.getElementById('edit-att-head').value;
           item.orchard = document.getElementById('edit-att-orchard').value;
@@ -1903,12 +1965,37 @@
       const wage = Number(document.getElementById('att-staff-wage').value || 0);
       const date = document.getElementById('att-staff-date').value;
 
-      if(!APP_DATA.staffAttendance) APP_DATA.staffAttendance = [];
+      if (!staffName) return alert("Please select or enter staff name.");
+
+      if (!APP_DATA.staffAttendance) APP_DATA.staffAttendance = [];
       APP_DATA.staffAttendance.push({ id: 'att_' + Date.now(), type: 'Single Staff', name: staffName, status, wage, date });
+
+      // Ensure staff exists in directory as well
+      if (!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
+      const existing = APP_DATA.staffDirectory.find(s => s.name.trim().toLowerCase() === staffName.toLowerCase());
+      if (!existing) {
+        APP_DATA.staffDirectory.push({
+          id: 'sd_' + Date.now(),
+          name: staffName,
+          role: 'Staff',
+          salary: wage > 0 ? (wage * 30) : 15000
+        });
+      } else if (wage > 0 && (!existing.salary || existing.salary === 0)) {
+        existing.salary = wage * 30;
+      }
+
+      if (APP_DATA.deletedStaffFromDir) {
+        APP_DATA.deletedStaffFromDir = APP_DATA.deletedStaffFromDir.filter(n => n !== staffName.toLowerCase());
+      }
+
       saveData();
       alert(`Attendance recorded for ${staffName}!`);
       e.target.reset();
       document.getElementById('att-staff-date').value = new Date().toISOString().split('T')[0];
+      populateDropdowns();
+      updateLedgerPersonDropdown();
+      renderSavedStaffDirectory();
+      renderStaffSalaryReport();
       renderAttendanceLedger();
     }
 
@@ -1923,6 +2010,9 @@
     }
 
     function toggleUserBlockStatus(idOrPhone, displayName) {
+      if (!currentUser || currentUser.role !== 'admin') {
+        return alert("Access Denied: Only Master Admin can block or unblock accounts.");
+      }
       const clean = (idOrPhone || "").toString().trim().toLowerCase().replace('@', '');
       if (!APP_DATA.blockedUsers) APP_DATA.blockedUsers = [];
 
@@ -1937,8 +2027,11 @@
     }
 
     function deleteStaffUser(id, username) {
-      if(confirm(`Permanently delete staff account @${username}?`)) {
-        if(!APP_DATA.deletedAccounts) APP_DATA.deletedAccounts = [];
+      if (!currentUser || currentUser.role !== 'admin') {
+        return alert("Access Denied: Only Master Admin can delete staff accounts.");
+      }
+      if (confirm(`Permanently delete staff account @${username}?`)) {
+        if (!APP_DATA.deletedAccounts) APP_DATA.deletedAccounts = [];
         APP_DATA.deletedAccounts.push(username.toLowerCase());
         APP_DATA.staffUsers = (APP_DATA.staffUsers || []).filter(u => u.id !== id && u.username.toLowerCase() !== username.toLowerCase());
         saveData();
@@ -1947,8 +2040,11 @@
     }
 
     function deletePartyAccount(phone, partyName, partyType) {
-      if(confirm(`Permanently delete portal credentials for ${partyType}: ${partyName} (${phone})?`)) {
-        if(!APP_DATA.deletedAccounts) APP_DATA.deletedAccounts = [];
+      if (!currentUser || currentUser.role !== 'admin') {
+        return alert("Access Denied: Only Master Admin can delete party accounts.");
+      }
+      if (confirm(`Permanently delete portal credentials for ${partyType}: ${partyName} (${phone})?`)) {
+        if (!APP_DATA.deletedAccounts) APP_DATA.deletedAccounts = [];
         APP_DATA.deletedAccounts.push(phone.toString().trim());
 
         if (partyType === 'Farmer') {
@@ -2026,19 +2122,28 @@
       document.getElementById('app-view').classList.remove('hidden');
       document.getElementById('user-display').innerText = `${currentUser.name} (${currentUser.role.toUpperCase()})`;
 
-      if (currentUser.role === 'admin') {
-        document.getElementById('tab-admin-panel').classList.remove('hidden');
-        document.getElementById('btn-reset-data').classList.remove('hidden');
+      const isAdmin = currentUser && currentUser.role === 'admin';
+      const adminTab = document.getElementById('tab-admin-panel');
+      const adminSec = document.getElementById('admin-panel-section');
+      const resetBtn = document.getElementById('btn-reset-data');
+
+      if (isAdmin) {
+        if (adminTab) adminTab.classList.remove('hidden');
+        if (resetBtn) resetBtn.classList.remove('hidden');
       } else {
-        document.getElementById('tab-admin-panel').classList.add('hidden');
-        document.getElementById('btn-reset-data').classList.add('hidden');
+        if (adminTab) adminTab.classList.add('hidden');
+        if (adminSec) adminSec.classList.add('hidden');
+        if (resetBtn) resetBtn.classList.add('hidden');
       }
 
+      syncStaffDirectory();
+      populateDropdowns();
       renderDashboard();
       renderStaffTable();
       renderPartyAccountsTable();
       renderSavedStaffDirectory();
       renderAttendanceLedger();
+      switchTab('dashboard');
     }
 
     function launchPartyPortal() {
@@ -2056,10 +2161,15 @@
       document.getElementById('login-view').classList.remove('hidden');
       document.getElementById('login-user').value = "";
       document.getElementById('login-pass').value = "";
+      
+      const adminTab = document.getElementById('tab-admin-panel');
+      const adminSec = document.getElementById('admin-panel-section');
+      if (adminTab) adminTab.classList.add('hidden');
+      if (adminSec) adminSec.classList.add('hidden');
     }
 
     function renderPartyPortalView() {
-      if(!currentPartySession) return;
+      if (!currentPartySession) return;
       const { role, name, phone } = currentPartySession;
 
       document.getElementById('party-portal-name').innerText = name;
@@ -2071,7 +2181,7 @@
       const thead = document.getElementById('party-table-head');
       const tbody = document.getElementById('party-table-body');
 
-      if(role === 'farmer') {
+      if (role === 'farmer') {
         const orchards = (APP_DATA.agreements || []).filter(a => (a.phone || "").toString().trim() === phone);
         const orchIds = orchards.map(o => o.id);
         const trips = (APP_DATA.inwards || []).filter(i => orchIds.includes(i.orchardId) || (i.phone || "").toString().trim() === phone);
@@ -2084,7 +2194,7 @@
 
         let totalGross = 0;
         orchards.forEach(o => {
-          if(o.type === 'lump_sum') totalGross += (o.total || 0);
+          if (o.type === 'lump_sum') totalGross += (o.total || 0);
           else {
             const orchTrips = trips.filter(t => t.orchardId === o.id);
             totalGross += orchTrips.reduce((a,b) => a + (b.totalTripAmt || 0), 0);
@@ -2167,7 +2277,7 @@
 
     function renderStaffTable() {
       const tbody = document.getElementById('staff-table-body');
-      if(!tbody) return;
+      if (!tbody) return;
       const cleanList = (APP_DATA.staffUsers || []).filter(s => !isUserDeleted(s.username));
       tbody.innerHTML = cleanList.map(s => {
         const blocked = isUserBlocked(s.username);
@@ -2188,18 +2298,18 @@
 
     function renderPartyAccountsTable() {
       const tbody = document.getElementById('party-accounts-table-body');
-      if(!tbody) return;
+      if (!tbody) return;
 
       const partyRows = [];
       (APP_DATA.agreements || []).forEach(a => {
         const ph = (a.phone || "").toString().trim();
-        if(ph && !isUserDeleted(ph)) partyRows.push({ type: 'Farmer', name: a.name, phone: ph });
+        if (ph && !isUserDeleted(ph)) partyRows.push({ type: 'Farmer', name: a.name, phone: ph });
       });
 
       const custMap = new Map();
       (APP_DATA.dispatches || []).forEach(d => {
         const ph = (d.phone || "").toString().trim();
-        if(ph && !isUserDeleted(ph) && !custMap.has(ph)) {
+        if (ph && !isUserDeleted(ph) && !custMap.has(ph)) {
           custMap.set(ph, { type: 'Customer', name: d.name, phone: ph });
         }
       });
@@ -2229,9 +2339,9 @@
       document.getElementById('eur-type').value = type;
       document.getElementById('eur-id').value = id;
 
-      if(type === 'dispatch') {
+      if (type === 'dispatch') {
         const d = (APP_DATA.dispatches || []).find(x => x.id === id);
-        if(!d) return;
+        if (!d) return;
         title.innerText = `Edit Customer Dispatch Invoice (${d.tokenNo})`;
         container.innerHTML = `
           <div class="grid grid-cols-2 gap-2">
@@ -2245,9 +2355,9 @@
             <div><label class="block font-semibold mb-1">Labour ₹</label><input type="number" id="ee-cust-labour" value="${d.labour || 0}" class="w-full border rounded p-1.5" /></div>
           </div>
         `;
-      } else if(type === 'inward') {
+      } else if (type === 'inward') {
         const i = (APP_DATA.inwards || []).find(x => x.id === id);
-        if(!i) return;
+        if (!i) return;
         title.innerText = `Edit Harvest Inward Trip (${i.tokenNo})`;
         container.innerHTML = `
           <div class="grid grid-cols-2 gap-2">
@@ -2267,9 +2377,9 @@
             <div><label class="block font-semibold mb-1">Received Crates</label><input type="number" id="ee-inw-recv" value="${i.recvCrates || 0}" class="w-full border rounded p-1.5" /></div>
           </div>
         `;
-      } else if(type === 'agreement') {
+      } else if (type === 'agreement') {
         const a = (APP_DATA.agreements || []).find(x => x.id === id);
-        if(!a) return;
+        if (!a) return;
         title.innerText = `Edit Farmer Deal Agreement (${a.tokenNo})`;
         container.innerHTML = `
           <div class="grid grid-cols-2 gap-2">
@@ -2293,9 +2403,9 @@
       const type = document.getElementById('eur-type').value;
       const id = document.getElementById('eur-id').value;
 
-      if(type === 'dispatch') {
+      if (type === 'dispatch') {
         const d = (APP_DATA.dispatches || []).find(x => x.id === id);
-        if(d) {
+        if (d) {
           d.name = document.getElementById('ee-cust-name').value.trim();
           d.phone = document.getElementById('ee-cust-phone').value.trim();
           d.vehicle = document.getElementById('ee-cust-vehicle').value.trim();
@@ -2305,9 +2415,9 @@
           d.freight = Number(document.getElementById('ee-cust-freight').value || 0);
           d.labour = Number(document.getElementById('ee-cust-labour').value || 0);
         }
-      } else if(type === 'inward') {
+      } else if (type === 'inward') {
         const i = (APP_DATA.inwards || []).find(x => x.id === id);
-        if(i) {
+        if (i) {
           i.name = document.getElementById('ee-inw-farmer').value.trim();
           i.vehicle = document.getElementById('ee-inw-vehicle').value.trim();
           i.gross = Number(document.getElementById('ee-inw-gross').value || 0);
@@ -2323,14 +2433,14 @@
           i.chargeable = i.net - i.cut;
           i.totalTripAmt = i.rate > 0 ? (i.chargeable * i.rate) : 0;
         }
-      } else if(type === 'agreement') {
+      } else if (type === 'agreement') {
         const a = (APP_DATA.agreements || []).find(x => x.id === id);
-        if(a) {
+        if (a) {
           a.name = document.getElementById('ee-agr-farmer').value.trim();
           a.phone = document.getElementById('ee-agr-phone').value.trim();
           a.village = document.getElementById('ee-agr-village').value.trim();
           a.advance = Number(document.getElementById('ee-agr-advance').value || 0);
-          if(a.type === 'lump_sum') {
+          if (a.type === 'lump_sum') {
             a.total = Number(document.getElementById('ee-agr-total').value || 0);
           } else {
             a.rate = Number(document.getElementById('ee-agr-rate').value || 0);
@@ -2346,21 +2456,21 @@
     }
 
     function deleteRecord(type, id) {
-      if(!confirm("Are you sure you want to permanently delete this record?")) return;
+      if (!confirm("Are you sure you want to permanently delete this record?")) return;
 
-      if(type === 'dispatch') {
+      if (type === 'dispatch') {
         APP_DATA.dispatches = (APP_DATA.dispatches || []).filter(x => x.id !== id);
         renderCustomerLedger();
-      } else if(type === 'custPayment') {
+      } else if (type === 'custPayment') {
         APP_DATA.customerPayments = (APP_DATA.customerPayments || []).filter(x => x.id !== id);
         renderCustomerLedger();
-      } else if(type === 'inward') {
+      } else if (type === 'inward') {
         APP_DATA.inwards = (APP_DATA.inwards || []).filter(x => x.id !== id);
         renderSingleOrchardSummary();
-      } else if(type === 'agreement') {
+      } else if (type === 'agreement') {
         APP_DATA.agreements = (APP_DATA.agreements || []).filter(x => x.id !== id);
         renderSingleOrchardSummary();
-      } else if(type === 'farmerPayment') {
+      } else if (type === 'farmerPayment') {
         APP_DATA.farmerPayments = (APP_DATA.farmerPayments || []).filter(x => x.id !== id);
         renderSingleOrchardSummary();
       }
@@ -2370,11 +2480,11 @@
 
     function reprintCustomerSlip(id) {
       const d = (APP_DATA.dispatches || []).find(x => x.id === id);
-      if(!d) return alert("Slip not found");
+      if (!d) return alert("Slip not found");
 
       const isVikri = d.custType === 'Vikri';
       let sizesHTML = "";
-      if(d.sizesBreakdown && Object.keys(d.sizesBreakdown).length > 0) {
+      if (d.sizesBreakdown && Object.keys(d.sizesBreakdown).length > 0) {
         sizesHTML = `<div class="grid grid-cols-3 md:grid-cols-4 gap-2 my-2 border p-2.5 bg-slate-50 text-[11px]">` + 
           Object.entries(d.sizesBreakdown).map(([sz, qty]) => {
             const rate = d.sizeRates?.[sz];
@@ -2419,7 +2529,7 @@
 
     function reprintInwardSlip(id) {
       const i = (APP_DATA.inwards || []).find(x => x.id === id);
-      if(!i) return alert("Slip not found");
+      if (!i) return alert("Slip not found");
 
       const hasCut = i.applyCut !== false;
       const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
@@ -2466,7 +2576,7 @@
 
     function reprintFarmerSlip(id) {
       const a = (APP_DATA.agreements || []).find(x => x.id === id);
-      if(!a) return alert("Agreement not found");
+      if (!a) return alert("Agreement not found");
 
       const logoSvg = document.getElementById('plant-logo-svg').innerHTML;
       const slipHTML = `
@@ -2535,24 +2645,25 @@
       const payFarmerSelect = document.getElementById('pay-farmer-select');
       const staffDatalist = document.getElementById('staff-datalist');
 
-      if(inwardSelect) inwardSelect.innerHTML = `<option value="">-- Choose saved orchard --</option>`;
-      if(orchLedgerSelect) orchLedgerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
-      if(payFarmerSelect) payFarmerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
-      if(staffDatalist) staffDatalist.innerHTML = "";
+      if (inwardSelect) inwardSelect.innerHTML = `<option value="">-- Choose saved orchard --</option>`;
+      if (orchLedgerSelect) orchLedgerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
+      if (payFarmerSelect) payFarmerSelect.innerHTML = `<option value="">-- Choose Orchard --</option>`;
+      if (staffDatalist) staffDatalist.innerHTML = "";
 
       (APP_DATA.agreements || []).forEach((orch) => {
         const opt = `<option value="${orch.id}">${orch.name} (${orch.village})</option>`;
-        if(inwardSelect) inwardSelect.innerHTML += opt;
-        if(orchLedgerSelect) orchLedgerSelect.innerHTML += opt;
-        if(payFarmerSelect) payFarmerSelect.innerHTML += opt;
+        if (inwardSelect) inwardSelect.innerHTML += opt;
+        if (orchLedgerSelect) orchLedgerSelect.innerHTML += opt;
+        if (payFarmerSelect) payFarmerSelect.innerHTML += opt;
       });
 
       const allStaffNames = new Set([
         ...(APP_DATA.staffUsers || []).map(u => u.name),
-        ...(APP_DATA.staffDirectory || []).map(d => d.name)
+        ...(APP_DATA.staffDirectory || []).map(d => d.name),
+        ...(APP_DATA.staffAttendance || []).map(a => a.name)
       ]);
       allStaffNames.forEach(name => {
-        if(staffDatalist) staffDatalist.innerHTML += `<option value="${name}"></option>`;
+        if (name && staffDatalist) staffDatalist.innerHTML += `<option value="${name}"></option>`;
       });
 
       const uniqueCusts = [...new Set([
@@ -2563,40 +2674,61 @@
       const payCustSelect = document.getElementById('pay-cust-select');
       const viewCustSelect = document.getElementById('view-cust-select');
 
-      if(payCustSelect) payCustSelect.innerHTML = `<option value="">-- Choose Customer --</option>`;
-      if(viewCustSelect) viewCustSelect.innerHTML = `<option value="">-- Select Customer --</option>`;
+      if (payCustSelect) payCustSelect.innerHTML = `<option value="">-- Choose Customer --</option>`;
+      if (viewCustSelect) viewCustSelect.innerHTML = `<option value="">-- Select Customer --</option>`;
 
       uniqueCusts.forEach(c => {
         const opt = `<option value="${c}">${c}</option>`;
-        if(payCustSelect) payCustSelect.innerHTML += opt;
-        if(viewCustSelect) viewCustSelect.innerHTML += opt;
+        if (payCustSelect) payCustSelect.innerHTML += opt;
+        if (viewCustSelect) viewCustSelect.innerHTML += opt;
       });
 
       populateCustomerAutofillOptions();
     }
 
+    // STRICT ROLE GUARD FOR TABS
     function switchTab(tab) {
+      const isAdmin = currentUser && currentUser.role === 'admin';
+      
+      // Never permit staff to switch into admin-panel
+      if (tab === 'admin-panel' && !isAdmin) {
+        tab = 'dashboard';
+      }
+
       ['dashboard', 'customer-ledger', 'orchards', 'farmer', 'daily', 'customer', 'attendance', 'admin-panel'].forEach(t => {
         const sec = document.getElementById(`${t}-section`);
         const btn = document.getElementById(`tab-${t}`);
-        if(sec) sec.classList.add('hidden');
-        if(btn) btn.className = btn.id === 'tab-admin-panel' ? 'py-2.5 text-amber-900 bg-amber-200 col-span-3 md:col-span-7 font-black' : 'py-2.5 text-gray-500 hover:text-amber-700 font-bold';
+        if (sec) sec.classList.add('hidden');
+        if (btn) {
+          if (t === 'admin-panel') {
+            btn.className = `py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black ${isAdmin ? '' : 'hidden'}`;
+          } else {
+            btn.className = 'py-2.5 text-gray-500 hover:text-amber-700 font-bold';
+          }
+        }
       });
 
       const activeSec = document.getElementById(`${tab}-section`);
       const activeBtn = document.getElementById(`tab-${tab}`);
-      if(activeSec) activeSec.classList.remove('hidden');
-      if(activeBtn) activeBtn.className = activeBtn.id === 'tab-admin-panel' ? 'py-2.5 bg-amber-300 text-black border-b-2 border-slate-900 col-span-3 md:col-span-7 font-black' : 'py-2.5 border-b-2 border-amber-600 text-amber-700 font-black';
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) {
+        if (tab === 'admin-panel') {
+          activeBtn.className = `py-2.5 bg-amber-300 text-black border-b-2 border-slate-900 col-span-3 md:col-span-7 font-black ${isAdmin ? '' : 'hidden'}`;
+        } else {
+          activeBtn.className = 'py-2.5 border-b-2 border-amber-600 text-amber-700 font-black';
+        }
+      }
 
-      if(tab === 'dashboard') renderDashboard();
-      if(tab === 'customer-ledger') renderCustomerLedger();
-      if(tab === 'orchards') renderSingleOrchardSummary();
-      if(tab === 'attendance') {
+      if (tab === 'dashboard') renderDashboard();
+      if (tab === 'customer-ledger') renderCustomerLedger();
+      if (tab === 'orchards') renderSingleOrchardSummary();
+      if (tab === 'attendance') {
+        syncStaffDirectory();
         updateLedgerPersonDropdown();
         renderSavedStaffDirectory();
         renderAttendanceLedger();
       }
-      if(tab === 'admin-panel') {
+      if (tab === 'admin-panel' && isAdmin) {
         renderStaffTable();
         renderPartyAccountsTable();
       }
@@ -2608,12 +2740,21 @@
       const username = document.getElementById('staff-user').value.trim().toLowerCase().replace('@', '');
       const password = document.getElementById('staff-pass').value.trim();
 
-      if(!APP_DATA.staffUsers) APP_DATA.staffUsers = [];
+      if (!APP_DATA.staffUsers) APP_DATA.staffUsers = [];
       APP_DATA.staffUsers.push({ id: 'staff_' + Date.now(), name, username, password, role: 'staff' });
+      
+      // Auto register to staffDirectory
+      if (!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
+      if (!APP_DATA.staffDirectory.some(s => s.name.trim().toLowerCase() === name.toLowerCase())) {
+        APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role: 'Staff', salary: 18000 });
+      }
+
       saveData();
       alert(`Staff account @${username} created!`);
       e.target.reset();
+      populateDropdowns();
       updateLedgerPersonDropdown();
+      renderSavedStaffDirectory();
     }
 
     function autoFillOrchardDetails() {
@@ -2657,7 +2798,7 @@
       const ref = document.getElementById('pay-cust-ref').value || "Direct";
       const dateStr = new Date().toISOString().split('T')[0];
 
-      if(!APP_DATA.customerPayments) APP_DATA.customerPayments = [];
+      if (!APP_DATA.customerPayments) APP_DATA.customerPayments = [];
       APP_DATA.customerPayments.push({ id: 'cpay_' + Date.now(), date: dateStr, customer, amount, bank, ref });
       saveData();
       alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment!`);
@@ -2674,7 +2815,7 @@
       const dateStr = new Date().toISOString().split('T')[0];
 
       const orch = (APP_DATA.agreements || []).find(a => a.id === orchardId);
-      if(!APP_DATA.farmerPayments) APP_DATA.farmerPayments = [];
+      if (!APP_DATA.farmerPayments) APP_DATA.farmerPayments = [];
       APP_DATA.farmerPayments.push({ id: 'fpay_' + Date.now(), date: dateStr, orchardId, farmerName: orch ? orch.name : "Farmer", amount, bank, ref });
       saveData();
       alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment!`);
@@ -2698,7 +2839,7 @@
       let dealData = { id: orchId, tokenNo, type, name, phone, village, supervisor, advBank, date: dateStr };
       let dealHTML = "";
 
-      if(type === 'lump_sum') {
+      if (type === 'lump_sum') {
         const total = Number(document.getElementById('f-lumpsum').value || 0);
         const adv = Number(document.getElementById('f-advance').value || 0);
         dealData.total = total;
@@ -2712,7 +2853,7 @@
         dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Per Kg Basis</b></div><div class="flex justify-between py-1"><span>Agreed Rate:</span><b>₹${rate} / Kg</b></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
       }
 
-      if(!APP_DATA.agreements) APP_DATA.agreements = [];
+      if (!APP_DATA.agreements) APP_DATA.agreements = [];
       APP_DATA.agreements.push(dealData);
       saveData();
 
@@ -2776,7 +2917,7 @@
         recvCrates 
       };
 
-      if(!APP_DATA.inwards) APP_DATA.inwards = [];
+      if (!APP_DATA.inwards) APP_DATA.inwards = [];
       APP_DATA.inwards.push(inwardRecord);
       saveData();
 
@@ -2816,32 +2957,32 @@
       KINNOW_SIZES.forEach(size => {
         const qty = Number(document.getElementById(`size-qty-${size}`).value || 0);
         const rate = isVikri ? 0 : Number(document.getElementById(`size-rate-${size}`).value || 0);
-        if(qty > 0) {
+        if (qty > 0) {
           totalBoxes += qty;
-          if(!isVikri) totalAmount += (qty * rate);
+          if (!isVikri) totalAmount += (qty * rate);
           sizesBreakdown[size] = qty;
-          if(!isVikri) sizeRates[size] = rate;
+          if (!isVikri) sizeRates[size] = rate;
         }
       });
 
-      for(let k = 1; k <= customSizeIndex; k++) {
+      for (let k = 1; k <= customSizeIndex; k++) {
         const nameEl = document.getElementById(`cust-size-name-${k}`);
         const qtyEl = document.getElementById(`cust-size-qty-${k}`);
         const rateEl = document.getElementById(`cust-size-rate-${k}`);
-        if(nameEl && qtyEl && Number(qtyEl.value || 0) > 0) {
+        if (nameEl && qtyEl && Number(qtyEl.value || 0) > 0) {
           const sName = nameEl.value.trim() || `Extra-${k}`;
           const sQty = Number(qtyEl.value || 0);
           const sRate = isVikri ? 0 : Number(rateEl?.value || 0);
           totalBoxes += sQty;
-          if(!isVikri) totalAmount += (sQty * sRate);
+          if (!isVikri) totalAmount += (sQty * sRate);
           sizesBreakdown[sName] = sQty;
-          if(!isVikri) sizeRates[sName] = sRate;
+          if (!isVikri) sizeRates[sName] = sRate;
         }
       }
 
       const grandTotal = isVikri ? 0 : (totalAmount + freight + labour + packaging + misc);
 
-      if(!APP_DATA.dispatches) APP_DATA.dispatches = [];
+      if (!APP_DATA.dispatches) APP_DATA.dispatches = [];
       const dispatchRecord = {
         id: 'disp_' + Date.now(),
         tokenNo,
@@ -2912,7 +3053,7 @@
       const combined = [
         ...invoices.map(i => {
           let breakdownStr = `${i.totalBoxes} Boxes (${i.vehicle}) [${i.custType || 'Billing'}]`;
-          if(i.sizesBreakdown && Object.keys(i.sizesBreakdown).length > 0) {
+          if (i.sizesBreakdown && Object.keys(i.sizesBreakdown).length > 0) {
             breakdownStr += " • " + Object.entries(i.sizesBreakdown).map(([sz, q]) => `${sz}: ${q}b`).join(', ');
           }
           return { id: i.id, date: i.date, type: i.custType === 'Vikri' ? 'VIKRI SLIP' : 'INVOICE', tokenNo: i.tokenNo, desc: breakdownStr, debit: i.grandTotal || 0, credit: 0 };
@@ -2950,7 +3091,7 @@
 
     function shareCustomerLedgerWA() {
       const custName = document.getElementById('view-cust-select').value;
-      if(!custName) return alert("Select customer first");
+      if (!custName) return alert("Select customer first");
       const invoices = (APP_DATA.dispatches || []).filter(d => d.name.trim().toLowerCase() === custName.toLowerCase());
       const payments = (APP_DATA.customerPayments || []).filter(p => p.customer.trim().toLowerCase() === custName.toLowerCase());
       const totalBilled = invoices.reduce((a, b) => a + (b.grandTotal || 0), 0);
@@ -3031,7 +3172,7 @@
 
     function shareFarmerLedgerWA() {
       const orchId = document.getElementById('orchard-ledger-select').value;
-      if(!orchId) return alert("Select orchard first");
+      if (!orchId) return alert("Select orchard first");
       const orch = (APP_DATA.agreements || []).find(a => a.id === orchId);
       const trips = (APP_DATA.inwards || []).filter(i => i.orchardId === orchId || i.name.toLowerCase() === orch.name.toLowerCase());
       const payments = (APP_DATA.farmerPayments || []).filter(p => p.orchardId === orchId);
@@ -3072,7 +3213,7 @@
 
       let seasonFarmerGross = 0;
       (APP_DATA.agreements || []).forEach(a => {
-        if(a.type === 'lump_sum') seasonFarmerGross += (a.total || 0);
+        if (a.type === 'lump_sum') seasonFarmerGross += (a.total || 0);
         else {
           const inws = (APP_DATA.inwards || []).filter(i => i.orchardId === a.id);
           const chWt = inws.reduce((x, y) => x + (y.chargeable || 0), 0);
@@ -3101,8 +3242,8 @@
     }
 
     function clearAllData() {
-      if(currentUser?.role !== 'admin') return alert("Only Admin can reset data");
-      if(confirm("Are you sure you want to reset all records across all devices?")) {
+      if (currentUser?.role !== 'admin') return alert("Only Admin can reset data");
+      if (confirm("Are you sure you want to reset all records across all devices?")) {
         APP_DATA = CORE_DEFAULTS;
         saveData();
       }
