@@ -490,13 +490,19 @@
               <div><span>Truck: </span><b id="vs-disp-truck" class="text-slate-900">-</b></div>
             </div>
 
-            <div>
-              <label class="block font-bold mb-1 text-slate-800">1. Gross Mandi Sale Amount ₹ (ਪੂਰੀ ਵਿਕਰੀ ਰਕਮ)</label>
-              <input type="number" id="vs-gross" required min="0" step="0.5" class="w-full border-2 border-slate-400 rounded-lg p-2.5 text-sm font-black text-slate-900 bg-white" placeholder="e.g. 240000" oninput="calculateVikriSettlementNet()" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold mb-1 text-slate-800">1. Gross Sale Amount ₹ (ਪੂਰੀ ਵਿਕਰੀ ਰਕਮ)</label>
+                <input type="number" id="vs-gross" required min="0" step="0.5" class="w-full border-2 border-slate-400 rounded-lg p-2.5 text-sm font-black text-slate-900 bg-white" placeholder="e.g. 240000" oninput="calculateVikriSettlementNet()" />
+              </div>
+              <div>
+                <label class="block font-bold mb-1 text-slate-800">2. Net Weight of Goods (Kg)</label>
+                <input type="number" id="vs-net-wt" min="0" step="0.1" class="w-full border-2 border-amber-400 rounded-lg p-2.5 text-sm font-black text-slate-900 bg-white" placeholder="e.g. 12000" oninput="calculateVikriSettlementNet()" />
+              </div>
             </div>
 
             <div class="bg-gray-50 p-3.5 rounded-xl border space-y-3">
-              <span class="block text-[11px] font-black uppercase tracking-wider text-slate-700">2. Deductions & Adjustments</span>
+              <span class="block text-[11px] font-black uppercase tracking-wider text-slate-700">3. Deductions & Adjustments</span>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label class="block font-semibold mb-1 text-amber-950">Agent Commission % (ਕਮਿਸ਼ਨ ਟਕੇ)</label>
@@ -519,12 +525,16 @@
             </div>
 
             <!-- NET CALCULATION PREVIEW -->
-            <div class="p-3.5 bg-slate-900 text-amber-300 rounded-xl border border-amber-500/40 flex justify-between items-center">
+            <div class="p-3.5 bg-slate-900 text-amber-300 rounded-xl border border-amber-500/40 flex justify-between items-center gap-2">
               <div>
                 <span class="text-[10px] font-bold uppercase block text-gray-300">Final Calculated Net Payable ₹</span>
                 <span class="text-[10px] text-gray-400" id="vs-formula-breakdown">Gross - Comm - Labour - Misc + Crates</span>
+                <h3 class="text-xl font-black text-amber-400 mt-1" id="vs-net-total-disp">₹0</h3>
               </div>
-              <h3 class="text-xl font-black text-amber-400" id="vs-net-total-disp">₹0</h3>
+              <div class="text-right border-l border-slate-700 pl-4">
+                <span class="text-[10px] font-bold uppercase block text-gray-300">Net Rate per Kg</span>
+                <h4 class="text-lg font-black text-emerald-400 mt-1" id="vs-net-rate-disp">₹0.00 / Kg</h4>
+              </div>
             </div>
 
             <div class="flex gap-2 pt-2 border-t">
@@ -1120,7 +1130,7 @@
               </label>
               <label class="flex items-center text-xs font-bold gap-2 cursor-pointer">
                 <input type="radio" name="cust-dispatch-type" value="Vikri" onchange="toggleCustomerType()" />
-                <span class="text-amber-900">📦 Vikri Customer (Only Sizes & Quantities - No Price Initially)</span>
+                <span class="text-amber-900">📦 Vikri Customer (Only Sizes & Quantities - Price Settled Post Sale)</span>
               </label>
             </div>
 
@@ -1153,6 +1163,25 @@
               <div>
                 <label class="block text-xs font-bold text-slate-800 mb-1">Driver Mobile No. (ਡਰਾਈਵਰ ਫੋਨ)</label>
                 <input type="tel" id="c-driver-phone" pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm bg-white font-mono" placeholder="10-digit mobile" />
+              </div>
+            </div>
+
+            <!-- ROW 3: GROSS, TARE & NET WEIGHT (SHOWN PROMINENTLY IN VIKRI) -->
+            <div id="vikri-weight-section" class="hidden bg-amber-50/80 p-3.5 rounded-xl border border-amber-300">
+              <span class="block text-xs font-black uppercase text-amber-950 mb-2">⚖️ Vikri Goods Weight in Truck (ਤੋਲ ਵੇਰਵਾ)</span>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block font-semibold mb-1">Gross Weight (Kg)</label>
+                  <input type="number" id="c-gross-wt" step="0.1" class="w-full border rounded-lg p-2 bg-white font-bold" placeholder="e.g. 18500" oninput="calculateDispatchWeight()" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1">Tare (Empty Truck Kg)</label>
+                  <input type="number" id="c-tare-wt" step="0.1" class="w-full border rounded-lg p-2 bg-white font-bold" placeholder="e.g. 6200" oninput="calculateDispatchWeight()" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1">Net Weight of Fruit (Kg)</label>
+                  <input type="number" id="c-net-wt" step="0.1" class="w-full border-2 border-amber-500 rounded-lg p-2 bg-white font-black text-slate-900" placeholder="e.g. 12300" />
+                </div>
               </div>
             </div>
 
@@ -1254,7 +1283,7 @@
       ],
       inwards: [],
       dispatches: [
-        { id: 'disp_1', tokenNo: 'TC-1', date: '2026-09-01', custType: 'Billing', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', driverName: '', driverPhone: '', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, isSettled: true, sizesBreakdown: { '36': 50 }, sizeRates: { '36': 500 } }
+        { id: 'disp_1', tokenNo: 'TC-1', date: '2026-09-01', custType: 'Billing', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', driverName: '', driverPhone: '', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, grossWt: 0, tareWt: 0, netWt: 0, isSettled: true, sizesBreakdown: { '36': 50 }, sizeRates: { '36': 500 } }
       ],
       customerPayments: [],
       farmerPayments: [],
@@ -1523,21 +1552,33 @@
       }
     }
 
-    // --- 2. SIZES IN VIKRI CUSTOMER (JUST SIZES, NO PRICE INITIALLY) ---
+    // --- 2. SIZES & WEIGHT CONTROLS IN VIKRI CUSTOMER ---
     function toggleCustomerType() {
       const isVikri = document.querySelector('input[name="cust-dispatch-type"]:checked')?.value === 'Vikri';
       const matrixTitle = document.getElementById('matrix-heading-title');
       const finSection = document.getElementById('financial-expenses-section');
+      const weightSection = document.getElementById('vikri-weight-section');
       const rateInputs = document.querySelectorAll('.size-rate-input');
 
       if (isVikri) {
         matrixTitle.innerText = "Kinnow Size Matrix (Only Boxes / Sizes - Price Settled Post Sale)";
         rateInputs.forEach(el => el.classList.add('hidden'));
         if (finSection) finSection.classList.add('hidden');
+        if (weightSection) weightSection.classList.remove('hidden');
       } else {
         matrixTitle.innerText = "Kinnow Size Matrix (Boxes & Rates)";
         rateInputs.forEach(el => el.classList.remove('hidden'));
         if (finSection) finSection.classList.remove('hidden');
+        if (weightSection) weightSection.classList.add('hidden');
+      }
+    }
+
+    function calculateDispatchWeight() {
+      const gross = Number(document.getElementById('c-gross-wt').value || 0);
+      const tare = Number(document.getElementById('c-tare-wt').value || 0);
+      if (gross > 0 || tare > 0) {
+        const net = Math.max(0, gross - tare);
+        document.getElementById('c-net-wt').value = net > 0 ? net.toFixed(1) : '';
       }
     }
 
@@ -1627,7 +1668,6 @@
       `).join('');
     }
 
-    // ADMIN-ONLY REMOVAL OF SAVED STAFF MEMBER
     function deleteStaffFromDirectory(id, name) {
       if (!currentUser || currentUser.role !== 'admin') {
         return alert("Access Denied: Only Master Admin can remove staff members from the directory.");
@@ -2092,7 +2132,8 @@
       document.getElementById('vs-disp-boxes').innerText = `${d.totalBoxes} Boxes`;
       document.getElementById('vs-disp-truck').innerText = `${d.vehicle}${d.driverName ? ' (' + d.driverName + ')' : ''}`;
 
-      document.getElementById('vs-gross').value = d.vikriGross || d.grandTotal || '';
+      document.getElementById('vs-gross').value = d.vikriGross || (d.grandTotal > 0 ? d.grandTotal : '');
+      document.getElementById('vs-net-wt').value = d.netWt || (d.grossWt ? Math.max(0, d.grossWt - (d.tareWt || 0)) : '');
       document.getElementById('vs-comm-pct').value = d.commPercent !== undefined ? d.commPercent : 5;
       document.getElementById('vs-labour').value = d.vikriLabour || d.labour || 0;
       document.getElementById('vs-misc').value = d.vikriMisc || d.misc || 0;
@@ -2108,6 +2149,7 @@
 
     function calculateVikriSettlementNet() {
       const gross = Number(document.getElementById('vs-gross').value || 0);
+      const netWt = Number(document.getElementById('vs-net-wt').value || 0);
       const pct = Number(document.getElementById('vs-comm-pct').value || 0);
       const labour = Number(document.getElementById('vs-labour').value || 0);
       const misc = Number(document.getElementById('vs-misc').value || 0);
@@ -2115,9 +2157,11 @@
 
       const commAmt = (gross * pct) / 100;
       const net = Math.max(0, gross - commAmt - labour - misc + crates);
+      const netPerKg = netWt > 0 ? (net / netWt) : 0;
 
       document.getElementById('vs-comm-amt-disp').innerText = `Commission (${pct}%): -₹${commAmt.toLocaleString('en-IN')}`;
       document.getElementById('vs-net-total-disp').innerText = `₹${net.toLocaleString('en-IN')}`;
+      document.getElementById('vs-net-rate-disp').innerText = `₹${netPerKg.toFixed(2)} / Kg`;
       document.getElementById('vs-formula-breakdown').innerText = `₹${gross.toLocaleString('en-IN')} - ₹${commAmt.toLocaleString('en-IN')} - ₹${labour} - ₹${misc} + ₹${crates}`;
     }
 
@@ -2128,6 +2172,7 @@
       if (!d) return;
 
       const gross = Number(document.getElementById('vs-gross').value || 0);
+      const netWt = Number(document.getElementById('vs-net-wt').value || 0);
       const pct = Number(document.getElementById('vs-comm-pct').value || 0);
       const labour = Number(document.getElementById('vs-labour').value || 0);
       const misc = Number(document.getElementById('vs-misc').value || 0);
@@ -2135,19 +2180,22 @@
 
       const commAmt = (gross * pct) / 100;
       const netCalculated = Math.max(0, gross - commAmt - labour - misc + crates);
+      const netRatePerKg = netWt > 0 ? (netCalculated / netWt) : 0;
 
       d.isSettled = true;
       d.vikriGross = gross;
+      d.netWt = netWt;
       d.commPercent = pct;
       d.commAmount = commAmt;
       d.vikriLabour = labour;
       d.vikriMisc = misc;
       d.vikriCrates = crates;
       d.grandTotal = netCalculated;
+      d.netRatePerKg = netRatePerKg;
 
       saveData();
       closeVikriSettlementModal();
-      alert(`Vikri report for ${d.tokenNo} updated! Net settled amount ₹${netCalculated.toLocaleString('en-IN')} reflected in ledger.`);
+      alert(`Vikri report for ${d.tokenNo} updated!\nNet Settled Amount: ₹${netCalculated.toLocaleString('en-IN')}\nNet Rate per Kg: ₹${netRatePerKg.toFixed(2)}/Kg`);
       renderCustomerLedger();
     }
 
@@ -2409,7 +2457,7 @@
         thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Dispatch / Details</th><th class="p-2.5 text-center">Boxes</th><th class="p-2.5 text-right">Debit (Billed ₹)</th><th class="p-2.5 text-right">Credit (Paid ₹)</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
-          ...dispatches.map(d => ({ id: d.id, type: 'invoice', date: d.date, token: d.tokenNo, desc: `Dispatch (${d.vehicle})`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
+          ...dispatches.map(d => ({ id: d.id, type: 'invoice', date: d.date, token: d.tokenNo, desc: `Dispatch (${d.vehicle})${d.driverName ? ' - Driver: ' + d.driverName : ''}`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
           ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
@@ -2503,6 +2551,8 @@
             <div><label class="block font-semibold mb-1">Lot No.</label><input type="text" id="ee-cust-lot" value="${d.lotNo || ''}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Driver Name</label><input type="text" id="ee-cust-driver-name" value="${d.driverName || ''}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Driver Mobile</label><input type="tel" id="ee-cust-driver-phone" value="${d.driverPhone || ''}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Gross Weight (Kg)</label><input type="number" step="0.1" id="ee-cust-gross" value="${d.grossWt || 0}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Net Weight (Kg)</label><input type="number" step="0.1" id="ee-cust-net" value="${d.netWt || 0}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Total Boxes</label><input type="number" id="ee-cust-boxes" value="${d.totalBoxes}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Grand Billed Total ₹</label><input type="number" id="ee-cust-total" value="${d.grandTotal}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Freight ₹</label><input type="number" id="ee-cust-freight" value="${d.freight || 0}" class="w-full border rounded p-1.5" /></div>
@@ -2566,10 +2616,15 @@
           d.lotNo = document.getElementById('ee-cust-lot').value.trim();
           d.driverName = document.getElementById('ee-cust-driver-name').value.trim();
           d.driverPhone = document.getElementById('ee-cust-driver-phone').value.trim();
+          d.grossWt = Number(document.getElementById('ee-cust-gross').value || 0);
+          d.netWt = Number(document.getElementById('ee-cust-net').value || 0);
           d.totalBoxes = Number(document.getElementById('ee-cust-boxes').value || 0);
           d.grandTotal = Number(document.getElementById('ee-cust-total').value || 0);
           d.freight = Number(document.getElementById('ee-cust-freight').value || 0);
           d.labour = Number(document.getElementById('ee-cust-labour').value || 0);
+          if (d.netWt > 0 && d.grandTotal > 0) {
+            d.netRatePerKg = d.grandTotal / d.netWt;
+          }
         }
       } else if (type === 'inward') {
         const i = (APP_DATA.inwards || []).find(x => x.id === id);
@@ -2668,18 +2723,27 @@
             <div class="flex justify-between"><span>Vehicle No:</span><b>${d.vehicle}</b></div>
             ${d.driverName ? `<div class="flex justify-between"><span>Driver:</span><b>${d.driverName} ${d.driverPhone ? '(' + d.driverPhone + ')' : ''}</b></div>` : ''}
             <div class="flex justify-between"><span>Lot:</span><b>${d.lotNo || '-'}</b></div>
+            ${d.netWt > 0 ? `<div class="flex justify-between text-amber-950 font-bold border-t pt-1"><span>Net Weight of Fruit:</span><b>${d.netWt.toLocaleString('en-IN')} Kg</b></div>` : ''}
           </div>
           ${sizesHTML}
 
           ${isVikri && d.isSettled ? `
             <div class="border border-amber-400 p-2.5 bg-amber-50/70 rounded-lg my-2 space-y-1 text-xs">
               <span class="font-black block uppercase text-amber-900 pb-1 border-b border-amber-300">Vikri Final Mandi Settlement Breakdown</span>
-              <div class="flex justify-between"><span>Gross Sale:</span><b>₹${(d.vikriGross || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between"><span>Gross Mandi Sale:</span><b>₹${(d.vikriGross || 0).toLocaleString('en-IN')}</b></div>
               <div class="flex justify-between text-red-700"><span>Agent Commission (${d.commPercent || 0}%):</span><b>-₹${(d.commAmount || 0).toLocaleString('en-IN')}</b></div>
               <div class="flex justify-between text-red-700"><span>Labour Deduction:</span><b>-₹${(d.vikriLabour || 0).toLocaleString('en-IN')}</b></div>
               <div class="flex justify-between text-red-700"><span>Misc Mandi Expense:</span><b>-₹${(d.vikriMisc || 0).toLocaleString('en-IN')}</b></div>
               <div class="flex justify-between text-emerald-800"><span>Added Crates Amount:</span><b>+₹${(d.vikriCrates || 0).toLocaleString('en-IN')}</b></div>
-              <div class="flex justify-between text-sm font-black border-t pt-1 text-slate-900"><span>Net Settled Amount:</span><span>₹${(d.grandTotal || 0).toLocaleString('en-IN')}</span></div>
+              <div class="flex justify-between text-sm font-black border-t pt-1 text-slate-900">
+                <span>Net Settled Amount:</span>
+                <span>₹${(d.grandTotal || 0).toLocaleString('en-IN')}</span>
+              </div>
+              ${d.netRatePerKg > 0 ? `
+              <div class="flex justify-between text-xs font-black text-emerald-800 pt-0.5">
+                <span>Net Calculated Rate:</span>
+                <span>₹${d.netRatePerKg.toFixed(2)} / Kg</span>
+              </div>` : ''}
             </div>
           ` : ''}
 
@@ -2688,13 +2752,13 @@
             ${!isVikri ? `<span class="font-black text-sm text-slate-900">Grand Total: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : (d.isSettled ? `<span class="font-black text-sm text-emerald-800">Net Settled: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : `<span class="font-black text-xs text-amber-900">VIKRI NON-BILLED (REPORT PENDING)</span>`)}
           </div>
           <div class="text-[10px] text-gray-500 pt-2 border-t flex justify-between">
-            <span>${!isVikri ? `Freight: ₹${d.freight || 0} | Labour: ₹${d.labour || 0}` : `Verified Dispatched Sizes`}</span>
+            <span>${!isVikri ? `Freight: ₹${d.freight || 0} | Labour: ₹${d.labour || 0}` : (d.isSettled && d.netRatePerKg > 0 ? `Net: ₹${d.netRatePerKg.toFixed(2)}/Kg` : `Verified Dispatched Sizes`)}</span>
             <span>Generated from SETIA Cloud Portal</span>
           </div>
         </div>
       `;
 
-      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0AVehicle: ${d.vehicle}${d.driverName ? '%0ADriver: ' + d.driverName + ' (' + (d.driverPhone || '-') + ')' : ''}%0A${!isVikri ? `Grand Total: Rs. ${d.grandTotal}` : (d.isSettled ? `Net Settled: Rs. ${d.grandTotal}` : `Type: Vikri Sizes Slip`)}`);
+      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0AVehicle: ${d.vehicle}${d.driverName ? '%0ADriver: ' + d.driverName + ' (' + (d.driverPhone || '-') + ')' : ''}${d.netWt ? '%0ANet Wt: ' + d.netWt + ' Kg' : ''}%0A${!isVikri ? `Grand Total: Rs. ${d.grandTotal}` : (d.isSettled ? `Net Settled: Rs. ${d.grandTotal} (Rs. ${(d.netRatePerKg || (d.grandTotal/d.netWt)).toFixed(2)}/Kg)` : `Type: Vikri Sizes Slip`)}`);
     }
 
     function reprintInwardSlip(id) {
@@ -3113,6 +3177,10 @@
       const supervisor = document.getElementById('c-supervisor').value || "Supervisor";
       const loader = document.getElementById('c-loader').value || "Loader";
 
+      const grossWt = Number(document.getElementById('c-gross-wt').value || 0);
+      const tareWt = Number(document.getElementById('c-tare-wt').value || 0);
+      const netWt = Number(document.getElementById('c-net-wt').value || (grossWt > 0 ? Math.max(0, grossWt - tareWt) : 0));
+
       const freight = isVikri ? 0 : Number(document.getElementById('c-freight').value || 0);
       const labour = isVikri ? 0 : Number(document.getElementById('c-labour').value || 0);
       const packaging = isVikri ? 0 : Number(document.getElementById('c-pack-charge').value || 0);
@@ -3175,6 +3243,10 @@
         totalBoxes,
         grandTotal,
         isSettled: !isVikri, // Billing is settled immediately; Vikri is pending until report is recorded
+        grossWt,
+        tareWt,
+        netWt,
+        netRatePerKg: 0,
         vikriGross: 0,
         commPercent: 0,
         commAmount: 0,
@@ -3198,6 +3270,9 @@
       e.target.reset();
       buildKinnowSizeGrid();
       document.getElementById('custom-sizes-container').innerHTML = "";
+      document.getElementById('c-gross-wt').value = "";
+      document.getElementById('c-tare-wt').value = "";
+      document.getElementById('c-net-wt').value = "";
     }
 
     function renderCustomerLedger() {
@@ -3235,11 +3310,13 @@
         ...invoices.map(i => {
           let breakdownStr = `${i.totalBoxes} Boxes (${i.vehicle})`;
           if (i.driverName) breakdownStr += ` [Driver: ${i.driverName}]`;
+          if (i.netWt > 0) breakdownStr += ` [Net Wt: ${i.netWt.toLocaleString('en-IN')} Kg]`;
           if (i.sizesBreakdown && Object.keys(i.sizesBreakdown).length > 0) {
             breakdownStr += " • " + Object.entries(i.sizesBreakdown).map(([sz, q]) => `${sz}: ${q}b`).join(', ');
           }
           if (i.custType === 'Vikri' && i.isSettled) {
-            breakdownStr += ` • [Settled: Gross ₹${(i.vikriGross || 0).toLocaleString('en-IN')} - Comm ₹${(i.commAmount || 0).toLocaleString('en-IN')} (${i.commPercent}%) - Lab ₹${i.vikriLabour || 0} - Misc ₹${i.vikriMisc || 0} + Crates ₹${i.vikriCrates || 0}]`;
+            const rateStr = i.netRatePerKg > 0 ? ` • Net Rate: ₹${i.netRatePerKg.toFixed(2)}/Kg` : '';
+            breakdownStr += ` • [Settled: Gross ₹${(i.vikriGross || 0).toLocaleString('en-IN')} - Comm ₹${(i.commAmount || 0).toLocaleString('en-IN')} (${i.commPercent}%) - Lab ₹${i.vikriLabour || 0} - Misc ₹${i.vikriMisc || 0} + Crates ₹${i.vikriCrates || 0}${rateStr}]`;
           }
           return {
             id: i.id,
