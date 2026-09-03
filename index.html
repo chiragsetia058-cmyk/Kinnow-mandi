@@ -470,6 +470,75 @@
         </div>
       </div>
 
+      <!-- VIKRI POST-SALE SETTLEMENT MODAL -->
+      <div id="vikri-settlement-modal" class="hidden fixed inset-0 bg-black/75 flex items-center justify-center p-3 md:p-6 z-50 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-5 text-xs overflow-y-auto max-h-[92vh]">
+          <div class="flex justify-between items-center border-b pb-2 mb-3">
+            <div>
+              <h3 class="text-base font-black text-slate-900">📦 Update Vikri Final Mandi Sale Report</h3>
+              <p class="text-[11px] text-gray-500" id="vs-header-subtitle">Token No & Details</p>
+            </div>
+            <button onclick="closeVikriSettlementModal()" class="text-gray-400 hover:text-black font-bold text-base">✕</button>
+          </div>
+
+          <form onsubmit="saveVikriSettlement(event)" class="space-y-3.5">
+            <input type="hidden" id="vs-dispatch-id" />
+
+            <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex justify-between text-xs font-semibold">
+              <div><span>Buyer: </span><b id="vs-disp-buyer" class="text-slate-900">-</b></div>
+              <div><span>Boxes: </span><b id="vs-disp-boxes" class="text-amber-900">-</b></div>
+              <div><span>Truck: </span><b id="vs-disp-truck" class="text-slate-900">-</b></div>
+            </div>
+
+            <div>
+              <label class="block font-bold mb-1 text-slate-800">1. Gross Mandi Sale Amount ₹ (ਪੂਰੀ ਵਿਕਰੀ ਰਕਮ)</label>
+              <input type="number" id="vs-gross" required min="0" step="0.5" class="w-full border-2 border-slate-400 rounded-lg p-2.5 text-sm font-black text-slate-900 bg-white" placeholder="e.g. 240000" oninput="calculateVikriSettlementNet()" />
+            </div>
+
+            <div class="bg-gray-50 p-3.5 rounded-xl border space-y-3">
+              <span class="block text-[11px] font-black uppercase tracking-wider text-slate-700">2. Deductions & Adjustments</span>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-semibold mb-1 text-amber-950">Agent Commission % (ਕਮਿਸ਼ਨ ਟਕੇ)</label>
+                  <input type="number" id="vs-comm-pct" step="0.1" min="0" class="w-full border rounded-lg p-2 font-bold" placeholder="e.g. 5 or 6" oninput="calculateVikriSettlementNet()" />
+                  <span class="text-[10px] text-red-600 font-bold block mt-0.5" id="vs-comm-amt-disp">Commission: -₹0</span>
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1 text-red-700">Labour / Mandi Loading ₹ (-)</label>
+                  <input type="number" id="vs-labour" step="0.5" min="0" class="w-full border rounded-lg p-2 font-bold" placeholder="0" oninput="calculateVikriSettlementNet()" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1 text-red-700">Misc Mandi Expense ₹ (-)</label>
+                  <input type="number" id="vs-misc" step="0.5" min="0" class="w-full border rounded-lg p-2 font-bold" placeholder="0" oninput="calculateVikriSettlementNet()" />
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1 text-emerald-700">Add Crates Amount ₹ (+)</label>
+                  <input type="number" id="vs-crates" step="0.5" min="0" class="w-full border rounded-lg p-2 font-bold" placeholder="0" oninput="calculateVikriSettlementNet()" />
+                </div>
+              </div>
+            </div>
+
+            <!-- NET CALCULATION PREVIEW -->
+            <div class="p-3.5 bg-slate-900 text-amber-300 rounded-xl border border-amber-500/40 flex justify-between items-center">
+              <div>
+                <span class="text-[10px] font-bold uppercase block text-gray-300">Final Calculated Net Payable ₹</span>
+                <span class="text-[10px] text-gray-400" id="vs-formula-breakdown">Gross - Comm - Labour - Misc + Crates</span>
+              </div>
+              <h3 class="text-xl font-black text-amber-400" id="vs-net-total-disp">₹0</h3>
+            </div>
+
+            <div class="flex gap-2 pt-2 border-t">
+              <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-black py-2.5 rounded-lg shadow">
+                Save Vikri Settlement & Update Balance
+              </button>
+              <button type="button" onclick="closeVikriSettlementModal()" class="px-5 py-2.5 border rounded-lg font-bold text-gray-700">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- EDIT ATTENDANCE MODAL -->
       <div id="edit-attendance-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-5 text-xs">
@@ -678,7 +747,7 @@
           <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
             <div>
               <h3 class="text-base font-bold text-gray-800">Customer Statement, Purchase History & Token Slips</h3>
-              <p class="text-xs text-gray-500">Every dispatch shows complete purchased sizes breakdown, with instant slip reprint/PDF download</p>
+              <p class="text-xs text-gray-500">View purchased sizes, driver details, and update post-sale Vikri reports with auto-deductions</p>
             </div>
             <div class="flex items-center gap-2">
               <select id="view-cust-select" class="border rounded-lg p-2 text-xs font-semibold bg-amber-50 text-slate-900 outline-none" onchange="renderCustomerLedger()">
@@ -714,7 +783,7 @@
                 <tr>
                   <th class="p-2.5">Date</th>
                   <th class="p-2.5">Token No.</th>
-                  <th class="p-2.5">Purchased Sizes / Particulars</th>
+                  <th class="p-2.5">Purchased Sizes / Particulars & Transport</th>
                   <th class="p-2.5 text-right">Debit (₹)</th>
                   <th class="p-2.5 text-right">Credit (₹)</th>
                   <th class="p-2.5 text-right">Balance (₹)</th>
@@ -1051,11 +1120,12 @@
               </label>
               <label class="flex items-center text-xs font-bold gap-2 cursor-pointer">
                 <input type="radio" name="cust-dispatch-type" value="Vikri" onchange="toggleCustomerType()" />
-                <span class="text-amber-900">📦 Vikri Customer (Only Sizes & Quantities - No Price)</span>
+                <span class="text-amber-900">📦 Vikri Customer (Only Sizes & Quantities - No Price Initially)</span>
               </label>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- ROW 1: CUSTOMER DETAILS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-xs font-semibold mb-1">Customer / Buyer Name</label>
                 <input type="text" id="c-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Chifu Agritech" />
@@ -1065,12 +1135,24 @@
                 <input type="tel" id="c-phone" required pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm font-bold text-slate-900" placeholder="10-digit mobile number" />
               </div>
               <div>
-                <label class="block text-xs font-semibold mb-1">Vehicle / Truck No</label>
-                <input type="text" id="c-vehicle" required class="w-full border rounded-lg p-2 text-sm" placeholder="PB 15 XX XXXX" />
-              </div>
-              <div>
                 <label class="block text-xs font-semibold mb-1">Mandi / Lot No.</label>
                 <input type="text" id="c-lot-no" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. E879 / C-30" />
+              </div>
+            </div>
+
+            <!-- ROW 2: VEHICLE & DRIVER CREDENTIALS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+              <div>
+                <label class="block text-xs font-bold text-slate-800 mb-1">Vehicle / Truck No</label>
+                <input type="text" id="c-vehicle" required class="w-full border rounded-lg p-2 text-sm uppercase font-semibold bg-white" placeholder="PB 15 XX XXXX" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-800 mb-1">Driver Name (ਡਰਾਈਵਰ ਦਾ ਨਾਮ)</label>
+                <input type="text" id="c-driver-name" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="e.g. Gurmukh Singh" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-800 mb-1">Driver Mobile No. (ਡਰਾਈਵਰ ਫੋਨ)</label>
+                <input type="tel" id="c-driver-phone" pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm bg-white font-mono" placeholder="10-digit mobile" />
               </div>
             </div>
 
@@ -1172,7 +1254,7 @@
       ],
       inwards: [],
       dispatches: [
-        { id: 'disp_1', tokenNo: 'TC-1', date: '2026-09-01', custType: 'Billing', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, sizesBreakdown: { '36': 50 }, sizeRates: { '36': 500 } }
+        { id: 'disp_1', tokenNo: 'TC-1', date: '2026-09-01', custType: 'Billing', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', driverName: '', driverPhone: '', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, isSettled: true, sizesBreakdown: { '36': 50 }, sizeRates: { '36': 500 } }
       ],
       customerPayments: [],
       farmerPayments: [],
@@ -1441,7 +1523,7 @@
       }
     }
 
-    // --- 2. SIZES IN VIKRI CUSTOMER (JUST SIZES, NO PRICE) ---
+    // --- 2. SIZES IN VIKRI CUSTOMER (JUST SIZES, NO PRICE INITIALLY) ---
     function toggleCustomerType() {
       const isVikri = document.querySelector('input[name="cust-dispatch-type"]:checked')?.value === 'Vikri';
       const matrixTitle = document.getElementById('matrix-heading-title');
@@ -1449,7 +1531,7 @@
       const rateInputs = document.querySelectorAll('.size-rate-input');
 
       if (isVikri) {
-        matrixTitle.innerText = "Kinnow Size Matrix (Only Boxes / Sizes - No Price)";
+        matrixTitle.innerText = "Kinnow Size Matrix (Only Boxes / Sizes - Price Settled Post Sale)";
         rateInputs.forEach(el => el.classList.add('hidden'));
         if (finSection) finSection.classList.add('hidden');
       } else {
@@ -1999,6 +2081,76 @@
       renderAttendanceLedger();
     }
 
+    // --- 9. POST-SALE VIKRI SETTLEMENT ENGINE ---
+    function openVikriSettlementModal(dispatchId) {
+      const d = (APP_DATA.dispatches || []).find(x => x.id === dispatchId);
+      if (!d) return alert("Dispatch record not found");
+
+      document.getElementById('vs-dispatch-id').value = dispatchId;
+      document.getElementById('vs-header-subtitle').innerText = `Token: ${d.tokenNo} • Date: ${d.date}`;
+      document.getElementById('vs-disp-buyer').innerText = d.name;
+      document.getElementById('vs-disp-boxes').innerText = `${d.totalBoxes} Boxes`;
+      document.getElementById('vs-disp-truck').innerText = `${d.vehicle}${d.driverName ? ' (' + d.driverName + ')' : ''}`;
+
+      document.getElementById('vs-gross').value = d.vikriGross || d.grandTotal || '';
+      document.getElementById('vs-comm-pct').value = d.commPercent !== undefined ? d.commPercent : 5;
+      document.getElementById('vs-labour').value = d.vikriLabour || d.labour || 0;
+      document.getElementById('vs-misc').value = d.vikriMisc || d.misc || 0;
+      document.getElementById('vs-crates').value = d.vikriCrates || 0;
+
+      calculateVikriSettlementNet();
+      document.getElementById('vikri-settlement-modal').classList.remove('hidden');
+    }
+
+    function closeVikriSettlementModal() {
+      document.getElementById('vikri-settlement-modal').classList.add('hidden');
+    }
+
+    function calculateVikriSettlementNet() {
+      const gross = Number(document.getElementById('vs-gross').value || 0);
+      const pct = Number(document.getElementById('vs-comm-pct').value || 0);
+      const labour = Number(document.getElementById('vs-labour').value || 0);
+      const misc = Number(document.getElementById('vs-misc').value || 0);
+      const crates = Number(document.getElementById('vs-crates').value || 0);
+
+      const commAmt = (gross * pct) / 100;
+      const net = Math.max(0, gross - commAmt - labour - misc + crates);
+
+      document.getElementById('vs-comm-amt-disp').innerText = `Commission (${pct}%): -₹${commAmt.toLocaleString('en-IN')}`;
+      document.getElementById('vs-net-total-disp').innerText = `₹${net.toLocaleString('en-IN')}`;
+      document.getElementById('vs-formula-breakdown').innerText = `₹${gross.toLocaleString('en-IN')} - ₹${commAmt.toLocaleString('en-IN')} - ₹${labour} - ₹${misc} + ₹${crates}`;
+    }
+
+    function saveVikriSettlement(e) {
+      e.preventDefault();
+      const dispatchId = document.getElementById('vs-dispatch-id').value;
+      const d = (APP_DATA.dispatches || []).find(x => x.id === dispatchId);
+      if (!d) return;
+
+      const gross = Number(document.getElementById('vs-gross').value || 0);
+      const pct = Number(document.getElementById('vs-comm-pct').value || 0);
+      const labour = Number(document.getElementById('vs-labour').value || 0);
+      const misc = Number(document.getElementById('vs-misc').value || 0);
+      const crates = Number(document.getElementById('vs-crates').value || 0);
+
+      const commAmt = (gross * pct) / 100;
+      const netCalculated = Math.max(0, gross - commAmt - labour - misc + crates);
+
+      d.isSettled = true;
+      d.vikriGross = gross;
+      d.commPercent = pct;
+      d.commAmount = commAmt;
+      d.vikriLabour = labour;
+      d.vikriMisc = misc;
+      d.vikriCrates = crates;
+      d.grandTotal = netCalculated;
+
+      saveData();
+      closeVikriSettlementModal();
+      alert(`Vikri report for ${d.tokenNo} updated! Net settled amount ₹${netCalculated.toLocaleString('en-IN')} reflected in ledger.`);
+      renderCustomerLedger();
+    }
+
     function isUserBlocked(idOrPhone) {
       const clean = (idOrPhone || "").toString().trim().toLowerCase().replace('@', '');
       return (APP_DATA.blockedUsers || []).includes(clean);
@@ -2346,9 +2498,11 @@
         container.innerHTML = `
           <div class="grid grid-cols-2 gap-2">
             <div><label class="block font-semibold mb-1">Customer Name</label><input type="text" id="ee-cust-name" value="${d.name}" class="w-full border rounded p-1.5" required /></div>
-            <div><label class="block font-semibold mb-1">Phone Number</label><input type="tel" id="ee-cust-phone" value="${d.phone || ''}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Customer Phone</label><input type="tel" id="ee-cust-phone" value="${d.phone || ''}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Vehicle No.</label><input type="text" id="ee-cust-vehicle" value="${d.vehicle}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Lot No.</label><input type="text" id="ee-cust-lot" value="${d.lotNo || ''}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Driver Name</label><input type="text" id="ee-cust-driver-name" value="${d.driverName || ''}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Driver Mobile</label><input type="tel" id="ee-cust-driver-phone" value="${d.driverPhone || ''}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Total Boxes</label><input type="number" id="ee-cust-boxes" value="${d.totalBoxes}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Grand Billed Total ₹</label><input type="number" id="ee-cust-total" value="${d.grandTotal}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Freight ₹</label><input type="number" id="ee-cust-freight" value="${d.freight || 0}" class="w-full border rounded p-1.5" /></div>
@@ -2410,6 +2564,8 @@
           d.phone = document.getElementById('ee-cust-phone').value.trim();
           d.vehicle = document.getElementById('ee-cust-vehicle').value.trim();
           d.lotNo = document.getElementById('ee-cust-lot').value.trim();
+          d.driverName = document.getElementById('ee-cust-driver-name').value.trim();
+          d.driverPhone = document.getElementById('ee-cust-driver-phone').value.trim();
           d.totalBoxes = Number(document.getElementById('ee-cust-boxes').value || 0);
           d.grandTotal = Number(document.getElementById('ee-cust-total').value || 0);
           d.freight = Number(document.getElementById('ee-cust-freight').value || 0);
@@ -2499,7 +2655,7 @@
             <div class="w-16">${logoSvg}</div>
             <div class="text-center flex-1">
               <h1 class="text-xl font-black text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700">${isVikri ? 'Vikri Delivery Slip (Only Sizes)' : 'Official Customer Invoice'}</p>
+              <p class="text-[10px] uppercase font-bold text-gray-700">${isVikri ? 'Vikri Delivery & Dispatch Slip' : 'Official Customer Invoice'}</p>
             </div>
             <div class="text-right text-[11px] font-bold">
               <div>Token: <span class="font-mono text-amber-900">${d.tokenNo}</span></div>
@@ -2510,12 +2666,26 @@
             <div class="flex justify-between"><span>Customer:</span><b>${d.name} (${d.custType || 'Billing'})</b></div>
             <div class="flex justify-between"><span>Mobile:</span><b>+91 ${d.phone || '-'}</b></div>
             <div class="flex justify-between"><span>Vehicle No:</span><b>${d.vehicle}</b></div>
+            ${d.driverName ? `<div class="flex justify-between"><span>Driver:</span><b>${d.driverName} ${d.driverPhone ? '(' + d.driverPhone + ')' : ''}</b></div>` : ''}
             <div class="flex justify-between"><span>Lot:</span><b>${d.lotNo || '-'}</b></div>
           </div>
           ${sizesHTML}
+
+          ${isVikri && d.isSettled ? `
+            <div class="border border-amber-400 p-2.5 bg-amber-50/70 rounded-lg my-2 space-y-1 text-xs">
+              <span class="font-black block uppercase text-amber-900 pb-1 border-b border-amber-300">Vikri Final Mandi Settlement Breakdown</span>
+              <div class="flex justify-between"><span>Gross Sale:</span><b>₹${(d.vikriGross || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-red-700"><span>Agent Commission (${d.commPercent || 0}%):</span><b>-₹${(d.commAmount || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-red-700"><span>Labour Deduction:</span><b>-₹${(d.vikriLabour || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-red-700"><span>Misc Mandi Expense:</span><b>-₹${(d.vikriMisc || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-emerald-800"><span>Added Crates Amount:</span><b>+₹${(d.vikriCrates || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-sm font-black border-t pt-1 text-slate-900"><span>Net Settled Amount:</span><span>₹${(d.grandTotal || 0).toLocaleString('en-IN')}</span></div>
+            </div>
+          ` : ''}
+
           <div class="border border-black p-2 bg-amber-50 mb-2 flex justify-between items-center">
             <span class="font-black text-sm">Total Dispatched: ${d.totalBoxes} Boxes</span>
-            ${!isVikri ? `<span class="font-black text-sm text-slate-900">Grand Total: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : `<span class="font-black text-xs text-amber-900">VIKRI NON-BILLED SLIP</span>`}
+            ${!isVikri ? `<span class="font-black text-sm text-slate-900">Grand Total: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : (d.isSettled ? `<span class="font-black text-sm text-emerald-800">Net Settled: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : `<span class="font-black text-xs text-amber-900">VIKRI NON-BILLED (REPORT PENDING)</span>`)}
           </div>
           <div class="text-[10px] text-gray-500 pt-2 border-t flex justify-between">
             <span>${!isVikri ? `Freight: ₹${d.freight || 0} | Labour: ₹${d.labour || 0}` : `Verified Dispatched Sizes`}</span>
@@ -2524,7 +2694,7 @@
         </div>
       `;
 
-      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0A${!isVikri ? `Grand Total: Rs. ${d.grandTotal}` : `Type: Vikri Sizes Slip`}`);
+      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0AVehicle: ${d.vehicle}${d.driverName ? '%0ADriver: ' + d.driverName + ' (' + (d.driverPhone || '-') + ')' : ''}%0A${!isVikri ? `Grand Total: Rs. ${d.grandTotal}` : (d.isSettled ? `Net Settled: Rs. ${d.grandTotal}` : `Type: Vikri Sizes Slip`)}`);
     }
 
     function reprintInwardSlip(id) {
@@ -2937,6 +3107,8 @@
       const name = document.getElementById('c-name').value.trim();
       const phone = (document.getElementById('c-phone').value || "").toString().trim();
       const vehicle = document.getElementById('c-vehicle').value.trim();
+      const driverName = document.getElementById('c-driver-name').value.trim();
+      const driverPhone = document.getElementById('c-driver-phone').value.trim();
       const lotNo = document.getElementById('c-lot-no').value || "E879";
       const supervisor = document.getElementById('c-supervisor').value || "Supervisor";
       const loader = document.getElementById('c-loader').value || "Loader";
@@ -2991,6 +3163,8 @@
         name,
         phone,
         vehicle,
+        driverName,
+        driverPhone,
         lotNo,
         supervisor,
         loader,
@@ -3000,6 +3174,13 @@
         misc,
         totalBoxes,
         grandTotal,
+        isSettled: !isVikri, // Billing is settled immediately; Vikri is pending until report is recorded
+        vikriGross: 0,
+        commPercent: 0,
+        commAmount: 0,
+        vikriLabour: 0,
+        vikriMisc: 0,
+        vikriCrates: 0,
         sizesBreakdown,
         sizeRates
       };
@@ -3052,13 +3233,37 @@
 
       const combined = [
         ...invoices.map(i => {
-          let breakdownStr = `${i.totalBoxes} Boxes (${i.vehicle}) [${i.custType || 'Billing'}]`;
+          let breakdownStr = `${i.totalBoxes} Boxes (${i.vehicle})`;
+          if (i.driverName) breakdownStr += ` [Driver: ${i.driverName}]`;
           if (i.sizesBreakdown && Object.keys(i.sizesBreakdown).length > 0) {
             breakdownStr += " • " + Object.entries(i.sizesBreakdown).map(([sz, q]) => `${sz}: ${q}b`).join(', ');
           }
-          return { id: i.id, date: i.date, type: i.custType === 'Vikri' ? 'VIKRI SLIP' : 'INVOICE', tokenNo: i.tokenNo, desc: breakdownStr, debit: i.grandTotal || 0, credit: 0 };
+          if (i.custType === 'Vikri' && i.isSettled) {
+            breakdownStr += ` • [Settled: Gross ₹${(i.vikriGross || 0).toLocaleString('en-IN')} - Comm ₹${(i.commAmount || 0).toLocaleString('en-IN')} (${i.commPercent}%) - Lab ₹${i.vikriLabour || 0} - Misc ₹${i.vikriMisc || 0} + Crates ₹${i.vikriCrates || 0}]`;
+          }
+          return {
+            id: i.id,
+            date: i.date,
+            type: i.custType === 'Vikri' ? (i.isSettled ? 'VIKRI (SETTLED)' : 'VIKRI (UNSETTLED)') : 'INVOICE',
+            isVikri: i.custType === 'Vikri',
+            isSettled: i.isSettled,
+            tokenNo: i.tokenNo,
+            desc: breakdownStr,
+            debit: i.grandTotal || 0,
+            credit: 0
+          };
         }),
-        ...payments.map(p => ({ id: p.id, date: p.date, type: 'PAYMENT', tokenNo: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, debit: 0, credit: p.amount }))
+        ...payments.map(p => ({
+          id: p.id,
+          date: p.date,
+          type: 'PAYMENT',
+          isVikri: false,
+          isSettled: true,
+          tokenNo: '-',
+          desc: `Bank Deposit: ${p.bank} (${p.ref})`,
+          debit: 0,
+          credit: p.amount
+        }))
       ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
       let running = 0;
@@ -3066,22 +3271,29 @@
         running += (row.debit - row.credit);
         return `
           <tr class="border-b hover:bg-gray-50">
-            <td class="p-2.5 font-medium">${row.date}</td>
+            <td class="p-2.5 font-medium whitespace-nowrap">${row.date}</td>
             <td class="p-2.5 font-mono font-bold text-amber-900">${row.tokenNo}</td>
             <td class="p-2.5">
               <span class="font-bold text-slate-800 block">${row.desc}</span>
               <span class="text-[10px] text-gray-500 uppercase">${row.type}</span>
             </td>
-            <td class="p-2.5 text-right font-semibold text-gray-800">${row.debit > 0 ? '₹' + row.debit.toLocaleString('en-IN') : (row.type.includes('VIKRI') ? 'Sizes Only' : '-')}</td>
+            <td class="p-2.5 text-right font-semibold text-gray-800">
+              ${row.debit > 0 ? '₹' + row.debit.toLocaleString('en-IN') : (row.isVikri && !row.isSettled ? '<span class="text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded text-[10px]">Report Pending</span>' : '-')}
+            </td>
             <td class="p-2.5 text-right font-semibold text-emerald-700">${row.credit > 0 ? '₹' + row.credit.toLocaleString('en-IN') : '-'}</td>
             <td class="p-2.5 text-right font-bold ${running > 0 ? 'text-red-600' : 'text-emerald-700'}">₹${running.toLocaleString('en-IN')}</td>
-            <td class="p-2.5 text-right space-x-2">
+            <td class="p-2.5 text-right space-x-1 whitespace-nowrap">
               ${row.type !== 'PAYMENT' ? `
-                <button onclick="reprintCustomerSlip('${row.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip / PDF</button>
-                <button onclick="openEditRecordModal('dispatch', '${row.id}')" class="text-amber-600 font-bold hover:underline">✏️ Edit</button>
-                <button onclick="deleteRecord('dispatch', '${row.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+                ${row.isVikri ? `
+                  <button onclick="openVikriSettlementModal('${row.id}')" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded font-bold text-[10px] shadow">
+                    ${row.isSettled ? '✏️ Edit Vikri' : '📝 Settle Vikri'}
+                  </button>
+                ` : ''}
+                <button onclick="reprintCustomerSlip('${row.id}')" class="text-blue-600 font-bold hover:underline text-[11px]">📄 Slip</button>
+                <button onclick="openEditRecordModal('dispatch', '${row.id}')" class="text-amber-700 font-bold hover:underline text-[11px]">✏️ Edit</button>
+                <button onclick="deleteRecord('dispatch', '${row.id}')" class="text-red-600 font-bold hover:underline text-[11px]">🗑️</button>
               ` : `
-                <button onclick="deleteRecord('custPayment', '${row.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
+                <button onclick="deleteRecord('custPayment', '${row.id}')" class="text-red-600 font-bold hover:underline text-[11px]">🗑️</button>
               `}
             </td>
           </tr>
