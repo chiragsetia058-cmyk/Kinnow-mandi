@@ -63,16 +63,9 @@
           <p class="text-[10px] text-gray-300" id="party-header-welcome">Party Account</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <select id="farmer-portal-language" class="text-xs bg-white text-slate-900 border rounded-md px-2 py-1.5 font-semibold outline-none" onchange="setFarmerPortalLanguage(this.value)">
-          <option value="en">English</option>
-          <option value="hi">à¤¹à¤¿à¤à¤¦à¥</option>
-          <option value="pa">à¨ªà©°à¨à¨¾à¨¬à©</option>
-        </select>
-        <button id="party-portal-logout" onclick="logoutPortal()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold text-white">
+      <button onclick="logoutPortal()" class="text-xs bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md font-semibold text-white">
         Logout
       </button>
-      </div>
     </header>
 
     <div class="max-w-4xl mx-auto w-full p-4 space-y-5">
@@ -534,12 +527,12 @@
             <!-- NET CALCULATION PREVIEW -->
             <div class="p-3.5 bg-slate-900 text-amber-300 rounded-xl border border-amber-500/40 flex justify-between items-center gap-2">
               <div>
-                <span class="text-[10px] font-bold uppercase block text-gray-300">Final Calculated Net Vikri â¹</span>
-                <span class="text-[10px] text-gray-400" id="vs-formula-breakdown">Net Vikri = Gross - Comm - Labour - Misc + Crates</span>
+                <span class="text-[10px] font-bold uppercase block text-gray-300">Final Calculated Net Payable â¹</span>
+                <span class="text-[10px] text-gray-400" id="vs-formula-breakdown">Gross - Comm - Labour - Misc + Crates</span>
                 <h3 class="text-xl font-black text-amber-400 mt-1" id="vs-net-total-disp">â¹0</h3>
               </div>
               <div class="text-right border-l border-slate-700 pl-4">
-                <span class="text-[10px] font-bold uppercase block text-gray-300">Net Rate per Kg (Crates Excluded)</span>
+                <span class="text-[10px] font-bold uppercase block text-gray-300">Net Rate per Kg</span>
                 <h4 class="text-lg font-black text-emerald-400 mt-1" id="vs-net-rate-disp">â¹0.00 / Kg</h4>
               </div>
             </div>
@@ -2163,14 +2156,13 @@
       const crates = Number(document.getElementById('vs-crates').value || 0);
 
       const commAmt = (gross * pct) / 100;
-      const netBeforeCrates = Math.max(0, gross - commAmt - labour - misc);
-      const netVikri = netBeforeCrates + crates;
-      const netPerKg = netWt > 0 ? (netBeforeCrates / netWt) : 0;
+      const net = Math.max(0, gross - commAmt - labour - misc + crates);
+      const netPerKg = netWt > 0 ? (net / netWt) : 0;
 
       document.getElementById('vs-comm-amt-disp').innerText = `Commission (${pct}%): -â¹${commAmt.toLocaleString('en-IN')}`;
-      document.getElementById('vs-net-total-disp').innerText = `â¹${netVikri.toLocaleString('en-IN')}`;
+      document.getElementById('vs-net-total-disp').innerText = `â¹${net.toLocaleString('en-IN')}`;
       document.getElementById('vs-net-rate-disp').innerText = `â¹${netPerKg.toFixed(2)} / Kg`;
-      document.getElementById('vs-formula-breakdown').innerText = `Net Vikri: â¹${gross.toLocaleString('en-IN')} - â¹${commAmt.toLocaleString('en-IN')} - â¹${labour} - â¹${misc} + â¹${crates} | Net Rate/Kg excludes Crates`;
+      document.getElementById('vs-formula-breakdown').innerText = `â¹${gross.toLocaleString('en-IN')} - â¹${commAmt.toLocaleString('en-IN')} - â¹${labour} - â¹${misc} + â¹${crates}`;
     }
 
     function saveVikriSettlement(e) {
@@ -2187,9 +2179,8 @@
       const crates = Number(document.getElementById('vs-crates').value || 0);
 
       const commAmt = (gross * pct) / 100;
-      const netBeforeCrates = Math.max(0, gross - commAmt - labour - misc);
-      const netCalculated = netBeforeCrates + crates;
-      const netRatePerKg = netWt > 0 ? (netBeforeCrates / netWt) : 0;
+      const netCalculated = Math.max(0, gross - commAmt - labour - misc + crates);
+      const netRatePerKg = netWt > 0 ? (netCalculated / netWt) : 0;
 
       d.isSettled = true;
       d.vikriGross = gross;
@@ -2204,7 +2195,7 @@
 
       saveData();
       closeVikriSettlementModal();
-      alert(`Vikri report for ${d.tokenNo} updated!\nNet Vikri: â¹${netCalculated.toLocaleString('en-IN')}\nNet Rate per Kg (excluding Crates): â¹${netRatePerKg.toFixed(2)}/Kg`);
+      alert(`Vikri report for ${d.tokenNo} updated!\nNet Settled Amount: â¹${netCalculated.toLocaleString('en-IN')}\nNet Rate per Kg: â¹${netRatePerKg.toFixed(2)}/Kg`);
       renderCustomerLedger();
     }
 
@@ -2359,11 +2350,6 @@
       document.getElementById('login-view').classList.add('hidden');
       document.getElementById('app-view').classList.add('hidden');
       document.getElementById('party-portal-view').classList.remove('hidden');
-      const portalLanguage = document.getElementById('farmer-portal-language');
-      if (portalLanguage) {
-        portalLanguage.value = farmerPortalLanguage;
-        portalLanguage.classList.toggle('hidden', currentPartySession?.role !== 'farmer');
-      }
       renderPartyPortalView();
     }
 
@@ -2382,56 +2368,14 @@
       if (adminSec) adminSec.classList.add('hidden');
     }
 
-    let farmerPortalLanguage = 'en';
-
-    const farmerPortalTranslations = {
-      en: {
-        language: 'Language', registeredMobile: 'Registered Mobile', selfService: 'FARMER SELF-SERVICE', account: 'FARMER ACCOUNT', balancePending: 'Balance Pending', statementHistory: 'Your Statement & History',
-        chargeableFruit: 'Chargeable Fruit', loads: 'Loads', pendingCrates: 'Pending Crates', sent: 'Sent', recv: 'Recv', totalValuation: 'Total Valuation', totalReceived: 'Total Received',
-        date: 'Date', token: 'Token', particulars: 'Particulars', netWt: 'Net Wt', cut: 'Cut', chargeableWt: 'Chargeable Wt', tripVal: 'Trip Val â¹', paidAmt: 'Paid Amt â¹', slip: 'Slip',
-        inward: 'Inward', bankDeposit: 'Bank Deposit', logout: 'Logout'
-      },
-      hi: {
-        language: 'à¤­à¤¾à¤·à¤¾', registeredMobile: 'à¤ªà¤à¤à¥à¤à¥à¤¤ à¤®à¥à¤¬à¤¾à¤à¤²', selfService: 'à¤à¤¿à¤¸à¤¾à¤¨ à¤¸à¥à¤²à¥à¤«-à¤¸à¤°à¥à¤µà¤¿à¤¸', account: 'à¤à¤¿à¤¸à¤¾à¤¨ à¤à¤¾à¤¤à¤¾', balancePending: 'à¤¬à¤à¤¾à¤¯à¤¾ à¤¶à¥à¤·', statementHistory: 'à¤à¤ªà¤à¤¾ à¤µà¤¿à¤µà¤°à¤£ à¤à¤° à¤à¤¤à¤¿à¤¹à¤¾à¤¸',
-        chargeableFruit: 'à¤à¤¾à¤°à¥à¤à¥à¤¬à¤² à¤«à¤²', loads: 'à¤²à¥à¤¡', pendingCrates: 'à¤²à¤à¤¬à¤¿à¤¤ à¤à¥à¤°à¥à¤', sent: 'à¤­à¥à¤à¥', recv: 'à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤', totalValuation: 'à¤à¥à¤² à¤®à¥à¤²à¥à¤¯à¤¾à¤à¤à¤¨', totalReceived: 'à¤à¥à¤² à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤',
-        date: 'à¤¦à¤¿à¤¨à¤¾à¤à¤', token: 'à¤à¥à¤à¤¨', particulars: 'à¤µà¤¿à¤µà¤°à¤£', netWt: 'à¤¨à¥à¤ à¤µà¤à¤¨', cut: 'à¤à¤', chargeableWt: 'à¤à¤¾à¤°à¥à¤à¥à¤¬à¤² à¤µà¤à¤¨', tripVal: 'à¤à¥à¤°à¤¿à¤ª à¤®à¥à¤²à¥à¤¯ â¹', paidAmt: 'à¤­à¥à¤à¤¤à¤¾à¤¨ à¤°à¤¾à¤¶à¤¿ â¹', slip: 'à¤ªà¤°à¥à¤à¥',
-        inward: 'à¤à¤®à¤¦', bankDeposit: 'à¤¬à¥à¤à¤ à¤à¤®à¤¾', logout: 'à¤²à¥à¤à¤à¤à¤'
-      },
-      pa: {
-        language: 'à¨­à¨¾à¨¸à¨¼à¨¾', registeredMobile: 'à¨°à¨à¨¿à¨¸à¨à¨°à¨¡ à¨®à©à¨¬à¨¾à¨à¨²', selfService: 'à¨à¨¿à¨¸à¨¾à¨¨ à¨¸à©à¨²à¨«-à¨¸à¨°à¨µà¨¿à¨¸', account: 'à¨à¨¿à¨¸à¨¾à¨¨ à¨à¨¾à¨¤à¨¾', balancePending: 'à¨¬à¨à¨¾à¨à¨ à¨°à¨à¨®', statementHistory: 'à¨¤à©à¨¹à¨¾à¨¡à¨¾ à¨µà©à¨°à¨µà¨¾ à¨à¨¤à© à¨à¨¤à¨¿à¨¹à¨¾à¨¸',
-        chargeableFruit: 'à¨à¨¾à¨°à¨à¨¯à©à¨ à¨«à¨²', loads: 'à¨²à©à¨¡', pendingCrates: 'à¨¬à¨à¨¾à¨à¨ à¨à¨°à©à¨', sent: 'à¨­à©à¨à©', recv: 'à¨ªà©à¨°à¨¾à¨ªà¨¤', totalValuation: 'à¨à©à©±à¨² à¨®à©à©±à¨²', totalReceived: 'à¨à©à©±à¨² à¨ªà©à¨°à¨¾à¨ªà¨¤',
-        date: 'à¨®à¨¿à¨¤à©', token: 'à¨à©à¨à¨¨', particulars: 'à¨µà©à¨°à¨µà¨¾', netWt: 'à¨¨à©à©±à¨ à¨µà¨à¨¼à¨¨', cut: 'à¨à¨', chargeableWt: 'à¨à¨¾à¨°à¨à¨¯à©à¨ à¨µà¨à¨¼à¨¨', tripVal: 'à¨à©à¨°à¨¿à¨ª à¨®à©à©±à¨² â¹', paidAmt: 'à¨à¨¦à¨¾ à¨°à¨à¨® â¹', slip: 'à¨ªà¨°à¨à©',
-        inward: 'à¨à¨®à¨¦', bankDeposit: 'à¨¬à©à¨à¨ à¨à¨®à©à¨¹à¨¾à¨', logout: 'à¨²à©à¨à¨à¨à¨'
-      }
-    };
-
-    function setFarmerPortalLanguage(lang) {
-      farmerPortalLanguage = farmerPortalTranslations[lang] ? lang : 'en';
-      const selector = document.getElementById('farmer-portal-language');
-      if (selector) selector.value = farmerPortalLanguage;
-      renderPartyPortalView();
-    }
-
     function renderPartyPortalView() {
       if (!currentPartySession) return;
       const { role, name, phone } = currentPartySession;
-      const t = farmerPortalTranslations[farmerPortalLanguage] || farmerPortalTranslations.en;
-      const portalLanguage = document.getElementById('farmer-portal-language');
-      const portalLogout = document.getElementById('party-portal-logout');
-      if (portalLanguage) {
-        portalLanguage.classList.toggle('hidden', role !== 'farmer');
-        portalLanguage.value = farmerPortalLanguage;
-      }
-      if (portalLogout && role === 'farmer') portalLogout.innerText = t.logout;
 
       document.getElementById('party-portal-name').innerText = name;
-      document.getElementById('party-portal-phone').innerText = `${t.registeredMobile}: +91 ${phone}`;
-      document.getElementById('party-header-welcome').innerText = role === 'farmer' ? t.selfService : `${role.toUpperCase()} SELF-SERVICE`;
-      document.getElementById('party-portal-type').innerText = role === 'farmer' ? t.account : `${role.toUpperCase()} ACCOUNT`;
-      const balanceLabel = document.querySelector('#party-portal-balance')?.previousElementSibling;
-      if (balanceLabel && role === 'farmer') balanceLabel.innerText = t.balancePending;
-      const statementTitle = document.querySelector('#party-portal-view h3');
-      if (statementTitle && role === 'farmer') statementTitle.innerText = t.statementHistory;
+      document.getElementById('party-portal-phone').innerText = `Registered Mobile: +91 ${phone}`;
+      document.getElementById('party-header-welcome').innerText = `${role.toUpperCase()} SELF-SERVICE`;
+      document.getElementById('party-portal-type').innerText = `${role.toUpperCase()} ACCOUNT`;
 
       const kpiGrid = document.getElementById('party-portal-kpi-grid');
       const thead = document.getElementById('party-table-head');
@@ -2464,17 +2408,17 @@
         document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-amber-800' : 'text-emerald-700'}`;
 
         kpiGrid.innerHTML = `
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">${t.chargeableFruit}</span><span class="text-base font-black text-slate-800">${totChargeable.toFixed(1)} Kg</span><span class="text-[10px] text-gray-400 block">${trips.length} ${t.loads}</span></div>
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">${t.pendingCrates}</span><span class="text-base font-black text-red-600">${pendingCrates}</span><span class="text-[10px] text-gray-400 block">${t.sent}: ${totSent} | ${t.recv}: ${totRecv}</span></div>
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">${t.totalValuation}</span><span class="text-base font-black text-slate-800">â¹${totalGross.toLocaleString('en-IN')}</span></div>
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">${t.totalReceived}</span><span class="text-base font-black text-emerald-700">â¹${totalPaid.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Chargeable Fruit</span><span class="text-base font-black text-slate-800">${totChargeable.toFixed(1)} Kg</span><span class="text-[10px] text-gray-400 block">${trips.length} Loads</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Pending Crates</span><span class="text-base font-black text-red-600">${pendingCrates}</span><span class="text-[10px] text-gray-400 block">Sent: ${totSent} | Recv: ${totRecv}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Valuation</span><span class="text-base font-black text-slate-800">â¹${totalGross.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Received</span><span class="text-base font-black text-emerald-700">â¹${totalPaid.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `<tr><th class="p-2.5">${t.date}</th><th class="p-2.5">${t.token}</th><th class="p-2.5">${t.particulars}</th><th class="p-2.5 text-right">${t.netWt}</th><th class="p-2.5 text-right">${t.cut}</th><th class="p-2.5 text-right">${t.chargeableWt}</th><th class="p-2.5 text-right">${t.tripVal}</th><th class="p-2.5 text-right">${t.paidAmt}</th><th class="p-2.5 text-right">${t.slip}</th></tr>`;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Cut</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val â¹</th><th class="p-2.5 text-right">Paid Amt â¹</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
-          ...trips.map(t => ({ id: t.id, type: 'inward', date: t.date, token: t.tokenNo, desc: `${t.inward} (${t.vehicle})`, net: t.net, cut: t.cut || 0, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
-          ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `${t.bankDeposit}: ${p.bank} (${p.ref})`, net: 0, cut: 0, chg: 0, val: 0, paid: p.amount }))
+          ...trips.map(t => ({ id: t.id, type: 'inward', date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, cut: t.cut || 0, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
+          ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, cut: 0, chg: 0, val: 0, paid: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
@@ -2487,7 +2431,7 @@
             <td class="p-2.5 text-right font-bold text-slate-900">${h.chg > 0 ? h.chg.toFixed(1) + ' Kg' : '-'}</td>
             <td class="p-2.5 text-right font-semibold text-slate-800">${h.val > 0 ? 'â¹' + h.val.toLocaleString('en-IN') : '-'}</td>
             <td class="p-2.5 text-right font-bold text-emerald-700">${h.paid > 0 ? 'â¹' + h.paid.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right">${h.type === 'inward' ? `<button onclick="reprintInwardSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">ð ${t.slip}</button>` : '-'}</td>
+            <td class="p-2.5 text-right">${h.type === 'inward' ? `<button onclick="reprintInwardSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">ð Slip</button>` : '-'}</td>
           </tr>
         `).join('');
 
