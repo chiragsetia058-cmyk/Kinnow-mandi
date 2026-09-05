@@ -43,7 +43,7 @@
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1">Password</label>
-          <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600 font-medium" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢" />
+          <input type="password" id="login-pass" required class="w-full border rounded-lg p-2.5 text-xs outline-amber-600 font-medium" placeholder="••••••••" />
         </div>
 
         <button type="submit" id="btn-login-submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2.5 rounded-lg transition text-xs shadow">
@@ -78,7 +78,7 @@
           </div>
           <div class="text-right">
             <span class="text-[10px] text-gray-500 block">Balance Pending</span>
-            <h3 class="text-xl font-black" id="party-portal-balance">â¹0</h3>
+            <h3 class="text-xl font-black" id="party-portal-balance">₹0</h3>
           </div>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center" id="party-portal-kpi-grid"></div>
@@ -103,7 +103,7 @@
         <div id="header-logo-container"></div>
         <div>
           <h1 class="font-extrabold text-base md:text-lg text-amber-400 tracking-wider">SETIA WAXING PLANT</h1>
-          <p class="text-[11px] text-gray-300">Abohar Hub â¢ Mandi Operations</p>
+          <p class="text-[11px] text-gray-300">Abohar Hub • Mandi Operations</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -116,14 +116,14 @@
 
     <div class="max-w-6xl mx-auto w-full p-4 no-print">
       <div class="grid grid-cols-3 md:grid-cols-7 border-b border-gray-300 gap-1 mb-6 text-center text-xs font-bold">
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2.5 border-b-2 border-amber-600 text-amber-700">ð Dashboard</button>
-        <button onclick="switchTab('customer-ledger')" id="tab-customer-ledger" class="py-2.5 text-gray-500 hover:text-amber-700">ð¤ Customer</button>
-        <button onclick="switchTab('orchards')" id="tab-orchards" class="py-2.5 text-gray-500 hover:text-amber-700">ð³ Farmer</button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2.5 border-b-2 border-amber-600 text-amber-700">📊 Dashboard</button>
+        <button onclick="switchTab('customer-ledger')" id="tab-customer-ledger" class="py-2.5 text-gray-500 hover:text-amber-700">👤 Customer</button>
+        <button onclick="switchTab('orchards')" id="tab-orchards" class="py-2.5 text-gray-500 hover:text-amber-700">🌳 Farmer</button>
         <button onclick="switchTab('farmer')" id="tab-farmer" class="py-2.5 text-gray-500 hover:text-amber-700">1. New Deal</button>
         <button onclick="switchTab('daily')" id="tab-daily" class="py-2.5 text-gray-500 hover:text-amber-700">2. Inward</button>
         <button onclick="switchTab('customer')" id="tab-customer" class="py-2.5 text-gray-500 hover:text-amber-700">3. Dispatch</button>
-        <button onclick="switchTab('attendance')" id="tab-attendance" class="py-2.5 text-gray-500 hover:text-amber-700 bg-amber-50">ð¥ Attendance</button>
-        <button onclick="switchTab('admin-panel')" id="tab-admin-panel" class="py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black hidden">ð Master Admin Control</button>
+        <button onclick="switchTab('attendance')" id="tab-attendance" class="py-2.5 text-gray-500 hover:text-amber-700 bg-amber-50">👥 Attendance</button>
+        <button onclick="switchTab('admin-panel')" id="tab-admin-panel" class="py-2.5 text-amber-900 hover:text-amber-700 bg-amber-200 col-span-3 md:col-span-7 mt-1 md:mt-0 font-black hidden">👑 Master Admin Control</button>
       </div>
 
       <!-- TAB: MASTER ADMIN PANEL -->
@@ -131,11 +131,11 @@
         <div class="bg-amber-50 border-2 border-amber-400 p-5 rounded-xl shadow-sm space-y-5">
           <div class="flex flex-wrap justify-between items-center gap-3">
             <div>
-              <h3 class="text-base font-black text-amber-900 mb-1">ð Master Admin Control Center</h3>
+              <h3 class="text-base font-black text-amber-900 mb-1">👑 Master Admin Control Center</h3>
               <p class="text-xs text-amber-800">Manage user access permissions, add staff, block or permanently delete accounts.</p>
             </div>
             <button onclick="forceSyncToCloud()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow">
-              âï¸ Force Push All Records to MongoDB
+              ☁️ Force Push All Records to MongoDB
             </button>
           </div>
 
@@ -150,7 +150,7 @@
             </div>
             <div>
               <label class="block font-bold mb-1 text-slate-800">Set Password</label>
-              <input type="password" id="staff-pass" required class="w-full border rounded-lg p-2" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢" />
+              <input type="password" id="staff-pass" required class="w-full border rounded-lg p-2" placeholder="••••••••" />
             </div>
             <div class="flex items-end">
               <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
@@ -202,7 +202,7 @@
 
         <!-- 1. REGISTER NEW STAFF WITH SALARY & SAVED DIRECTORY -->
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
-          <h3 class="text-base font-bold text-slate-800 pb-2 border-b">ð Register New Staff Member with Salary</h3>
+          <h3 class="text-base font-bold text-slate-800 pb-2 border-b">📋 Register New Staff Member with Salary</h3>
           <form onsubmit="registerQuickStaff(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Staff Member Name</label>
@@ -213,7 +213,7 @@
               <input type="text" id="reg-staff-role" class="w-full border rounded-lg p-2" placeholder="e.g. Machine Operator" />
             </div>
             <div>
-              <label class="block font-semibold mb-1">Monthly Salary â¹ (à¨¤à¨¨à¨à¨¼à¨¾à¨¹)</label>
+              <label class="block font-semibold mb-1">Monthly Salary ₹ (ਤਨਖ਼ਾਹ)</label>
               <input type="number" id="reg-staff-salary" required min="0" class="w-full border rounded-lg p-2 font-bold text-slate-900" placeholder="e.g. 15000" />
             </div>
             <div class="flex items-end">
@@ -235,8 +235,8 @@
                   <tr>
                     <th class="p-2.5">Staff Name</th>
                     <th class="p-2.5">Role / Designation</th>
-                    <th class="p-2.5 text-right">Monthly Salary â¹</th>
-                    <th class="p-2.5 text-right">Daily Rate Approx (Salary Ã· 30)</th>
+                    <th class="p-2.5 text-right">Monthly Salary ₹</th>
+                    <th class="p-2.5 text-right">Daily Rate Approx (Salary ÷ 30)</th>
                     <th class="p-2.5 text-right">Action (Admin Only)</th>
                   </tr>
                 </thead>
@@ -265,7 +265,7 @@
               </select>
             </div>
             <div>
-              <label class="block font-semibold mb-1">Daily Wages â¹ (Auto from Salary)</label>
+              <label class="block font-semibold mb-1">Daily Wages ₹ (Auto from Salary)</label>
               <input type="number" id="att-staff-wage" class="w-full border rounded-lg p-2 font-bold text-slate-900" placeholder="e.g. 500" />
             </div>
             <div>
@@ -305,36 +305,36 @@
               <div>
                 <label class="block font-black text-amber-950 mb-1">Attendance Status</label>
                 <select id="att-group-status" class="w-full border-2 border-amber-400 rounded-lg p-2 bg-white font-bold text-slate-900" onchange="calculateGroupWage()">
-                  <option value="Present" selected>â Full Day (Present)</option>
-                  <option value="Half Day">ð Half Day (50% Wages)</option>
-                  <option value="Absent">â Absent (0 Wages)</option>
+                  <option value="Present" selected>✅ Full Day (Present)</option>
+                  <option value="Half Day">🌓 Half Day (50% Wages)</option>
+                  <option value="Absent">❌ Absent (0 Wages)</option>
                 </select>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-3.5 rounded-xl border border-amber-200">
               <div class="space-y-2 border-r md:pr-4">
-                <span class="font-black text-slate-800 uppercase text-[11px] block text-blue-800">ð¨ Men Labour</span>
+                <span class="font-black text-slate-800 uppercase text-[11px] block text-blue-800">👨 Men Labour</span>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-semibold mb-1">Men Count</label>
                     <input type="number" id="att-group-men-count" min="0" value="0" class="w-full border rounded-lg p-2 font-bold" oninput="calculateGroupWage()" />
                   </div>
                   <div>
-                    <label class="block font-semibold mb-1">Rate / Man â¹</label>
+                    <label class="block font-semibold mb-1">Rate / Man ₹</label>
                     <input type="number" id="att-group-men-rate" min="0" value="500" class="w-full border rounded-lg p-2 font-bold" oninput="calculateGroupWage()" />
                   </div>
                 </div>
               </div>
               <div class="space-y-2">
-                <span class="font-black text-slate-800 uppercase text-[11px] block text-pink-800">ð© Women Labour</span>
+                <span class="font-black text-slate-800 uppercase text-[11px] block text-pink-800">👩 Women Labour</span>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-semibold mb-1">Women Count</label>
                     <input type="number" id="att-group-women-count" min="0" value="0" class="w-full border rounded-lg p-2 font-bold" oninput="calculateGroupWage()" />
                   </div>
                   <div>
-                    <label class="block font-semibold mb-1">Rate / Woman â¹</label>
+                    <label class="block font-semibold mb-1">Rate / Woman ₹</label>
                     <input type="number" id="att-group-women-rate" min="0" value="450" class="w-full border rounded-lg p-2 font-bold" oninput="calculateGroupWage()" />
                   </div>
                 </div>
@@ -343,7 +343,7 @@
 
             <div class="flex flex-wrap justify-between items-center pt-2">
               <div class="text-xs font-bold text-amber-950">
-                Calculated Total: <span id="disp-group-total" class="text-base font-black text-slate-900 bg-amber-200 px-3 py-1 rounded-lg">â¹0</span>
+                Calculated Total: <span id="disp-group-total" class="text-base font-black text-slate-900 bg-amber-200 px-3 py-1 rounded-lg">₹0</span>
                 <span class="text-[11px] text-gray-500 ml-2" id="disp-group-breakdown">(0 Men + 0 Women = 0 Total)</span>
               </div>
               <button type="submit" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-2.5 px-6 rounded-lg shadow transition text-xs">
@@ -357,8 +357,8 @@
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-3">
           <div class="flex justify-between items-center border-b pb-2">
             <div>
-              <h3 class="text-base font-bold text-slate-900">ð¼ Staff Salary Statement (Calculated by Present Days)</h3>
-              <p class="text-xs text-gray-500">Auto-calculated: Payable = (Present + 0.5 Ã HalfDay) Ã (Monthly Salary Ã· 30) for filtered dates</p>
+              <h3 class="text-base font-bold text-slate-900">💼 Staff Salary Statement (Calculated by Present Days)</h3>
+              <p class="text-xs text-gray-500">Auto-calculated: Payable = (Present + 0.5 × HalfDay) × (Monthly Salary ÷ 30) for filtered dates</p>
             </div>
           </div>
           <div class="overflow-x-auto border rounded-xl">
@@ -367,12 +367,12 @@
                 <tr>
                   <th class="p-2.5">Staff Name</th>
                   <th class="p-2.5">Role</th>
-                  <th class="p-2.5 text-right">Base Monthly Salary â¹</th>
+                  <th class="p-2.5 text-right">Base Monthly Salary ₹</th>
                   <th class="p-2.5 text-center">Present Days</th>
                   <th class="p-2.5 text-center">Half Days</th>
                   <th class="p-2.5 text-center">Absent / Leave</th>
                   <th class="p-2.5 text-center">Effective Days Worked</th>
-                  <th class="p-2.5 text-right">Net Calculated Salary â¹</th>
+                  <th class="p-2.5 text-right">Net Calculated Salary ₹</th>
                 </tr>
               </thead>
               <tbody id="staff-salary-report-tbody"></tbody>
@@ -389,10 +389,10 @@
             </div>
             <div class="flex gap-2">
               <button onclick="printAttendanceLedger()" class="bg-slate-900 hover:bg-black text-amber-400 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow">
-                ð¨ï¸ Print Ledger
+                🖨️ Print Ledger
               </button>
               <button onclick="shareAttendanceLedgerWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow">
-                ð¬ WhatsApp Ledger
+                💬 WhatsApp Ledger
               </button>
             </div>
           </div>
@@ -444,7 +444,7 @@
             </div>
             <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
               <span class="text-[11px] font-bold text-emerald-800 block">Total Wage Amount</span>
-              <h4 class="text-lg font-black text-emerald-700 mt-1" id="ledger-stat-total-wages">â¹0</h4>
+              <h4 class="text-lg font-black text-emerald-700 mt-1" id="ledger-stat-total-wages">₹0</h4>
             </div>
           </div>
 
@@ -459,8 +459,8 @@
                   <th class="p-2.5">Location / Work</th>
                   <th class="p-2.5 text-center">Labour Count / Status</th>
                   <th class="p-2.5">Rate Particulars</th>
-                  <th class="p-2.5 text-right">Day Amount â¹</th>
-                  <th class="p-2.5 text-right">Cumulative Total â¹</th>
+                  <th class="p-2.5 text-right">Day Amount ₹</th>
+                  <th class="p-2.5 text-right">Cumulative Total ₹</th>
                   <th class="p-2.5 text-right no-print">Actions (Admin Only)</th>
                 </tr>
               </thead>
@@ -475,10 +475,10 @@
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-5 text-xs overflow-y-auto max-h-[92vh]">
           <div class="flex justify-between items-center border-b pb-2 mb-3">
             <div>
-              <h3 class="text-base font-black text-slate-900">ð¦ Update Vikri Final Mandi Sale Report</h3>
+              <h3 class="text-base font-black text-slate-900">📦 Update Vikri Final Mandi Sale Report</h3>
               <p class="text-[11px] text-gray-500" id="vs-header-subtitle">Token No & Details</p>
             </div>
-            <button onclick="closeVikriSettlementModal()" class="text-gray-400 hover:text-black font-bold text-base">â</button>
+            <button onclick="closeVikriSettlementModal()" class="text-gray-400 hover:text-black font-bold text-base">✕</button>
           </div>
 
           <form onsubmit="saveVikriSettlement(event)" class="space-y-3.5">
@@ -492,7 +492,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label class="block font-bold mb-1 text-slate-800">1. Gross Sale Amount â¹ (à¨ªà©à¨°à© à¨µà¨¿à¨à¨°à© à¨°à¨à¨®)</label>
+                <label class="block font-bold mb-1 text-slate-800">1. Gross Sale Amount ₹ (ਪੂਰੀ ਵਿਕਰੀ ਰਕਮ)</label>
                 <input type="number" id="vs-gross" required min="0" step="0.5" class="w-full border-2 border-slate-400 rounded-lg p-2.5 text-sm font-black text-slate-900 bg-white" placeholder="e.g. 240000" oninput="calculateVikriSettlementNet()" />
               </div>
               <div>
@@ -505,20 +505,20 @@
               <span class="block text-[11px] font-black uppercase tracking-wider text-slate-700">3. Deductions & Adjustments</span>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label class="block font-semibold mb-1 text-amber-950">Agent Commission % (à¨à¨®à¨¿à¨¸à¨¼à¨¨ à¨à¨à©)</label>
+                  <label class="block font-semibold mb-1 text-amber-950">Agent Commission % (ਕਮਿਸ਼ਨ ਟਕੇ)</label>
                   <input type="number" id="vs-comm-pct" step="0.1" min="0" class="w-full border rounded-lg p-2 font-bold" placeholder="e.g. 5 or 6" oninput="calculateVikriSettlementNet()" />
-                  <span class="text-[10px] text-red-600 font-bold block mt-0.5" id="vs-comm-amt-disp">Commission: -â¹0</span>
+                  <span class="text-[10px] text-red-600 font-bold block mt-0.5" id="vs-comm-amt-disp">Commission: -₹0</span>
                 </div>
                 <div>
-                  <label class="block font-semibold mb-1 text-red-700">Labour / Mandi Loading â¹ (-)</label>
+                  <label class="block font-semibold mb-1 text-red-700">Labour / Mandi Loading ₹ (-)</label>
                   <input type="number" id="vs-labour" step="0.5" min="0" class="w-full border rounded-lg p-2 font-bold" placeholder="0" oninput="calculateVikriSettlementNet()" />
                 </div>
                 <div>
-                  <label class="block font-semibold mb-1 text-red-700">Misc Mandi Expense â¹ (-)</label>
+                  <label class="block font-semibold mb-1 text-red-700">Misc Mandi Expense ₹ (-)</label>
                   <input type="number" id="vs-misc" step="0.5" min="0" class="w-full border rounded-lg p-2 font-bold" placeholder="0" oninput="calculateVikriSettlementNet()" />
                 </div>
                 <div>
-                  <label class="block font-semibold mb-1 text-emerald-700">Add Crates Amount â¹ (+)</label>
+                  <label class="block font-semibold mb-1 text-emerald-700">Add Crates Amount ₹ (+)</label>
                   <input type="number" id="vs-crates" step="0.5" min="0" class="w-full border rounded-lg p-2 font-bold" placeholder="0" oninput="calculateVikriSettlementNet()" />
                 </div>
               </div>
@@ -527,13 +527,13 @@
             <!-- NET CALCULATION PREVIEW -->
             <div class="p-3.5 bg-slate-900 text-amber-300 rounded-xl border border-amber-500/40 flex justify-between items-center gap-2">
               <div>
-                <span class="text-[10px] font-bold uppercase block text-gray-300">Final Calculated Net Payable â¹</span>
+                <span class="text-[10px] font-bold uppercase block text-gray-300">Final Calculated Net Payable ₹</span>
                 <span class="text-[10px] text-gray-400" id="vs-formula-breakdown">Gross - Comm - Labour - Misc + Crates</span>
-                <h3 class="text-xl font-black text-amber-400 mt-1" id="vs-net-total-disp">â¹0</h3>
+                <h3 class="text-xl font-black text-amber-400 mt-1" id="vs-net-total-disp">₹0</h3>
               </div>
               <div class="text-right border-l border-slate-700 pl-4">
                 <span class="text-[10px] font-bold uppercase block text-gray-300">Net Rate per Kg</span>
-                <h4 class="text-lg font-black text-emerald-400 mt-1" id="vs-net-rate-disp">â¹0.00 / Kg</h4>
+                <h4 class="text-lg font-black text-emerald-400 mt-1" id="vs-net-rate-disp">₹0.00 / Kg</h4>
               </div>
             </div>
 
@@ -575,7 +575,7 @@
                 </select>
               </div>
               <div class="mt-2">
-                <label class="block font-semibold mb-1">Daily Wages â¹</label>
+                <label class="block font-semibold mb-1">Daily Wages ₹</label>
                 <input type="number" id="edit-att-wage" class="w-full border rounded-lg p-2" />
               </div>
             </div>
@@ -602,7 +602,7 @@
                   <input type="number" id="edit-att-men-count" class="w-full border rounded p-1.5" />
                 </div>
                 <div>
-                  <label class="block font-semibold mb-1 text-blue-700">Men Rate â¹</label>
+                  <label class="block font-semibold mb-1 text-blue-700">Men Rate ₹</label>
                   <input type="number" id="edit-att-men-rate" class="w-full border rounded p-1.5" />
                 </div>
                 <div>
@@ -610,7 +610,7 @@
                   <input type="number" id="edit-att-women-count" class="w-full border rounded p-1.5" />
                 </div>
                 <div>
-                  <label class="block font-semibold mb-1 text-pink-700">Women Rate â¹</label>
+                  <label class="block font-semibold mb-1 text-pink-700">Women Rate ₹</label>
                   <input type="number" id="edit-att-women-rate" class="w-full border rounded p-1.5" />
                 </div>
               </div>
@@ -628,7 +628,7 @@
         <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-5 text-xs overflow-y-auto max-h-[90vh]">
           <div class="flex justify-between items-center border-b pb-2 mb-4">
             <h3 class="text-base font-black text-slate-900" id="edit-record-title">Edit Record</h3>
-            <button onclick="closeEditRecordModal()" class="text-gray-400 hover:text-black font-bold text-base">â</button>
+            <button onclick="closeEditRecordModal()" class="text-gray-400 hover:text-black font-bold text-base">✕</button>
           </div>
           <form id="universal-edit-form" onsubmit="handleUniversalRecordUpdate(event)" class="space-y-4">
             <input type="hidden" id="eur-type" />
@@ -674,12 +674,12 @@
             </div>
             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
               <p class="text-xs text-gray-500 font-medium">Customer Collections</p>
-              <h3 class="text-xl font-bold text-emerald-700 mt-1" id="stat-daily-cust-recv">â¹0</h3>
+              <h3 class="text-xl font-bold text-emerald-700 mt-1" id="stat-daily-cust-recv">₹0</h3>
               <p class="text-[11px] text-gray-400 mt-1">Bank receipts today</p>
             </div>
             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
               <p class="text-xs text-gray-500 font-medium">Farmer Payments</p>
-              <h3 class="text-xl font-bold text-red-700 mt-1" id="stat-daily-farmer-paid">â¹0</h3>
+              <h3 class="text-xl font-bold text-red-700 mt-1" id="stat-daily-farmer-paid">₹0</h3>
               <p class="text-[11px] text-gray-400 mt-1">Disbursed today</p>
             </div>
           </div>
@@ -688,25 +688,25 @@
         <div class="bg-slate-900 text-white p-5 rounded-2xl shadow-md border-t-4 border-amber-500">
           <div class="flex justify-between items-center mb-4">
             <h4 class="text-sm font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
-              <span>SETIA WAXING PLANT</span> â¢ Season Cumulative Overview
+              <span>SETIA WAXING PLANT</span> • Season Cumulative Overview
             </h4>
             <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-bold">Season 2026</span>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div class="border-r border-slate-700 pr-2">
               <span class="text-xs text-gray-400">Total Billed Sales</span>
-              <p class="text-xl font-extrabold mt-1 text-amber-300" id="season-total-sales">â¹0</p>
-              <span class="text-[10px] text-gray-400" id="season-cust-pending">â¹0 Uncollected</span>
+              <p class="text-xl font-extrabold mt-1 text-amber-300" id="season-total-sales">₹0</p>
+              <span class="text-[10px] text-gray-400" id="season-cust-pending">₹0 Uncollected</span>
             </div>
             <div class="border-r border-slate-700 pr-2">
               <span class="text-xs text-gray-400">Total Collections</span>
-              <p class="text-xl font-extrabold mt-1 text-emerald-400" id="season-total-received">â¹0</p>
+              <p class="text-xl font-extrabold mt-1 text-emerald-400" id="season-total-received">₹0</p>
               <span class="text-[10px] text-gray-400">Bank deposits</span>
             </div>
             <div class="border-r border-slate-700 pr-2">
               <span class="text-xs text-gray-400">Farmer Fruit Dues</span>
-              <p class="text-xl font-extrabold mt-1 text-orange-400" id="season-farmer-dues">â¹0</p>
-              <span class="text-[10px] text-gray-400" id="season-farmer-pending">â¹0 Pending</span>
+              <p class="text-xl font-extrabold mt-1 text-orange-400" id="season-farmer-dues">₹0</p>
+              <span class="text-[10px] text-gray-400" id="season-farmer-pending">₹0 Pending</span>
             </div>
             <div>
               <span class="text-xs text-gray-400">Pending Crates</span>
@@ -725,7 +725,7 @@
       <!-- TAB 1: CUSTOMER MASTER LEDGER -->
       <div id="customer-ledger-section" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">ð³ Record Customer Payment Received</h3>
+          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">💳 Record Customer Payment Received</h3>
           <form onsubmit="recordCustomerPayment(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Customer</label>
@@ -734,7 +734,7 @@
               </select>
             </div>
             <div>
-              <label class="block font-semibold mb-1">Amount Received â¹</label>
+              <label class="block font-semibold mb-1">Amount Received ₹</label>
               <input type="number" id="pay-cust-amount" required class="w-full border rounded-lg p-2" placeholder="e.g. 150000" />
             </div>
             <div>
@@ -764,7 +764,7 @@
                 <option value="">-- Select Customer to View --</option>
               </select>
               <button onclick="shareCustomerLedgerWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1">
-                ð¬ WhatsApp Ledger
+                💬 WhatsApp Ledger
               </button>
             </div>
           </div>
@@ -772,17 +772,17 @@
           <div id="cust-kpi-container" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3">
             <div class="p-3.5 bg-gray-50 rounded-xl border">
               <span class="text-xs text-gray-500 font-medium">Total Billed Sales</span>
-              <h4 class="text-lg font-bold text-gray-800 mt-1" id="cust-kpi-invoiced">â¹0</h4>
+              <h4 class="text-lg font-bold text-gray-800 mt-1" id="cust-kpi-invoiced">₹0</h4>
               <p class="text-[11px] text-gray-400" id="cust-kpi-boxes">0 Boxes</p>
             </div>
             <div class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200">
               <span class="text-xs text-emerald-700 font-medium">Total Received (Bank/Cash)</span>
-              <h4 class="text-lg font-bold text-emerald-800 mt-1" id="cust-kpi-paid">â¹0</h4>
+              <h4 class="text-lg font-bold text-emerald-800 mt-1" id="cust-kpi-paid">₹0</h4>
               <p class="text-[11px] text-emerald-600" id="cust-kpi-paycount">0 Receipts</p>
             </div>
             <div class="p-3.5 bg-red-50 rounded-xl border border-red-200">
               <span class="text-xs text-red-600 font-medium">Balance Receivable</span>
-              <h4 class="text-xl font-black text-red-700 mt-1" id="cust-kpi-balance">â¹0</h4>
+              <h4 class="text-xl font-black text-red-700 mt-1" id="cust-kpi-balance">₹0</h4>
               <p class="text-[11px] text-red-500">Unpaid balance</p>
             </div>
           </div>
@@ -794,9 +794,9 @@
                   <th class="p-2.5">Date</th>
                   <th class="p-2.5">Token No.</th>
                   <th class="p-2.5">Purchased Sizes / Particulars & Transport</th>
-                  <th class="p-2.5 text-right">Debit (â¹)</th>
-                  <th class="p-2.5 text-right">Credit (â¹)</th>
-                  <th class="p-2.5 text-right">Balance (â¹)</th>
+                  <th class="p-2.5 text-right">Debit (₹)</th>
+                  <th class="p-2.5 text-right">Credit (₹)</th>
+                  <th class="p-2.5 text-right">Balance (₹)</th>
                   <th class="p-2.5 text-right">Slip & Controls</th>
                 </tr>
               </thead>
@@ -813,7 +813,7 @@
       <!-- TAB 2: FARMER MASTER LEDGER -->
       <div id="orchards-section" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">ð¸ Record Payment Made to Farmer</h3>
+          <h3 class="text-base font-bold text-gray-800 mb-3 pb-2 border-b">💸 Record Payment Made to Farmer</h3>
           <form onsubmit="recordFarmerPayment(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Select Orchard / Farmer</label>
@@ -822,7 +822,7 @@
               </select>
             </div>
             <div>
-              <label class="block font-semibold mb-1">Amount Paid â¹</label>
+              <label class="block font-semibold mb-1">Amount Paid ₹</label>
               <input type="number" id="pay-farmer-amount" required class="w-full border rounded-lg p-2" placeholder="e.g. 50000" />
             </div>
             <div>
@@ -852,7 +852,7 @@
                 <option value="">-- Choose an Orchard to view --</option>
               </select>
               <button onclick="shareFarmerLedgerWA()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg font-bold flex items-center gap-1">
-                ð¬ WhatsApp Ledger
+                💬 WhatsApp Ledger
               </button>
             </div>
           </div>
@@ -876,8 +876,8 @@
               </div>
               <div class="p-3 bg-gray-50 rounded-xl border">
                 <span class="text-xs text-gray-500 font-medium">Balance Payable</span>
-                <h4 class="text-lg font-bold text-red-600 mt-1" id="orch-kpi-financials">â¹0</h4>
-                <p class="text-[11px] text-gray-400" id="orch-kpi-paid-info">Paid: â¹0</p>
+                <h4 class="text-lg font-bold text-red-600 mt-1" id="orch-kpi-financials">₹0</h4>
+                <p class="text-[11px] text-gray-400" id="orch-kpi-paid-info">Paid: ₹0</p>
               </div>
             </div>
 
@@ -890,8 +890,8 @@
                       <th class="p-2.5">Date</th>
                       <th class="p-2.5">Token</th>
                       <th class="p-2.5">Details</th>
-                      <th class="p-2.5 text-right">Inward Amt â¹</th>
-                      <th class="p-2.5 text-right">Paid Amt â¹</th>
+                      <th class="p-2.5 text-right">Inward Amt ₹</th>
+                      <th class="p-2.5 text-right">Paid Amt ₹</th>
                       <th class="p-2.5 text-right">Crates In/Out</th>
                       <th class="p-2.5 text-right">Slip & Controls</th>
                     </tr>
@@ -910,7 +910,7 @@
 
       <!-- TAB 3: NEW ORCHARD AGREEMENT -->
       <div id="farmer-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 class="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Orchard Purchase Agreement (à¨¬à¨¾à¨à¨¼ à¨à¨¼à¨°à©à¨¦ à¨à¨à¨°à¨¾à¨°à¨¨à¨¾à¨®à¨¾)</h3>
+        <h3 class="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Orchard Purchase Agreement (ਬਾਗ਼ ਖ਼ਰੀਦ ਇਕਰਾਰਨਾਮਾ)</h3>
         <form onsubmit="generateFarmerSlip(event)" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -928,24 +928,24 @@
           </div>
 
           <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
-            <label class="block text-xs font-semibold mb-2">Deal Type (à¨¸à©à¨¦à© à¨¦à© à¨à¨¿à¨¸à¨®)</label>
+            <label class="block text-xs font-semibold mb-2">Deal Type (ਸੌਦੇ ਦੀ ਕਿਸਮ)</label>
             <div class="flex gap-4">
               <label class="flex items-center text-sm gap-2">
-                <input type="radio" name="p-type" value="lump_sum" checked onchange="togglePurchaseType()" /> Full Orchard / Lump Sum (à¨®à©à©±à¨à¨¤à¨¾)
+                <input type="radio" name="p-type" value="lump_sum" checked onchange="togglePurchaseType()" /> Full Orchard / Lump Sum (ਮੁੱਕਤਾ)
               </label>
               <label class="flex items-center text-sm gap-2">
-                <input type="radio" name="p-type" value="per_kg" onchange="togglePurchaseType()" /> Per Kg Basis (à¨ªà©à¨°à¨¤à© à¨à¨¿à©±à¨²à©)
+                <input type="radio" name="p-type" value="per_kg" onchange="togglePurchaseType()" /> Per Kg Basis (ਪ੍ਰਤੀ ਕਿੱਲੋ)
               </label>
             </div>
           </div>
 
           <div id="lump-sum-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold mb-1">Total Agreement Value â¹</label>
+              <label class="block text-xs font-semibold mb-1">Total Agreement Value ₹</label>
               <input type="number" id="f-lumpsum" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 500000" />
             </div>
             <div>
-              <label class="block text-xs font-semibold mb-1">Advance Token Paid â¹</label>
+              <label class="block text-xs font-semibold mb-1">Advance Token Paid ₹</label>
               <input type="number" id="f-advance" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 100000" />
             </div>
           </div>
@@ -953,11 +953,11 @@
           <div id="per-kg-fields" class="hidden space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-semibold mb-1">Agreed Rate per Kg â¹</label>
+                <label class="block text-xs font-semibold mb-1">Agreed Rate per Kg ₹</label>
                 <input type="number" id="f-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. 26" />
               </div>
               <div>
-                <label class="block text-xs font-semibold mb-1">Advance Token Paid â¹</label>
+                <label class="block text-xs font-semibold mb-1">Advance Token Paid ₹</label>
                 <input type="number" id="f-kg-advance" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
               </div>
             </div>
@@ -983,14 +983,14 @@
       <!-- TAB 4: DAILY INWARD SLIP -->
       <div id="daily-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <div class="flex justify-between items-center border-b pb-2 mb-4">
-          <h3 class="text-base font-bold text-gray-800">Daily Orchard Inward (à¨¤à©à©à¨¾à¨ à¨¤à© à¨à¨®à¨¦)</h3>
+          <h3 class="text-base font-bold text-gray-800">Daily Orchard Inward (ਤੁੜਾਈ ਤੇ ਆਮਦ)</h3>
           <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-bold">
-            â¡ 1 Kg / 100 Kg Cut Toggle Active
+            ⚡ 1 Kg / 100 Kg Cut Toggle Active
           </span>
         </div>
 
         <div class="mb-5 bg-amber-50 p-3.5 rounded-xl border border-amber-200">
-          <label class="block text-xs font-bold text-slate-900 mb-1">Select Saved Orchard (à¨¸à©à¨µ à¨à©à¨¤à¨¾ à¨¬à¨¾à¨à¨¼ à¨à©à¨£à©)</label>
+          <label class="block text-xs font-bold text-slate-900 mb-1">Select Saved Orchard (ਸੇਵ ਕੀਤਾ ਬਾਗ਼ ਚੁਣੋ)</label>
           <select id="inward-orchard-select" class="w-full border border-amber-300 rounded-lg p-2 text-sm bg-white font-medium outline-none" onchange="autoFillOrchardDetails()">
             <option value="">-- Choose saved orchard to auto-fill details --</option>
           </select>
@@ -1026,15 +1026,15 @@
             </div>
             
             <div>
-              <label class="block text-xs font-black text-amber-900 mb-1">Cut 1 Kg / 100 Kg? (à¨à©±à¨)</label>
+              <label class="block text-xs font-black text-amber-900 mb-1">Cut 1 Kg / 100 Kg? (ਕੱਟ)</label>
               <select id="d-cut-choice" class="w-full border-2 border-amber-400 rounded-lg p-2 text-sm font-bold bg-white outline-none" onchange="calculateDailyWeight()">
-                <option value="yes" selected>â YES - Cut 1 Kg / 100 Kg</option>
-                <option value="no">â NO - Net Weight (0 Cut)</option>
+                <option value="yes" selected>✅ YES - Cut 1 Kg / 100 Kg</option>
+                <option value="no">❌ NO - Net Weight (0 Cut)</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-xs font-semibold mb-1">Rate per Kg â¹</label>
+              <label class="block text-xs font-semibold mb-1">Rate per Kg ₹</label>
               <input type="number" id="d-rate" step="0.5" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="0" oninput="calculateDailyWeight()" />
             </div>
             <div>
@@ -1073,7 +1073,7 @@
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
           <div class="flex justify-between items-center pb-2 mb-3 border-b">
             <div>
-              <h3 class="text-base font-bold text-slate-900">ð¤ Add New Customer Details First (Directory)</h3>
+              <h3 class="text-base font-bold text-slate-900">👤 Add New Customer Details First (Directory)</h3>
               <p class="text-xs text-gray-500">Save buyer details once to autofill into Vikri & Billing dispatch slips</p>
             </div>
           </div>
@@ -1108,14 +1108,14 @@
         <!-- 2. DISPATCH GENERATOR FORM -->
         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div class="flex justify-between items-center border-b pb-2 mb-4">
-            <h3 class="text-base font-bold text-gray-800">Kinnow Dispatch Slip (à¨à©à¨°à¨¾à¨¹à¨ à¨¨à¨¿à¨à¨¾à¨¸à© à¨ªà¨°à¨à©)</h3>
+            <h3 class="text-base font-bold text-gray-800">Kinnow Dispatch Slip (ਗ੍ਰਾਹਕ ਨਿਕਾਸੀ ਪਰਚੀ)</h3>
             <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-bold">
-              â¡ Customer Auto-Fill Active
+              ⚡ Customer Auto-Fill Active
             </span>
           </div>
 
           <div class="mb-5 bg-amber-50 p-3.5 rounded-xl border border-amber-200">
-            <label class="block text-xs font-bold text-slate-900 mb-1">Select Customer to Autofill (à¨¸à©à¨µ à¨à©à¨¤à¨¾ à¨à©à¨°à¨¾à¨¹à¨ à¨à©à¨£à©)</label>
+            <label class="block text-xs font-bold text-slate-900 mb-1">Select Customer to Autofill (ਸੇਵ ਕੀਤਾ ਗ੍ਰਾਹਕ ਚੁਣੋ)</label>
             <select id="autofill-cust-select" class="w-full border border-amber-300 rounded-lg p-2 text-sm bg-white font-medium outline-none" onchange="autoFillCustomerDetails()">
               <option value="">-- Choose saved customer to auto-fill details --</option>
             </select>
@@ -1126,11 +1126,11 @@
               <span class="text-xs font-black text-slate-900 uppercase">Dispatch Type:</span>
               <label class="flex items-center text-xs font-bold gap-2 cursor-pointer">
                 <input type="radio" name="cust-dispatch-type" value="Billing" checked onchange="toggleCustomerType()" />
-                <span>ð Billing Customer (With Rates & Amounts)</span>
+                <span>📄 Billing Customer (With Rates & Amounts)</span>
               </label>
               <label class="flex items-center text-xs font-bold gap-2 cursor-pointer">
                 <input type="radio" name="cust-dispatch-type" value="Vikri" onchange="toggleCustomerType()" />
-                <span class="text-amber-900">ð¦ Vikri Customer (Only Sizes & Quantities - Price Settled Post Sale)</span>
+                <span class="text-amber-900">📦 Vikri Customer (Only Sizes & Quantities - Price Settled Post Sale)</span>
               </label>
             </div>
 
@@ -1157,18 +1157,18 @@
                 <input type="text" id="c-vehicle" required class="w-full border rounded-lg p-2 text-sm uppercase font-semibold bg-white" placeholder="PB 15 XX XXXX" />
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-800 mb-1">Driver Name (à¨¡à¨°à¨¾à¨à¨µà¨° à¨¦à¨¾ à¨¨à¨¾à¨®)</label>
+                <label class="block text-xs font-bold text-slate-800 mb-1">Driver Name (ਡਰਾਈਵਰ ਦਾ ਨਾਮ)</label>
                 <input type="text" id="c-driver-name" class="w-full border rounded-lg p-2 text-sm bg-white" placeholder="e.g. Gurmukh Singh" />
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-800 mb-1">Driver Mobile No. (à¨¡à¨°à¨¾à¨à¨µà¨° à¨«à©à¨¨)</label>
+                <label class="block text-xs font-bold text-slate-800 mb-1">Driver Mobile No. (ਡਰਾਈਵਰ ਫੋਨ)</label>
                 <input type="tel" id="c-driver-phone" pattern="[0-9]{10}" class="w-full border rounded-lg p-2 text-sm bg-white font-mono" placeholder="10-digit mobile" />
               </div>
             </div>
 
             <!-- ROW 3: GROSS, TARE & NET WEIGHT (SHOWN PROMINENTLY IN VIKRI) -->
             <div id="vikri-weight-section" class="hidden bg-amber-50/80 p-3.5 rounded-xl border border-amber-300">
-              <span class="block text-xs font-black uppercase text-amber-950 mb-2">âï¸ Vikri Goods Weight in Truck (à¨¤à©à¨² à¨µà©à¨°à¨µà¨¾)</span>
+              <span class="block text-xs font-black uppercase text-amber-950 mb-2">⚖️ Vikri Goods Weight in Truck (ਤੋਲ ਵੇਰਵਾ)</span>
               <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                 <div>
                   <label class="block font-semibold mb-1">Gross Weight (Kg)</label>
@@ -1197,22 +1197,22 @@
             </div>
 
             <div id="financial-expenses-section" class="border-t pt-4 bg-gray-50 p-4 rounded-xl space-y-3">
-              <h4 class="text-xs font-bold uppercase text-slate-700">Freight & Miscellaneous Expenses (à¨«à©à¨à¨à¨² à¨à¨¼à¨°à¨à©)</h4>
+              <h4 class="text-xs font-bold uppercase text-slate-700">Freight & Miscellaneous Expenses (ਫੁਟਕਲ ਖ਼ਰਚੇ)</h4>
               <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div>
-                  <label class="block text-xs font-semibold mb-1">Freight / Bhada â¹</label>
+                  <label class="block text-xs font-semibold mb-1">Freight / Bhada ₹</label>
                   <input type="number" id="c-freight" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold mb-1">Labour / Loading â¹</label>
+                  <label class="block text-xs font-semibold mb-1">Labour / Loading ₹</label>
                   <input type="number" id="c-labour" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold mb-1">Packaging / Stencil â¹</label>
+                  <label class="block text-xs font-semibold mb-1">Packaging / Stencil ₹</label>
                   <input type="number" id="c-pack-charge" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold mb-1">Misc Expense â¹</label>
+                  <label class="block text-xs font-semibold mb-1">Misc Expense ₹</label>
                   <input type="number" id="c-misc" class="w-full border rounded-lg p-2 text-sm" placeholder="0" />
                 </div>
               </div>
@@ -1239,10 +1239,10 @@
           <div id="printable-slip"></div>
           <div class="flex gap-2 mt-6 no-print border-t pt-4">
             <button onclick="triggerDirectPrint()" class="flex-1 bg-slate-900 hover:bg-black text-amber-400 py-2.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1">
-              ð¨ï¸ Print Slip / PDF
+              🖨️ Print Slip / PDF
             </button>
             <button id="whatsapp-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1">
-              ð¬ Send on WhatsApp
+              💬 Send on WhatsApp
             </button>
             <button onclick="closeModal()" class="px-4 py-2.5 border border-gray-300 rounded-lg text-xs font-bold text-gray-700">
               Close
@@ -1401,7 +1401,7 @@
             localStorage.setItem('SETIA_WAXING_PORTAL_V10', JSON.stringify(APP_DATA));
 
             if (badge) {
-              badge.innerText = "âï¸ MongoDB Atlas Cloud Sync Active";
+              badge.innerText = "☁️ MongoDB Atlas Cloud Sync Active";
               badge.className = "mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
             }
 
@@ -1493,7 +1493,7 @@
           <div class="border rounded-lg p-1.5 bg-gray-50 text-center">
             <div class="text-[11px] font-extrabold text-amber-700">${size}</div>
             <input type="number" id="size-qty-${size}" placeholder="Qty" class="w-full border rounded p-1 text-xs mt-1 text-center font-medium" />
-            <input type="number" id="size-rate-${size}" placeholder="â¹ Rate" class="size-rate-input w-full border rounded p-1 text-xs mt-1 text-center font-medium ${isVikri ? 'hidden' : ''}" />
+            <input type="number" id="size-rate-${size}" placeholder="₹ Rate" class="size-rate-input w-full border rounded p-1 text-xs mt-1 text-center font-medium ${isVikri ? 'hidden' : ''}" />
           </div>
         `;
       });
@@ -1630,7 +1630,7 @@
       }
 
       saveData();
-      alert(`Staff member ${name} added to Directory with monthly salary â¹${salary.toLocaleString('en-IN')}!`);
+      alert(`Staff member ${name} added to Directory with monthly salary ₹${salary.toLocaleString('en-IN')}!`);
       e.target.reset();
       populateDropdowns();
       updateLedgerPersonDropdown();
@@ -1655,11 +1655,11 @@
         <tr class="border-b hover:bg-gray-50">
           <td class="p-2.5 font-bold text-slate-800">${st.name}</td>
           <td class="p-2.5 text-gray-600">${st.role || 'Staff'}</td>
-          <td class="p-2.5 text-right font-bold text-slate-900">â¹${(st.salary || 0).toLocaleString('en-IN')}</td>
-          <td class="p-2.5 text-right font-semibold text-emerald-700">â¹${Math.round((st.salary || 0) / 30).toLocaleString('en-IN')}/day</td>
+          <td class="p-2.5 text-right font-bold text-slate-900">₹${(st.salary || 0).toLocaleString('en-IN')}</td>
+          <td class="p-2.5 text-right font-semibold text-emerald-700">₹${Math.round((st.salary || 0) / 30).toLocaleString('en-IN')}/day</td>
           <td class="p-2.5 text-right">
             ${isAdmin ? `
-              <button onclick="deleteStaffFromDirectory('${st.id}', '${st.name}')" class="text-red-600 font-bold hover:underline">ðï¸ Remove Staff</button>
+              <button onclick="deleteStaffFromDirectory('${st.id}', '${st.name}')" class="text-red-600 font-bold hover:underline">🗑️ Remove Staff</button>
             ` : `
               <span class="text-gray-400 text-[10px] italic">Admin Only</span>
             `}
@@ -1707,17 +1707,17 @@
       const womenRate = Number(document.getElementById('att-group-women-rate').value || 0);
 
       let total = (menCount * menRate) + (womenCount * womenRate);
-      let note = `(${menCount} Men @â¹${menRate} + ${womenCount} Women @â¹${womenRate})`;
+      let note = `(${menCount} Men @₹${menRate} + ${womenCount} Women @₹${womenRate})`;
 
       if (status === 'Half Day') {
         total = total * 0.5;
-        note += ` Ã 50% (Half Day)`;
+        note += ` × 50% (Half Day)`;
       } else if (status === 'Absent') {
         total = 0;
-        note += ` Ã 0 (Absent)`;
+        note += ` × 0 (Absent)`;
       }
 
-      document.getElementById('disp-group-total').innerText = `â¹${total.toLocaleString('en-IN')}`;
+      document.getElementById('disp-group-total').innerText = `₹${total.toLocaleString('en-IN')}`;
       document.getElementById('disp-group-breakdown').innerText = `${note} = ${menCount + womenCount} Total Workers`;
     }
 
@@ -1759,7 +1759,7 @@
       });
 
       saveData();
-      alert(`Recorded attendance [${status}] for ${head} (Total â¹${totalPayable.toLocaleString('en-IN')})!`);
+      alert(`Recorded attendance [${status}] for ${head} (Total ₹${totalPayable.toLocaleString('en-IN')})!`);
       e.target.reset();
       document.getElementById('att-group-date').value = new Date().toISOString().split('T')[0];
       document.getElementById('att-group-status').value = 'Present';
@@ -1805,12 +1805,12 @@
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2.5 font-bold text-slate-800">${st.name}</td>
             <td class="p-2.5 text-gray-600">${st.role || 'Staff'}</td>
-            <td class="p-2.5 text-right font-semibold text-slate-900">â¹${monthlySalary.toLocaleString('en-IN')}</td>
+            <td class="p-2.5 text-right font-semibold text-slate-900">₹${monthlySalary.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-center font-bold text-emerald-700">${presentCount}</td>
             <td class="p-2.5 text-center font-bold text-amber-600">${halfDayCount}</td>
             <td class="p-2.5 text-center font-bold text-red-600">${absentCount}</td>
             <td class="p-2.5 text-center font-black text-slate-900 bg-amber-50">${effectiveDays}</td>
-            <td class="p-2.5 text-right font-black text-emerald-800 text-sm">â¹${netCalculatedSalary.toLocaleString('en-IN')}</td>
+            <td class="p-2.5 text-right font-black text-emerald-800 text-sm">₹${netCalculatedSalary.toLocaleString('en-IN')}</td>
           </tr>
         `;
       }).join('');
@@ -1874,7 +1874,7 @@
         name: s.name,
         location: 'Waxing Plant Hub',
         countStatus: s.status,
-        rateDetail: `â¹${s.wage || 0}/day`,
+        rateDetail: `₹${s.wage || 0}/day`,
         amount: (s.status === 'Absent' || s.status === 'Leave') ? 0 : (s.status === 'Half Day' ? (s.wage || 0)/2 : (s.wage || 0)),
         menCount: 0,
         womenCount: 0,
@@ -1888,7 +1888,7 @@
         name: g.head,
         location: g.orchard || 'Plant',
         countStatus: `${g.status || 'Present'}: ${g.menCount || 0}M + ${g.womenCount || 0}W (${g.count} Persons)`,
-        rateDetail: `Men: â¹${g.menRate || 0} | Women: â¹${g.womenRate || 0}`,
+        rateDetail: `Men: ₹${g.menRate || 0} | Women: ₹${g.womenRate || 0}`,
         amount: g.totalPayable,
         menCount: g.menCount || 0,
         womenCount: g.womenCount || 0,
@@ -1936,11 +1936,11 @@
             <td class="p-2.5 text-gray-600">${r.location}</td>
             <td class="p-2.5 text-center font-bold text-slate-900">${r.countStatus}</td>
             <td class="p-2.5 text-gray-600">${r.rateDetail}</td>
-            <td class="p-2.5 text-right font-bold text-slate-900">â¹${r.amount.toLocaleString('en-IN')}</td>
-            <td class="p-2.5 text-right font-black text-emerald-700">â¹${cumulative.toLocaleString('en-IN')}</td>
+            <td class="p-2.5 text-right font-bold text-slate-900">₹${r.amount.toLocaleString('en-IN')}</td>
+            <td class="p-2.5 text-right font-black text-emerald-700">₹${cumulative.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-right space-x-2 no-print">
-              <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">âï¸ Edit</button>
-              ${isAdmin ? `<button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">ðï¸ Delete</button>` : `<span class="text-gray-400 text-[10px] italic">Admin Only</span>`}
+              <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">✏️ Edit</button>
+              ${isAdmin ? `<button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">🗑️ Delete</button>` : `<span class="text-gray-400 text-[10px] italic">Admin Only</span>`}
             </td>
           </tr>
         `;
@@ -1954,7 +1954,7 @@
       document.getElementById('ledger-stat-staff-days').innerText = `${totalStaffDays} Staff Days`;
       document.getElementById('ledger-stat-group-heads').innerText = `${totalMen + totalWomen} Labour Heads`;
       document.getElementById('ledger-stat-mw-breakdown').innerText = `${totalMen} Men + ${totalWomen} Women`;
-      document.getElementById('ledger-stat-total-wages').innerText = `â¹${cumulative.toLocaleString('en-IN')}`;
+      document.getElementById('ledger-stat-total-wages').innerText = `₹${cumulative.toLocaleString('en-IN')}`;
 
       renderStaffSalaryReport();
       renderSavedStaffDirectory();
@@ -2127,7 +2127,7 @@
       if (!d) return alert("Dispatch record not found");
 
       document.getElementById('vs-dispatch-id').value = dispatchId;
-      document.getElementById('vs-header-subtitle').innerText = `Token: ${d.tokenNo} â¢ Date: ${d.date}`;
+      document.getElementById('vs-header-subtitle').innerText = `Token: ${d.tokenNo} • Date: ${d.date}`;
       document.getElementById('vs-disp-buyer').innerText = d.name;
       document.getElementById('vs-disp-boxes').innerText = `${d.totalBoxes} Boxes`;
       document.getElementById('vs-disp-truck').innerText = `${d.vehicle}${d.driverName ? ' (' + d.driverName + ')' : ''}`;
@@ -2159,10 +2159,10 @@
       const net = Math.max(0, gross - commAmt - labour - misc + crates);
       const netPerKg = netWt > 0 ? (net / netWt) : 0;
 
-      document.getElementById('vs-comm-amt-disp').innerText = `Commission (${pct}%): -â¹${commAmt.toLocaleString('en-IN')}`;
-      document.getElementById('vs-net-total-disp').innerText = `â¹${net.toLocaleString('en-IN')}`;
-      document.getElementById('vs-net-rate-disp').innerText = `â¹${netPerKg.toFixed(2)} / Kg`;
-      document.getElementById('vs-formula-breakdown').innerText = `â¹${gross.toLocaleString('en-IN')} - â¹${commAmt.toLocaleString('en-IN')} - â¹${labour} - â¹${misc} + â¹${crates}`;
+      document.getElementById('vs-comm-amt-disp').innerText = `Commission (${pct}%): -₹${commAmt.toLocaleString('en-IN')}`;
+      document.getElementById('vs-net-total-disp').innerText = `₹${net.toLocaleString('en-IN')}`;
+      document.getElementById('vs-net-rate-disp').innerText = `₹${netPerKg.toFixed(2)} / Kg`;
+      document.getElementById('vs-formula-breakdown').innerText = `₹${gross.toLocaleString('en-IN')} - ₹${commAmt.toLocaleString('en-IN')} - ₹${labour} - ₹${misc} + ₹${crates}`;
     }
 
     function saveVikriSettlement(e) {
@@ -2195,7 +2195,7 @@
 
       saveData();
       closeVikriSettlementModal();
-      alert(`Vikri report for ${d.tokenNo} updated!\nNet Settled Amount: â¹${netCalculated.toLocaleString('en-IN')}\nNet Rate per Kg: â¹${netRatePerKg.toFixed(2)}/Kg`);
+      alert(`Vikri report for ${d.tokenNo} updated!\nNet Settled Amount: ₹${netCalculated.toLocaleString('en-IN')}\nNet Rate per Kg: ₹${netRatePerKg.toFixed(2)}/Kg`);
       renderCustomerLedger();
     }
 
@@ -2404,17 +2404,17 @@
         const totalPaid = orchards.reduce((a,b) => a + (b.advance||0), 0) + payments.reduce((a,b) => a + b.amount, 0);
         const balanceDue = totalGross - totalPaid;
 
-        document.getElementById('party-portal-balance').innerText = `â¹${balanceDue.toLocaleString('en-IN')}`;
+        document.getElementById('party-portal-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
         document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-amber-800' : 'text-emerald-700'}`;
 
         kpiGrid.innerHTML = `
           <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Chargeable Fruit</span><span class="text-base font-black text-slate-800">${totChargeable.toFixed(1)} Kg</span><span class="text-[10px] text-gray-400 block">${trips.length} Loads</span></div>
           <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Pending Crates</span><span class="text-base font-black text-red-600">${pendingCrates}</span><span class="text-[10px] text-gray-400 block">Sent: ${totSent} | Recv: ${totRecv}</span></div>
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Valuation</span><span class="text-base font-black text-slate-800">â¹${totalGross.toLocaleString('en-IN')}</span></div>
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Received</span><span class="text-base font-black text-emerald-700">â¹${totalPaid.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Valuation</span><span class="text-base font-black text-slate-800">₹${totalGross.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Received</span><span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Cut</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val â¹</th><th class="p-2.5 text-right">Paid Amt â¹</th><th class="p-2.5 text-right">Slip</th></tr>`;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Cut</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val ₹</th><th class="p-2.5 text-right">Paid Amt ₹</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
           ...trips.map(t => ({ id: t.id, type: 'inward', date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, cut: t.cut || 0, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
@@ -2429,9 +2429,9 @@
             <td class="p-2.5 text-right">${h.net > 0 ? h.net.toFixed(1) + ' Kg' : '-'}</td>
             <td class="p-2.5 text-right text-red-600 font-semibold">${h.cut > 0 ? '-' + h.cut.toFixed(1) + ' Kg' : (h.type==='inward' ? '0' : '-')}</td>
             <td class="p-2.5 text-right font-bold text-slate-900">${h.chg > 0 ? h.chg.toFixed(1) + ' Kg' : '-'}</td>
-            <td class="p-2.5 text-right font-semibold text-slate-800">${h.val > 0 ? 'â¹' + h.val.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right font-bold text-emerald-700">${h.paid > 0 ? 'â¹' + h.paid.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right">${h.type === 'inward' ? `<button onclick="reprintInwardSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">ð Slip</button>` : '-'}</td>
+            <td class="p-2.5 text-right font-semibold text-slate-800">${h.val > 0 ? '₹' + h.val.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right font-bold text-emerald-700">${h.paid > 0 ? '₹' + h.paid.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right">${h.type === 'inward' ? `<button onclick="reprintInwardSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>` : '-'}</td>
           </tr>
         `).join('');
 
@@ -2444,17 +2444,17 @@
         const totalPaid = payments.reduce((a,b) => a + (b.amount || 0), 0);
         const balanceDue = totalBilled - totalPaid;
 
-        document.getElementById('party-portal-balance').innerText = `â¹${balanceDue.toLocaleString('en-IN')}`;
+        document.getElementById('party-portal-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
         document.getElementById('party-portal-balance').className = `text-xl font-black ${balanceDue > 0 ? 'text-red-700' : 'text-emerald-700'}`;
 
         kpiGrid.innerHTML = `
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Billed Sales</span><span class="text-base font-black text-slate-800">â¹${totalBilled.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Billed Sales</span><span class="text-base font-black text-slate-800">₹${totalBilled.toLocaleString('en-IN')}</span></div>
           <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Boxes Purchased</span><span class="text-base font-black text-amber-700">${totalBoxes} Boxes</span></div>
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Paid in Bank</span><span class="text-base font-black text-emerald-700">â¹${totalPaid.toLocaleString('en-IN')}</span></div>
-          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Pending Balance</span><span class="text-base font-black text-red-600">â¹${balanceDue.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Paid in Bank</span><span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span></div>
+          <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Pending Balance</span><span class="text-base font-black text-red-600">₹${balanceDue.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Dispatch / Details</th><th class="p-2.5 text-center">Boxes</th><th class="p-2.5 text-right">Debit (Billed â¹)</th><th class="p-2.5 text-right">Credit (Paid â¹)</th><th class="p-2.5 text-right">Slip</th></tr>`;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Dispatch / Details</th><th class="p-2.5 text-center">Boxes</th><th class="p-2.5 text-right">Debit (Billed ₹)</th><th class="p-2.5 text-right">Credit (Paid ₹)</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
           ...dispatches.map(d => ({ id: d.id, type: 'invoice', date: d.date, token: d.tokenNo, desc: `Dispatch (${d.vehicle})${d.driverName ? ' - Driver: ' + d.driverName : ''}`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
@@ -2467,9 +2467,9 @@
             <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
             <td class="p-2.5 font-medium">${h.desc}</td>
             <td class="p-2.5 text-center font-bold">${h.boxes}</td>
-            <td class="p-2.5 text-right font-bold text-slate-900">${h.debit > 0 ? 'â¹' + h.debit.toLocaleString('en-IN') : (h.desc.includes('Vikri') ? 'Sizes Only' : '-')}</td>
-            <td class="p-2.5 text-right font-bold text-emerald-700">${h.credit > 0 ? 'â¹' + h.credit.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right">${h.type === 'invoice' ? `<button onclick="reprintCustomerSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">ð Slip</button>` : '-'}</td>
+            <td class="p-2.5 text-right font-bold text-slate-900">${h.debit > 0 ? '₹' + h.debit.toLocaleString('en-IN') : (h.desc.includes('Vikri') ? 'Sizes Only' : '-')}</td>
+            <td class="p-2.5 text-right font-bold text-emerald-700">${h.credit > 0 ? '₹' + h.credit.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right">${h.type === 'invoice' ? `<button onclick="reprintCustomerSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>` : '-'}</td>
           </tr>
         `).join('');
       }
@@ -2488,8 +2488,8 @@
             <td class="p-2.5 font-mono text-gray-500">${s.password}</td>
             <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${blocked ? 'Blocked' : 'Active'}</span></td>
             <td class="p-2.5 text-right space-x-2">
-              <button onclick="toggleUserBlockStatus('${s.username}', '${s.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? 'â Unblock' : 'ð« Block'}</button>
-              <button onclick="deleteStaffUser('${s.id}', '${s.username}')" class="text-red-600 font-bold text-[11px] hover:underline">ðï¸ Delete</button>
+              <button onclick="toggleUserBlockStatus('${s.username}', '${s.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? '✅ Unblock' : '🚫 Block'}</button>
+              <button onclick="deleteStaffUser('${s.id}', '${s.username}')" class="text-red-600 font-bold text-[11px] hover:underline">🗑️ Delete</button>
             </td>
           </tr>
         `;
@@ -2524,8 +2524,8 @@
             <td class="p-2.5 font-mono font-bold text-amber-900">${p.phone}</td>
             <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${blocked ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'}">${blocked ? 'Blocked' : 'Active'}</span></td>
             <td class="p-2.5 text-right space-x-2">
-              <button onclick="toggleUserBlockStatus('${p.phone}', '${p.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? 'â Unblock' : 'ð« Block'}</button>
-              <button onclick="deletePartyAccount('${p.phone}', '${p.name}', '${p.type}')" class="text-red-600 font-bold text-[11px] hover:underline">ðï¸ Delete Account</button>
+              <button onclick="toggleUserBlockStatus('${p.phone}', '${p.name}')" class="font-bold text-[11px] ${blocked ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'}">${blocked ? '✅ Unblock' : '🚫 Block'}</button>
+              <button onclick="deletePartyAccount('${p.phone}', '${p.name}', '${p.type}')" class="text-red-600 font-bold text-[11px] hover:underline">🗑️ Delete Account</button>
             </td>
           </tr>
         `;
@@ -2554,9 +2554,9 @@
             <div><label class="block font-semibold mb-1">Gross Weight (Kg)</label><input type="number" step="0.1" id="ee-cust-gross" value="${d.grossWt || 0}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Net Weight (Kg)</label><input type="number" step="0.1" id="ee-cust-net" value="${d.netWt || 0}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Total Boxes</label><input type="number" id="ee-cust-boxes" value="${d.totalBoxes}" class="w-full border rounded p-1.5" required /></div>
-            <div><label class="block font-semibold mb-1">Grand Billed Total â¹</label><input type="number" id="ee-cust-total" value="${d.grandTotal}" class="w-full border rounded p-1.5" required /></div>
-            <div><label class="block font-semibold mb-1">Freight â¹</label><input type="number" id="ee-cust-freight" value="${d.freight || 0}" class="w-full border rounded p-1.5" /></div>
-            <div><label class="block font-semibold mb-1">Labour â¹</label><input type="number" id="ee-cust-labour" value="${d.labour || 0}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Grand Billed Total ₹</label><input type="number" id="ee-cust-total" value="${d.grandTotal}" class="w-full border rounded p-1.5" required /></div>
+            <div><label class="block font-semibold mb-1">Freight ₹</label><input type="number" id="ee-cust-freight" value="${d.freight || 0}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Labour ₹</label><input type="number" id="ee-cust-labour" value="${d.labour || 0}" class="w-full border rounded p-1.5" /></div>
           </div>
         `;
       } else if (type === 'inward') {
@@ -2576,7 +2576,7 @@
                 <option value="no" ${i.applyCut === false ? 'selected' : ''}>NO - Net Weight (0 Cut)</option>
               </select>
             </div>
-            <div><label class="block font-semibold mb-1">Rate â¹/Kg</label><input type="number" step="0.5" id="ee-inw-rate" value="${i.rate || 0}" class="w-full border rounded p-1.5" /></div>
+            <div><label class="block font-semibold mb-1">Rate ₹/Kg</label><input type="number" step="0.5" id="ee-inw-rate" value="${i.rate || 0}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Sent Crates</label><input type="number" id="ee-inw-sent" value="${i.sentCrates || 0}" class="w-full border rounded p-1.5" /></div>
             <div><label class="block font-semibold mb-1">Received Crates</label><input type="number" id="ee-inw-recv" value="${i.recvCrates || 0}" class="w-full border rounded p-1.5" /></div>
           </div>
@@ -2590,8 +2590,8 @@
             <div><label class="block font-semibold mb-1">Farmer Name</label><input type="text" id="ee-agr-farmer" value="${a.name}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Phone</label><input type="tel" id="ee-agr-phone" value="${a.phone}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Village</label><input type="text" id="ee-agr-village" value="${a.village}" class="w-full border rounded p-1.5" /></div>
-            <div><label class="block font-semibold mb-1">Advance Token Paid â¹</label><input type="number" id="ee-agr-advance" value="${a.advance || 0}" class="w-full border rounded p-1.5" /></div>
-            ${a.type === 'lump_sum' ? `<div><label class="block font-semibold mb-1">Total Lump Sum Value â¹</label><input type="number" id="ee-agr-total" value="${a.total || 0}" class="w-full border rounded p-1.5" /></div>` : `<div><label class="block font-semibold mb-1">Rate â¹ / Kg</label><input type="number" step="0.5" id="ee-agr-rate" value="${a.rate || 0}" class="w-full border rounded p-1.5" /></div>`}
+            <div><label class="block font-semibold mb-1">Advance Token Paid ₹</label><input type="number" id="ee-agr-advance" value="${a.advance || 0}" class="w-full border rounded p-1.5" /></div>
+            ${a.type === 'lump_sum' ? `<div><label class="block font-semibold mb-1">Total Lump Sum Value ₹</label><input type="number" id="ee-agr-total" value="${a.total || 0}" class="w-full border rounded p-1.5" /></div>` : `<div><label class="block font-semibold mb-1">Rate ₹ / Kg</label><input type="number" step="0.5" id="ee-agr-rate" value="${a.rate || 0}" class="w-full border rounded p-1.5" /></div>`}
           </div>
         `;
       }
@@ -2699,7 +2699,7 @@
         sizesHTML = `<div class="grid grid-cols-3 md:grid-cols-4 gap-2 my-2 border p-2.5 bg-slate-50 text-[11px]">` + 
           Object.entries(d.sizesBreakdown).map(([sz, qty]) => {
             const rate = d.sizeRates?.[sz];
-            return `<div class="p-1 border rounded bg-white font-medium">Size <b>${sz}</b>: ${qty} Boxes ${!isVikri && rate ? `(@â¹${rate})` : ''}</div>`;
+            return `<div class="p-1 border rounded bg-white font-medium">Size <b>${sz}</b>: ${qty} Boxes ${!isVikri && rate ? `(@₹${rate})` : ''}</div>`;
           }).join('') + `</div>`;
       }
 
@@ -2730,29 +2730,29 @@
           ${isVikri && d.isSettled ? `
             <div class="border border-amber-400 p-2.5 bg-amber-50/70 rounded-lg my-2 space-y-1 text-xs">
               <span class="font-black block uppercase text-amber-900 pb-1 border-b border-amber-300">Vikri Final Mandi Settlement Breakdown</span>
-              <div class="flex justify-between"><span>Gross Mandi Sale:</span><b>â¹${(d.vikriGross || 0).toLocaleString('en-IN')}</b></div>
-              <div class="flex justify-between text-red-700"><span>Agent Commission (${d.commPercent || 0}%):</span><b>-â¹${(d.commAmount || 0).toLocaleString('en-IN')}</b></div>
-              <div class="flex justify-between text-red-700"><span>Labour Deduction:</span><b>-â¹${(d.vikriLabour || 0).toLocaleString('en-IN')}</b></div>
-              <div class="flex justify-between text-red-700"><span>Misc Mandi Expense:</span><b>-â¹${(d.vikriMisc || 0).toLocaleString('en-IN')}</b></div>
-              <div class="flex justify-between text-emerald-800"><span>Added Crates Amount:</span><b>+â¹${(d.vikriCrates || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between"><span>Gross Mandi Sale:</span><b>₹${(d.vikriGross || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-red-700"><span>Agent Commission (${d.commPercent || 0}%):</span><b>-₹${(d.commAmount || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-red-700"><span>Labour Deduction:</span><b>-₹${(d.vikriLabour || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-red-700"><span>Misc Mandi Expense:</span><b>-₹${(d.vikriMisc || 0).toLocaleString('en-IN')}</b></div>
+              <div class="flex justify-between text-emerald-800"><span>Added Crates Amount:</span><b>+₹${(d.vikriCrates || 0).toLocaleString('en-IN')}</b></div>
               <div class="flex justify-between text-sm font-black border-t pt-1 text-slate-900">
                 <span>Net Settled Amount:</span>
-                <span>â¹${(d.grandTotal || 0).toLocaleString('en-IN')}</span>
+                <span>₹${(d.grandTotal || 0).toLocaleString('en-IN')}</span>
               </div>
               ${d.netRatePerKg > 0 ? `
               <div class="flex justify-between text-xs font-black text-emerald-800 pt-0.5">
                 <span>Net Calculated Rate:</span>
-                <span>â¹${d.netRatePerKg.toFixed(2)} / Kg</span>
+                <span>₹${d.netRatePerKg.toFixed(2)} / Kg</span>
               </div>` : ''}
             </div>
           ` : ''}
 
           <div class="border border-black p-2 bg-amber-50 mb-2 flex justify-between items-center">
             <span class="font-black text-sm">Total Dispatched: ${d.totalBoxes} Boxes</span>
-            ${!isVikri ? `<span class="font-black text-sm text-slate-900">Grand Total: â¹${d.grandTotal.toLocaleString('en-IN')}</span>` : (d.isSettled ? `<span class="font-black text-sm text-emerald-800">Net Settled: â¹${d.grandTotal.toLocaleString('en-IN')}</span>` : `<span class="font-black text-xs text-amber-900">VIKRI NON-BILLED (REPORT PENDING)</span>`)}
+            ${!isVikri ? `<span class="font-black text-sm text-slate-900">Grand Total: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : (d.isSettled ? `<span class="font-black text-sm text-emerald-800">Net Settled: ₹${d.grandTotal.toLocaleString('en-IN')}</span>` : `<span class="font-black text-xs text-amber-900">VIKRI NON-BILLED (REPORT PENDING)</span>`)}
           </div>
           <div class="text-[10px] text-gray-500 pt-2 border-t flex justify-between">
-            <span>${!isVikri ? `Freight: â¹${d.freight || 0} | Labour: â¹${d.labour || 0}` : (d.isSettled && d.netRatePerKg > 0 ? `Net: â¹${d.netRatePerKg.toFixed(2)}/Kg` : `Verified Dispatched Sizes`)}</span>
+            <span>${!isVikri ? `Freight: ₹${d.freight || 0} | Labour: ₹${d.labour || 0}` : (d.isSettled && d.netRatePerKg > 0 ? `Net: ₹${d.netRatePerKg.toFixed(2)}/Kg` : `Verified Dispatched Sizes`)}</span>
             <span>Generated from SETIA Cloud Portal</span>
           </div>
         </div>
@@ -2773,7 +2773,7 @@
             <div class="w-16">${logoSvg}</div>
             <div class="text-center flex-1">
               <h1 class="text-xl font-black uppercase text-black">SETIA WAXING PLANT</h1>
-              <p class="text-[10px] uppercase font-bold text-gray-700">Harvest Inward Slip (à¨¤à©à©à¨¾à¨ à¨ªà¨°à¨à©)</p>
+              <p class="text-[10px] uppercase font-bold text-gray-700">Harvest Inward Slip (ਤੁੜਾਈ ਪਰਚੀ)</p>
             </div>
             <div class="text-right text-[11px] font-bold">
               <div>Token: <span class="font-mono text-amber-900">${i.tokenNo}</span></div>
@@ -2795,8 +2795,8 @@
             </div>
           </div>
           <div class="border border-black p-2 bg-amber-50 flex justify-between font-bold text-xs mb-2">
-            <span>Rate: â¹${i.rate || 0} / Kg</span>
-            <span>Trip Valuation: â¹${(i.totalTripAmt || 0).toLocaleString('en-IN')}</span>
+            <span>Rate: ₹${i.rate || 0} / Kg</span>
+            <span>Trip Valuation: ₹${(i.totalTripAmt || 0).toLocaleString('en-IN')}</span>
           </div>
           <div class="text-[10px] text-gray-500 pt-2 border-t flex justify-between">
             <span>Crates: Sent ${i.sentCrates || 0} / Received ${i.recvCrates || 0}</span>
@@ -2828,8 +2828,8 @@
             <div class="flex justify-between"><span>Village:</span><b>${a.village}</b></div>
             <div class="flex justify-between"><span>Phone:</span><b>+91 ${a.phone}</b></div>
             <div class="flex justify-between"><span>Deal Type:</span><b>${a.type === 'lump_sum' ? 'Full Orchard / Lump Sum' : 'Per Kg Basis'}</b></div>
-            ${a.type === 'lump_sum' ? `<div class="flex justify-between font-black text-sm"><span>Total Valuation:</span><span>â¹${(a.total || 0).toLocaleString('en-IN')}</span></div>` : `<div class="flex justify-between font-black text-sm"><span>Agreed Rate:</span><span>â¹${a.rate} / Kg</span></div>`}
-            <div class="flex justify-between text-emerald-800 font-bold border-t pt-1"><span>Advance Token Paid:</span><span>â¹${(a.advance || 0).toLocaleString('en-IN')}</span></div>
+            ${a.type === 'lump_sum' ? `<div class="flex justify-between font-black text-sm"><span>Total Valuation:</span><span>₹${(a.total || 0).toLocaleString('en-IN')}</span></div>` : `<div class="flex justify-between font-black text-sm"><span>Agreed Rate:</span><span>₹${a.rate} / Kg</span></div>`}
+            <div class="flex justify-between text-emerald-800 font-bold border-t pt-1"><span>Advance Token Paid:</span><span>₹${(a.advance || 0).toLocaleString('en-IN')}</span></div>
           </div>
         </div>
       `;
@@ -2863,11 +2863,11 @@
       div.innerHTML = `
         <div class="flex justify-between items-center">
           <input type="text" id="cust-size-name-${customSizeIndex}" placeholder="Size (e.g. 120)" class="w-3/4 border rounded p-1 text-xs font-bold" />
-          <button type="button" onclick="document.getElementById('custom-size-box-${customSizeIndex}').remove()" class="text-red-500 font-bold text-xs px-1">â</button>
+          <button type="button" onclick="document.getElementById('custom-size-box-${customSizeIndex}').remove()" class="text-red-500 font-bold text-xs px-1">✕</button>
         </div>
         <div class="flex gap-1">
           <input type="number" id="cust-size-qty-${customSizeIndex}" placeholder="Boxes" class="w-full border rounded p-1 text-xs" />
-          <input type="number" id="cust-size-rate-${customSizeIndex}" placeholder="Rate â¹" class="size-rate-input w-1/2 border rounded p-1 text-xs ${isVikri ? 'hidden' : ''}" />
+          <input type="number" id="cust-size-rate-${customSizeIndex}" placeholder="Rate ₹" class="size-rate-input w-1/2 border rounded p-1 text-xs ${isVikri ? 'hidden' : ''}" />
         </div>
       `;
       container.appendChild(div);
@@ -3035,7 +3035,7 @@
       if (!APP_DATA.customerPayments) APP_DATA.customerPayments = [];
       APP_DATA.customerPayments.push({ id: 'cpay_' + Date.now(), date: dateStr, customer, amount, bank, ref });
       saveData();
-      alert(`Recorded â¹${amount.toLocaleString('en-IN')} payment!`);
+      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment!`);
       e.target.reset();
       renderCustomerLedger();
     }
@@ -3052,7 +3052,7 @@
       if (!APP_DATA.farmerPayments) APP_DATA.farmerPayments = [];
       APP_DATA.farmerPayments.push({ id: 'fpay_' + Date.now(), date: dateStr, orchardId, farmerName: orch ? orch.name : "Farmer", amount, bank, ref });
       saveData();
-      alert(`Recorded â¹${amount.toLocaleString('en-IN')} payment!`);
+      alert(`Recorded ₹${amount.toLocaleString('en-IN')} payment!`);
       e.target.reset();
       renderSingleOrchardSummary();
     }
@@ -3078,13 +3078,13 @@
         const adv = Number(document.getElementById('f-advance').value || 0);
         dealData.total = total;
         dealData.advance = adv;
-        dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Full Orchard</b></div><div class="flex justify-between py-1"><span>Agreed Value:</span><span>â¹${total.toLocaleString('en-IN')}</span></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>â¹${adv.toLocaleString('en-IN')}</span></div>`;
+        dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Full Orchard</b></div><div class="flex justify-between py-1"><span>Agreed Value:</span><span>₹${total.toLocaleString('en-IN')}</span></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
       } else {
         const rate = Number(document.getElementById('f-rate').value || 0);
         const adv = Number(document.getElementById('f-kg-advance').value || 0);
         dealData.rate = rate;
         dealData.advance = adv;
-        dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Per Kg Basis</b></div><div class="flex justify-between py-1"><span>Agreed Rate:</span><b>â¹${rate} / Kg</b></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>â¹${adv.toLocaleString('en-IN')}</span></div>`;
+        dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Per Kg Basis</b></div><div class="flex justify-between py-1"><span>Agreed Rate:</span><b>₹${rate} / Kg</b></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
       }
 
       if (!APP_DATA.agreements) APP_DATA.agreements = [];
@@ -3099,7 +3099,7 @@
             <div class="text-center flex-1"><h1 class="text-xl font-black uppercase text-black">SETIA WAXING PLANT</h1><p class="text-[10px] uppercase font-bold text-gray-700">Orchard Purchase Agreement</p></div>
           </div>
           <div class="border border-black p-2.5 bg-gray-50 mb-3 space-y-1">${dealHTML}</div>
-          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">ð Farmer Portal Access: Username: <b>${phone}</b> | Password: <b>${phone}</b></div>
+          <div class="p-2 border border-black bg-amber-50 text-[11px] mb-3">🔐 Farmer Portal Access: Username: <b>${phone}</b> | Password: <b>${phone}</b></div>
         </div>
       `;
 
@@ -3301,10 +3301,10 @@
       const totalPaid = payments.reduce((a, b) => a + (b.amount || 0), 0);
       const balanceDue = totalBilled - totalPaid;
 
-      document.getElementById('cust-kpi-invoiced').innerText = `â¹${totalBilled.toLocaleString('en-IN')}`;
+      document.getElementById('cust-kpi-invoiced').innerText = `₹${totalBilled.toLocaleString('en-IN')}`;
       document.getElementById('cust-kpi-boxes').innerText = `${totalBoxes} Boxes`;
-      document.getElementById('cust-kpi-paid').innerText = `â¹${totalPaid.toLocaleString('en-IN')}`;
-      document.getElementById('cust-kpi-balance').innerText = `â¹${balanceDue.toLocaleString('en-IN')}`;
+      document.getElementById('cust-kpi-paid').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
+      document.getElementById('cust-kpi-balance').innerText = `₹${balanceDue.toLocaleString('en-IN')}`;
 
       const combined = [
         ...invoices.map(i => {
@@ -3312,11 +3312,11 @@
           if (i.driverName) breakdownStr += ` [Driver: ${i.driverName}]`;
           if (i.netWt > 0) breakdownStr += ` [Net Wt: ${i.netWt.toLocaleString('en-IN')} Kg]`;
           if (i.sizesBreakdown && Object.keys(i.sizesBreakdown).length > 0) {
-            breakdownStr += " â¢ " + Object.entries(i.sizesBreakdown).map(([sz, q]) => `${sz}: ${q}b`).join(', ');
+            breakdownStr += " • " + Object.entries(i.sizesBreakdown).map(([sz, q]) => `${sz}: ${q}b`).join(', ');
           }
           if (i.custType === 'Vikri' && i.isSettled) {
-            const rateStr = i.netRatePerKg > 0 ? ` â¢ Net Rate: â¹${i.netRatePerKg.toFixed(2)}/Kg` : '';
-            breakdownStr += ` â¢ [Settled: Gross â¹${(i.vikriGross || 0).toLocaleString('en-IN')} - Comm â¹${(i.commAmount || 0).toLocaleString('en-IN')} (${i.commPercent}%) - Lab â¹${i.vikriLabour || 0} - Misc â¹${i.vikriMisc || 0} + Crates â¹${i.vikriCrates || 0}${rateStr}]`;
+            const rateStr = i.netRatePerKg > 0 ? ` • Net Rate: ₹${i.netRatePerKg.toFixed(2)}/Kg` : '';
+            breakdownStr += ` • [Settled: Gross ₹${(i.vikriGross || 0).toLocaleString('en-IN')} - Comm ₹${(i.commAmount || 0).toLocaleString('en-IN')} (${i.commPercent}%) - Lab ₹${i.vikriLabour || 0} - Misc ₹${i.vikriMisc || 0} + Crates ₹${i.vikriCrates || 0}${rateStr}]`;
           }
           return {
             id: i.id,
@@ -3355,22 +3355,22 @@
               <span class="text-[10px] text-gray-500 uppercase">${row.type}</span>
             </td>
             <td class="p-2.5 text-right font-semibold text-gray-800">
-              ${row.debit > 0 ? 'â¹' + row.debit.toLocaleString('en-IN') : (row.isVikri && !row.isSettled ? '<span class="text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded text-[10px]">Report Pending</span>' : '-')}
+              ${row.debit > 0 ? '₹' + row.debit.toLocaleString('en-IN') : (row.isVikri && !row.isSettled ? '<span class="text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded text-[10px]">Report Pending</span>' : '-')}
             </td>
-            <td class="p-2.5 text-right font-semibold text-emerald-700">${row.credit > 0 ? 'â¹' + row.credit.toLocaleString('en-IN') : '-'}</td>
-            <td class="p-2.5 text-right font-bold ${running > 0 ? 'text-red-600' : 'text-emerald-700'}">â¹${running.toLocaleString('en-IN')}</td>
+            <td class="p-2.5 text-right font-semibold text-emerald-700">${row.credit > 0 ? '₹' + row.credit.toLocaleString('en-IN') : '-'}</td>
+            <td class="p-2.5 text-right font-bold ${running > 0 ? 'text-red-600' : 'text-emerald-700'}">₹${running.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-right space-x-1 whitespace-nowrap">
               ${row.type !== 'PAYMENT' ? `
                 ${row.isVikri ? `
                   <button onclick="openVikriSettlementModal('${row.id}')" class="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 rounded font-bold text-[10px] shadow">
-                    ${row.isSettled ? 'âï¸ Edit Vikri' : 'ð Settle Vikri'}
+                    ${row.isSettled ? '✏️ Edit Vikri' : '📝 Settle Vikri'}
                   </button>
                 ` : ''}
-                <button onclick="reprintCustomerSlip('${row.id}')" class="text-blue-600 font-bold hover:underline text-[11px]">ð Slip</button>
-                <button onclick="openEditRecordModal('dispatch', '${row.id}')" class="text-amber-700 font-bold hover:underline text-[11px]">âï¸ Edit</button>
-                <button onclick="deleteRecord('dispatch', '${row.id}')" class="text-red-600 font-bold hover:underline text-[11px]">ðï¸</button>
+                <button onclick="reprintCustomerSlip('${row.id}')" class="text-blue-600 font-bold hover:underline text-[11px]">📄 Slip</button>
+                <button onclick="openEditRecordModal('dispatch', '${row.id}')" class="text-amber-700 font-bold hover:underline text-[11px]">✏️ Edit</button>
+                <button onclick="deleteRecord('dispatch', '${row.id}')" class="text-red-600 font-bold hover:underline text-[11px]">🗑️</button>
               ` : `
-                <button onclick="deleteRecord('custPayment', '${row.id}')" class="text-red-600 font-bold hover:underline text-[11px]">ðï¸</button>
+                <button onclick="deleteRecord('custPayment', '${row.id}')" class="text-red-600 font-bold hover:underline text-[11px]">🗑️</button>
               `}
             </td>
           </tr>
@@ -3425,12 +3425,12 @@
       document.getElementById('orch-kpi-crates').innerText = `${pendingCrates} Pending`;
       document.getElementById('orch-kpi-crates-breakdown').innerText = `Sent: ${totSent} | Recv: ${totRecv}`;
       document.getElementById('orch-kpi-weight').innerText = `${totChargeable.toFixed(1)} Kg`;
-      document.getElementById('orch-kpi-financials').innerText = `â¹${balDue.toLocaleString('en-IN')} Due`;
-      document.getElementById('orch-kpi-paid-info').innerText = `Paid: â¹${totPaid.toLocaleString('en-IN')}`;
+      document.getElementById('orch-kpi-financials').innerText = `₹${balDue.toLocaleString('en-IN')} Due`;
+      document.getElementById('orch-kpi-paid-info').innerText = `Paid: ₹${totPaid.toLocaleString('en-IN')}`;
 
       const history = [
         ...(orch.advance > 0 ? [{ id: orch.id, recordType: 'agreement', date: orch.date, type: 'ADVANCE TOKEN', tokenNo: orch.tokenNo, desc: `Token ${orch.tokenNo} (${orch.advBank || 'Bank/Cash'})`, inwardAmt: 0, paidAmt: orch.advance, crates: '-' }] : []),
-        ...trips.map(t => ({ id: t.id, recordType: 'inward', date: t.date, type: 'INWARD TRIP', tokenNo: t.tokenNo, desc: `Inward (${t.vehicle}) - ${t.chargeable.toFixed(1)} Kg @â¹${t.rate} ${t.applyCut !== false ? '(1kg Cut)' : '(0 Cut)'}`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
+        ...trips.map(t => ({ id: t.id, recordType: 'inward', date: t.date, type: 'INWARD TRIP', tokenNo: t.tokenNo, desc: `Inward (${t.vehicle}) - ${t.chargeable.toFixed(1)} Kg @₹${t.rate} ${t.applyCut !== false ? '(1kg Cut)' : '(0 Cut)'}`, inwardAmt: t.totalTripAmt, paidAmt: 0, crates: `Sent ${t.sentCrates} / Recv ${t.recvCrates}` })),
         ...payments.map(p => ({ id: p.id, recordType: 'farmerPayment', date: p.date, type: 'BANK PAYMENT', tokenNo: '-', desc: `Paid: ${p.bank} (${p.ref})`, inwardAmt: 0, paidAmt: p.amount, crates: '-' }))
       ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -3440,19 +3440,19 @@
           <td class="p-2.5 font-medium">${h.date}</td>
           <td class="p-2.5 font-mono font-bold text-amber-900">${h.tokenNo}</td>
           <td class="p-2.5 font-medium">${h.desc}</td>
-          <td class="p-2.5 text-right font-semibold text-gray-800">${h.inwardAmt > 0 ? 'â¹' + h.inwardAmt.toLocaleString('en-IN') : '-'}</td>
-          <td class="p-2.5 text-right font-semibold text-emerald-700">${h.paidAmt > 0 ? 'â¹' + h.paidAmt.toLocaleString('en-IN') : '-'}</td>
+          <td class="p-2.5 text-right font-semibold text-gray-800">${h.inwardAmt > 0 ? '₹' + h.inwardAmt.toLocaleString('en-IN') : '-'}</td>
+          <td class="p-2.5 text-right font-semibold text-emerald-700">${h.paidAmt > 0 ? '₹' + h.paidAmt.toLocaleString('en-IN') : '-'}</td>
           <td class="p-2.5 text-right font-medium">${h.crates}</td>
           <td class="p-2.5 text-right space-x-2">
             ${h.recordType === 'inward' ? `
-              <button onclick="reprintInwardSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">ð Slip</button>
-              <button onclick="openEditRecordModal('inward', '${h.id}')" class="text-amber-600 font-bold hover:underline">âï¸ Edit</button>
-              <button onclick="deleteRecord('inward', '${h.id}')" class="text-red-600 font-bold hover:underline">ðï¸</button>
+              <button onclick="reprintInwardSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>
+              <button onclick="openEditRecordModal('inward', '${h.id}')" class="text-amber-600 font-bold hover:underline">✏️ Edit</button>
+              <button onclick="deleteRecord('inward', '${h.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
             ` : h.recordType === 'agreement' ? `
-              <button onclick="reprintFarmerSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">ð Slip</button>
-              <button onclick="openEditRecordModal('agreement', '${h.id}')" class="text-amber-600 font-bold hover:underline">âï¸ Edit</button>
+              <button onclick="reprintFarmerSlip('${h.id}')" class="text-blue-600 font-bold hover:underline">📄 Slip</button>
+              <button onclick="openEditRecordModal('agreement', '${h.id}')" class="text-amber-600 font-bold hover:underline">✏️ Edit</button>
             ` : `
-              <button onclick="deleteRecord('farmerPayment', '${h.id}')" class="text-red-600 font-bold hover:underline">ðï¸</button>
+              <button onclick="deleteRecord('farmerPayment', '${h.id}')" class="text-red-600 font-bold hover:underline">🗑️</button>
             `}
           </td>
         </tr>
@@ -3493,8 +3493,8 @@
       document.getElementById('stat-daily-weight').innerText = `${dailyNetWt.toLocaleString('en-IN')} Kg`;
       document.getElementById('stat-daily-cut').innerText = `${dailyCutWt.toFixed(1)} Kg Cut`;
       document.getElementById('stat-daily-boxes').innerText = `${dailyBoxes.toLocaleString('en-IN')} Boxes`;
-      document.getElementById('stat-daily-cust-recv').innerText = `â¹${dailyCustRecv.toLocaleString('en-IN')}`;
-      document.getElementById('stat-daily-farmer-paid').innerText = `â¹${dailyFarmerPaid.toLocaleString('en-IN')}`;
+      document.getElementById('stat-daily-cust-recv').innerText = `₹${dailyCustRecv.toLocaleString('en-IN')}`;
+      document.getElementById('stat-daily-farmer-paid').innerText = `₹${dailyFarmerPaid.toLocaleString('en-IN')}`;
 
       const seasonSales = (APP_DATA.dispatches || []).reduce((acc, curr) => acc + (curr.grandTotal || 0), 0);
       const seasonCustRecv = (APP_DATA.customerPayments || []).reduce((acc, curr) => acc + (curr.amount || 0), 0);
@@ -3513,11 +3513,11 @@
       const seasonFarmerPaid = (APP_DATA.agreements || []).reduce((x, y) => x + (y.advance || 0), 0) + (APP_DATA.farmerPayments || []).reduce((x, y) => x + (y.amount || 0), 0);
       const seasonFarmerPending = seasonFarmerGross - seasonFarmerPaid;
 
-      document.getElementById('season-total-sales').innerText = `â¹${seasonSales.toLocaleString('en-IN')}`;
-      document.getElementById('season-cust-pending').innerText = `â¹${seasonCustPending.toLocaleString('en-IN')} Pending`;
-      document.getElementById('season-total-received').innerText = `â¹${seasonCustRecv.toLocaleString('en-IN')}`;
-      document.getElementById('season-farmer-dues').innerText = `â¹${seasonFarmerGross.toLocaleString('en-IN')}`;
-      document.getElementById('season-farmer-pending').innerText = `â¹${seasonFarmerPending.toLocaleString('en-IN')} Pending`;
+      document.getElementById('season-total-sales').innerText = `₹${seasonSales.toLocaleString('en-IN')}`;
+      document.getElementById('season-cust-pending').innerText = `₹${seasonCustPending.toLocaleString('en-IN')} Pending`;
+      document.getElementById('season-total-received').innerText = `₹${seasonCustRecv.toLocaleString('en-IN')}`;
+      document.getElementById('season-farmer-dues').innerText = `₹${seasonFarmerGross.toLocaleString('en-IN')}`;
+      document.getElementById('season-farmer-pending').innerText = `₹${seasonFarmerPending.toLocaleString('en-IN')} Pending`;
     }
 
     function showSlip(html, phone, waText) {
