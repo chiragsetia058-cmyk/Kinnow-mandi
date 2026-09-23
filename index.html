@@ -1615,11 +1615,40 @@
             ${emp.exitDate ? `<span class="text-amber-800 font-bold">${emp.exitDate}</span>` : '<span class="text-emerald-700 font-semibold">Active Season</span>'}
             <button onclick="markSeasonExit('${emp.id}')" class="text-slate-900 underline ml-2 font-semibold">🚪 Exit</button>
           </td>
-          <td class="p-2.5 text-right">
+          <td class="p-2.5 text-right whitespace-nowrap">
+            <button onclick="openEditSalaryModal('${emp.id}')" class="text-amber-700 font-bold hover:underline mr-2">✏️ Salary</button>
             <button onclick="deletePermanentEmployee('${emp.id}')" class="text-red-600 font-bold hover:underline">🗑️ Remove</button>
           </td>
         </tr>
       `).join('');
+    }
+
+    function openEditSalaryModal(id) {
+      const emp = (APP_DATA.permanentEmployees || []).find(e => e.id === id);
+      if (!emp) return;
+      const newSal = prompt(`Enter new monthly salary for ${emp.name} (₹):`, emp.salary || 18000);
+      if (newSal !== null && !isNaN(newSal) && newSal.trim() !== '') {
+        const salNum = Number(newSal);
+        emp.salary = salNum;
+        
+        // Also update staffDirectory
+        if (!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
+        const dirEntry = APP_DATA.staffDirectory.find(s => s.name.trim().toLowerCase() === emp.name.trim().toLowerCase());
+        if (dirEntry) {
+          dirEntry.salary = salNum;
+        } else {
+          APP_DATA.staffDirectory.push({
+            id: 'sd_' + Date.now(),
+            name: emp.name,
+            role: emp.role || 'Staff',
+            salary: salNum
+          });
+        }
+        saveData();
+        renderPermanentEmployees();
+        renderAttendanceLedger();
+        alert(`Salary for ${emp.name} updated to ₹${salNum.toLocaleString('en-IN')}.`);
+      }
     }
 
     function markSeasonExit(id) {
