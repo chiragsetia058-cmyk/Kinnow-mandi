@@ -199,6 +199,60 @@
 
       <!-- TAB: ATTENDANCE & LABOUR -->
       <div id="attendance-section" class="hidden space-y-6">
+        
+        <!-- PERMANENT PLANT RESIDENT EMPLOYEES SECTION -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+          <div class="flex justify-between items-center pb-2 border-b">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">🏠 Permanent Plant Resident Employees</h3>
+              <p class="text-xs text-gray-500">Auto-attendance for staff staying inside plant premises (Join date to Season End / Leave)</p>
+            </div>
+          </div>
+
+          <form onsubmit="registerPermanentEmployee(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+            <div>
+              <label class="block font-semibold mb-1">Employee Name</label>
+              <input type="text" id="perm-emp-name" required class="w-full border rounded-lg p-2" placeholder="e.g. Ramesh Kumar" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Role / Designation</label>
+              <input type="text" id="perm-emp-role" class="w-full border rounded-lg p-2" placeholder="e.g. Plant Supervisor" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Joining Date (ਸ਼ੁਰੂਆਤੀ ਮਿਤੀ)</label>
+              <input type="date" id="perm-emp-join" required class="w-full border rounded-lg p-2 font-medium" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Staying in Plant Premises?</label>
+              <select id="perm-emp-stay" class="w-full border rounded-lg p-2 font-bold text-emerald-700">
+                <option value="yes" selected>✅ Yes (Auto-Attendance)</option>
+                <option value="no">❌ No</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full bg-slate-900 hover:bg-black text-amber-400 font-bold py-2 rounded-lg">
+                + Register Permanent
+              </button>
+            </div>
+          </form>
+
+          <div class="overflow-x-auto border rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-800 text-amber-300 font-bold">
+                <tr>
+                  <th class="p-2.5">Employee Name</th>
+                  <th class="p-2.5">Joining Date</th>
+                  <th class="p-2.5">Premises Stay</th>
+                  <th class="p-2.5">Leave Period (From - To)</th>
+                  <th class="p-2.5">Season Exit Date</th>
+                  <th class="p-2.5 text-right">Controls</th>
+                </tr>
+              </thead>
+              <tbody id="permanent-employee-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
           <h3 class="text-base font-bold text-slate-800 pb-2 border-b">📋 Register New Staff Member with Salary</h3>
           <form onsubmit="registerQuickStaff(event)" class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
@@ -1259,6 +1313,9 @@
         { id: 'sd_2', name: 'Gurpreet Singh', role: 'Machine Operator', salary: 15000 },
         { id: 'sd_3', name: 'Chirag Setia', role: 'Staff Operations', salary: 18000 }
       ],
+      permanentEmployees: [
+        { id: 'pe_1', name: 'Ramesh Kumar', role: 'Plant Supervisor', joiningDate: '2026-09-20', stayInPlant: true, leaveFrom: '', leaveTo: '', exitDate: '', status: 'Active' }
+      ],
       customerDirectory: [
         { id: 'cd_1', name: 'Chifu Agritech', phone: '9658200058', type: 'Billing', vehicle: 'PB 15 XX 0000' },
         { id: 'cd_2', name: 'Ramesh Vikri Seller', phone: '9876543211', type: 'Vikri', vehicle: 'PB 15 T 9999' }
@@ -1295,21 +1352,6 @@
               name: u.name.trim(),
               role: u.role === 'admin' ? 'Administrator' : 'Staff',
               salary: 18000
-            });
-          }
-        }
-      });
-
-      (APP_DATA.staffAttendance || []).forEach(a => {
-        if (a.name && !delFromDir.includes(a.name.trim().toLowerCase())) {
-          const exists = APP_DATA.staffDirectory.some(d => d.name.trim().toLowerCase() === a.name.trim().toLowerCase());
-          if (!exists) {
-            const wage = Number(a.wage || 0);
-            APP_DATA.staffDirectory.push({
-              id: 'sd_att_' + Math.random(),
-              name: a.name.trim(),
-              role: 'Staff',
-              salary: wage > 0 ? (wage * 30) : 15000
             });
           }
         }
@@ -1369,6 +1411,7 @@
             APP_DATA = {
               staffUsers: cleanStaff,
               staffDirectory: raw.staffDirectory || APP_DATA.staffDirectory || CORE_DEFAULTS.staffDirectory,
+              permanentEmployees: raw.permanentEmployees || APP_DATA.permanentEmployees || CORE_DEFAULTS.permanentEmployees,
               customerDirectory: raw.customerDirectory || APP_DATA.customerDirectory || CORE_DEFAULTS.customerDirectory,
               staffAttendance: raw.staffAttendance || APP_DATA.staffAttendance || [],
               groupLabourAttendance: raw.groupLabourAttendance || APP_DATA.groupLabourAttendance || [],
@@ -1394,11 +1437,11 @@
             populateDropdowns();
             renderDashboard();
             renderSavedStaffDirectory();
+            renderPermanentEmployees();
             renderAttendanceLedger();
             renderStaffTable();
             renderPartyAccountsTable();
             
-            // Maintain active user ledger view seamlessly
             const activeCust = document.getElementById('view-cust-select')?.value;
             if (activeCust) renderCustomerLedger();
             const activeOrch = document.getElementById('orchard-ledger-select')?.value;
@@ -1421,6 +1464,7 @@
       populateDropdowns();
       renderDashboard();
       renderSavedStaffDirectory();
+      renderPermanentEmployees();
       renderAttendanceLedger();
       renderStaffTable();
       renderPartyAccountsTable();
@@ -1458,6 +1502,8 @@
       const todayStr = new Date().toISOString().split('T')[0];
       document.getElementById('att-staff-date').value = todayStr;
       document.getElementById('att-group-date').value = todayStr;
+      const permJoinInput = document.getElementById('perm-emp-join');
+      if (permJoinInput) permJoinInput.value = todayStr;
 
       const curYearMonth = todayStr.substring(0, 7);
       document.getElementById('ledger-month-filter').value = curYearMonth;
@@ -1469,12 +1515,12 @@
       populateDropdowns();
       updateLedgerPersonDropdown();
       renderSavedStaffDirectory();
+      renderPermanentEmployees();
       renderAttendanceLedger();
       calculateDailyWeight();
       calculateGroupWage();
       fetchCloudData();
 
-      // Poll cloud data without resetting selected values
       setInterval(fetchCloudData, 8000);
     };
 
@@ -1491,6 +1537,104 @@
           </div>
         `;
       });
+    }
+
+    // --- PERMANENT PLANT EMPLOYEE MANAGEMENT ---
+    function registerPermanentEmployee(e) {
+      e.preventDefault();
+      const name = document.getElementById('perm-emp-name').value.trim();
+      const role = document.getElementById('perm-emp-role').value.trim() || 'Plant Staff';
+      const joiningDate = document.getElementById('perm-emp-join').value;
+      const stayInPlant = document.getElementById('perm-emp-stay').value === 'yes';
+
+      if (!APP_DATA.permanentEmployees) APP_DATA.permanentEmployees = [];
+
+      APP_DATA.permanentEmployees.push({
+        id: 'perm_' + Date.now(),
+        name,
+        role,
+        joiningDate,
+        stayInPlant,
+        leaveFrom: '',
+        leaveTo: '',
+        exitDate: '',
+        status: 'Active'
+      });
+
+      saveData();
+      alert(`Permanent employee ${name} registered successfully with automatic plant stay attendance!`);
+      e.target.reset();
+      document.getElementById('perm-emp-join').value = new Date().toISOString().split('T')[0];
+      renderPermanentEmployees();
+      renderAttendanceLedger();
+    }
+
+    function renderPermanentEmployees() {
+      const tbody = document.getElementById('permanent-employee-tbody');
+      if (!tbody) return;
+
+      const list = APP_DATA.permanentEmployees || [];
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-gray-400">No permanent resident employees registered yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(emp => `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-2.5 font-bold text-slate-800">${emp.name} <span class="block text-[10px] text-gray-500 font-normal">${emp.role}</span></td>
+          <td class="p-2.5 font-medium">${emp.joiningDate}</td>
+          <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${emp.stayInPlant ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-700'}">${emp.stayInPlant ? 'Staying in Plant' : 'External'}</span></td>
+          <td class="p-2.5 text-xs">
+            ${emp.leaveFrom ? `<span class="text-red-600 font-bold">Leave: ${emp.leaveFrom} to ${emp.leaveTo || 'Present'}</span>` : '<span class="text-gray-400">No Leave</span>'}
+            <button onclick="openLeaveModal('${emp.id}')" class="text-blue-600 underline ml-2 font-semibold">📅 Update Leave</button>
+          </td>
+          <td class="p-2.5">
+            ${emp.exitDate ? `<span class="text-amber-800 font-bold">${emp.exitDate}</span>` : '<span class="text-emerald-700 font-semibold">Active Season</span>'}
+            <button onclick="markSeasonExit('${emp.id}')" class="text-slate-900 underline ml-2 font-semibold">🚪 Exit</button>
+          </td>
+          <td class="p-2.5 text-right">
+            <button onclick="deletePermanentEmployee('${emp.id}')" class="text-red-600 font-bold hover:underline">🗑️ Remove</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function markSeasonExit(id) {
+      const emp = (APP_DATA.permanentEmployees || []).find(e => e.id === id);
+      if (!emp) return;
+      const exitDate = prompt("Enter season exit date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+      if (exitDate) {
+        emp.exitDate = exitDate;
+        emp.status = 'Exited';
+        saveData();
+        renderPermanentEmployees();
+        renderAttendanceLedger();
+        alert(`${emp.name}'s season exit recorded on ${exitDate}.`);
+      }
+    }
+
+    function openLeaveModal(id) {
+      const emp = (APP_DATA.permanentEmployees || []).find(e => e.id === id);
+      if (!emp) return;
+      const from = prompt("Enter Leave Start Date (YYYY-MM-DD):", emp.leaveFrom || new Date().toISOString().split('T')[0]);
+      if (from !== null) {
+        const to = prompt("Enter Leave End Date (YYYY-MM-DD):", emp.leaveTo || from);
+        emp.leaveFrom = from;
+        emp.leaveTo = to || from;
+        saveData();
+        renderPermanentEmployees();
+        renderAttendanceLedger();
+        alert("Leave dates updated successfully.");
+      }
+    }
+
+    function deletePermanentEmployee(id) {
+      if (confirm("Remove this permanent employee record?")) {
+        APP_DATA.permanentEmployees = (APP_DATA.permanentEmployees || []).filter(e => e.id !== id);
+        saveData();
+        renderPermanentEmployees();
+        renderAttendanceLedger();
+      }
     }
 
     // --- 1. CUSTOMER DIRECTORY REGISTRATION & AUTOFILL ---
@@ -1552,7 +1696,6 @@
       }
     }
 
-    // --- 2. SIZES & WEIGHT CONTROLS IN VIKRI CUSTOMER ---
     function toggleCustomerType() {
       const isVikri = document.querySelector('input[name="cust-dispatch-type"]:checked')?.value === 'Vikri';
       const matrixTitle = document.getElementById('matrix-heading-title');
@@ -1582,7 +1725,6 @@
       }
     }
 
-    // --- 3. FARMER INWARD: 1 KG / 100 KG CUT TOGGLE ---
     function calculateDailyWeight() {
       const gross = Number(document.getElementById('d-gross-wt').value || 0);
       const tare = Number(document.getElementById('d-tare-wt').value || 0);
@@ -1606,7 +1748,6 @@
       document.getElementById('disp-final-wt').innerText = finalWt.toFixed(1);
     }
 
-    // --- 4. STAFF SALARY REGISTRATION & SAVED DIRECTORY ---
     function registerQuickStaff(e) {
       e.preventDefault();
       const name = document.getElementById('reg-staff-name').value.trim();
@@ -1698,7 +1839,6 @@
       }
     }
 
-    // --- 5. CONTRACTOR LABOUR ATTENDANCE ---
     function calculateGroupWage() {
       const status = document.getElementById('att-group-status').value;
       const menCount = Number(document.getElementById('att-group-men-count').value || 0);
@@ -1771,7 +1911,6 @@
       renderAttendanceLedger();
     }
 
-    // --- 6. STAFF SALARY REPORT ---
     function renderStaffSalaryReport() {
       const tbody = document.getElementById('staff-salary-report-tbody');
       if (!tbody) return;
@@ -1816,7 +1955,6 @@
       }).join('');
     }
 
-    // --- 7. ATTENDANCE LEDGER CONTROLS ---
     function updateLedgerPersonDropdown() {
       const cat = document.getElementById('ledger-cat-filter').value;
       const personSel = document.getElementById('ledger-person-filter');
@@ -1829,7 +1967,8 @@
         const staffNames = new Set([
           ...(APP_DATA.staffUsers || []).map(u => u.name),
           ...(APP_DATA.staffDirectory || []).map(d => d.name),
-          ...(APP_DATA.staffAttendance || []).map(a => a.name)
+          ...(APP_DATA.staffAttendance || []).map(a => a.name),
+          ...(APP_DATA.permanentEmployees || []).map(p => p.name)
         ]);
         staffNames.forEach(name => {
           if (name && name.trim()) {
@@ -1865,6 +2004,7 @@
       renderAttendanceLedger();
     }
 
+    // --- EXPANDED ATTENDANCE LEDGER WITH PERMANENT PLANT STAY AUTO-GENERATION ---
     function renderAttendanceLedger() {
       const tbody = document.getElementById('attendance-ledger-tbody');
       if (!tbody) return;
@@ -1889,6 +2029,57 @@
         totalPersons: (s.status === 'Present' ? 1 : (s.status === 'Half Day' ? 0.5 : 0))
       }));
 
+      // Generate automatic daily entries for Permanent Plant Resident Employees
+      if (fromDate && toDate && (catFilter === 'ALL' || catFilter === 'Single Staff')) {
+        const start = new Date(fromDate);
+        const end = new Date(toDate);
+
+        (APP_DATA.permanentEmployees || []).forEach(emp => {
+          if (!emp.stayInPlant) return;
+          const join = new Date(emp.joiningDate);
+          const exit = emp.exitDate ? new Date(emp.exitDate) : new Date();
+
+          let curr = new Date(Math.max(start, join));
+          const effectiveEnd = new Date(Math.min(end, exit));
+
+          const staffDirEntry = (APP_DATA.staffDirectory || []).find(d => d.name.trim().toLowerCase() === emp.name.trim().toLowerCase());
+          const monthlySal = staffDirEntry ? staffDirEntry.salary : 18000;
+          const dailyRate = Math.round(monthlySal / 30);
+
+          while (curr <= effectiveEnd) {
+            const dateStr = curr.toISOString().split('T')[0];
+            
+            // Check if date falls in leave range
+            let status = 'Present (Plant Resident)';
+            let amt = dailyRate;
+            if (emp.leaveFrom && emp.leaveTo && dateStr >= emp.leaveFrom && dateStr <= emp.leaveTo) {
+              status = 'On Leave';
+              amt = 0;
+            }
+
+            // Avoid duplicate manual overrides on the same day
+            const existsManual = staffList.some(s => s.name.trim().toLowerCase() === emp.name.trim().toLowerCase() && s.date === dateStr);
+            if (!existsManual) {
+              staffList.push({
+                id: 'auto_' + emp.id + '_' + dateStr,
+                date: dateStr,
+                cat: 'Single Staff',
+                name: emp.name + ' (Plant Resident)',
+                location: 'Plant Premises (Stay)',
+                countStatus: status,
+                rateDetail: `₹${dailyRate}/day (Auto Stay)`,
+                amount: amt,
+                menCount: 0,
+                womenCount: 0,
+                totalPersons: status === 'On Leave' ? 0 : 1
+              });
+            }
+
+            curr.setDate(curr.getDate() + 1);
+          }
+        });
+      }
+
       let groupList = (APP_DATA.groupLabourAttendance || []).map(g => ({
         id: g.id,
         date: g.date,
@@ -1911,7 +2102,7 @@
 
       if (personFilter !== 'ALL') {
         const [prefix, pName] = personFilter.split(':');
-        allRecords = allRecords.filter(r => r.name.trim().toLowerCase() === pName.trim().toLowerCase());
+        allRecords = allRecords.filter(r => r.name.toLowerCase().includes(pName.trim().toLowerCase()));
       }
 
       if (fromDate) {
@@ -1936,6 +2127,8 @@
           totalWomen += r.womenCount;
         }
 
+        const isAutoEntry = r.id.startsWith('auto_');
+
         return `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2.5 font-medium whitespace-nowrap">${r.date}</td>
@@ -1947,8 +2140,10 @@
             <td class="p-2.5 text-right font-bold text-slate-900">₹${r.amount.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-right font-black text-emerald-700">₹${cumulative.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-right space-x-2 no-print">
-              <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">✏️ Edit</button>
-              ${isAdmin ? `<button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">🗑️ Delete</button>` : `<span class="text-gray-400 text-[10px] italic">Admin Only</span>`}
+              ${!isAutoEntry ? `
+                <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">✏️ Edit</button>
+                ${isAdmin ? `<button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">🗑️ Delete</button>` : `<span class="text-gray-400 text-[10px] italic">Admin Only</span>`}
+              ` : `<span class="text-gray-400 text-[10px] italic">Auto Stay</span>`}
             </td>
           </tr>
         `;
@@ -1966,9 +2161,9 @@
 
       renderStaffSalaryReport();
       renderSavedStaffDirectory();
+      renderPermanentEmployees();
     }
 
-    // --- 8. ATTENDANCE ACTIONS ---
     function deleteAttendance(id, cat) {
       if (!currentUser || currentUser.role !== 'admin') {
         return alert("Access Denied: Only Master Admin can delete attendance records.");
@@ -2128,7 +2323,6 @@
       renderAttendanceLedger();
     }
 
-    // --- 9. POST-SALE VIKRI SETTLEMENT ENGINE (CRATES EXCLUDED FROM PER KG RATE) ---
     function openVikriSettlementModal(dispatchId) {
       const d = (APP_DATA.dispatches || []).find(x => x.id === dispatchId);
       if (!d) return alert("Dispatch record not found");
@@ -2163,11 +2357,8 @@
       const crates = Number(document.getElementById('vs-crates').value || 0);
 
       const commAmt = (gross * pct) / 100;
-      // Fruit value strictly without crates
       const fruitNetAmt = Math.max(0, gross - commAmt - labour - misc);
-      // Net Rate per Kg: calculated only on fruit value
       const netPerKg = netWt > 0 ? (fruitNetAmt / netWt) : 0;
-      // Net Total: includes crates amount added to payable
       const netTotal = Math.max(0, fruitNetAmt + crates);
 
       document.getElementById('vs-comm-amt-disp').innerText = `Commission (${pct}%): -₹${commAmt.toLocaleString('en-IN')}`;
@@ -2355,6 +2546,7 @@
       renderStaffTable();
       renderPartyAccountsTable();
       renderSavedStaffDirectory();
+      renderPermanentEmployees();
       renderAttendanceLedger();
       switchTab('dashboard');
     }
@@ -2896,7 +3088,6 @@
       container.appendChild(div);
     }
 
-    // --- POPULATE DROPDOWNS WITHOUT RESETTING USER SELECTION ---
     function populateDropdowns() {
       const inwardSelect = document.getElementById('inward-orchard-select');
       const orchLedgerSelect = document.getElementById('orchard-ledger-select');
@@ -2934,7 +3125,8 @@
         const allStaffNames = new Set([
           ...(APP_DATA.staffUsers || []).map(u => u.name),
           ...(APP_DATA.staffDirectory || []).map(d => d.name),
-          ...(APP_DATA.staffAttendance || []).map(a => a.name)
+          ...(APP_DATA.staffAttendance || []).map(a => a.name),
+          ...(APP_DATA.permanentEmployees || []).map(p => p.name)
         ]);
         let staffOpts = "";
         allStaffNames.forEach(name => {
@@ -3003,6 +3195,7 @@
         syncStaffDirectory();
         updateLedgerPersonDropdown();
         renderSavedStaffDirectory();
+        renderPermanentEmployees();
         renderAttendanceLedger();
       }
       if (tab === 'admin-panel' && isAdmin) {
