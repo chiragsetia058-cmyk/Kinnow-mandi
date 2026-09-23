@@ -1342,11 +1342,11 @@
       lastUpdated: 0
     };
 
-    // SAFE MERGING & RETRIEVAL FROM LOCALSTORAGE TO PREVENT DATA LOSS
+    // SAFE MERGING & RETRIEVAL FROM LOCALSTORAGE TO PREVENT ATTENDANCE DATA LOSS
     let savedRaw = localStorage.getItem('SETIA_WAXING_PORTAL_V10');
     let APP_DATA = savedRaw ? JSON.parse(savedRaw) : CORE_DEFAULTS;
 
-    // Ensure all required properties exist
+    // Ensure all required properties exist from older versions
     if (!APP_DATA.permanentEmployees) APP_DATA.permanentEmployees = CORE_DEFAULTS.permanentEmployees;
     if (!APP_DATA.staffAttendance) APP_DATA.staffAttendance = [];
     if (!APP_DATA.groupLabourAttendance) APP_DATA.groupLabourAttendance = [];
@@ -1579,7 +1579,6 @@
         status: 'Active'
       });
 
-      // Also ensure they are in staff directory for salary statement calculation
       if (!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
       if (!APP_DATA.staffDirectory.some(s => s.name.trim().toLowerCase() === name.toLowerCase())) {
         APP_DATA.staffDirectory.push({ id: 'sd_' + Date.now(), name, role, salary });
@@ -1950,10 +1949,8 @@
         return;
       }
 
-      // Collect manual attendance + auto-generated permanent resident attendance
       let attendanceRecords = [...(APP_DATA.staffAttendance || [])];
       
-      // Also factor auto permanent resident employee days into salary count
       if (fromDate && toDate) {
         const start = new Date(fromDate);
         const end = new Date(toDate);
@@ -1970,7 +1967,6 @@
             if (emp.leaveFrom && emp.leaveTo && dateStr >= emp.leaveFrom && dateStr <= emp.leaveTo) {
               status = 'Leave';
             }
-            // Add to pseudo records for salary summation
             attendanceRecords.push({ name: emp.name, status, date: dateStr });
             curr.setDate(curr.getDate() + 1);
           }
