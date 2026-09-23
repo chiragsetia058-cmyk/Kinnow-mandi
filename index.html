@@ -209,7 +209,7 @@
             </div>
           </div>
 
-          <form onsubmit="registerPermanentEmployee(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+          <form onsubmit="registerPermanentEmployee(event)" class="grid grid-cols-1 md:grid-cols-6 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Employee Name</label>
               <input type="text" id="perm-emp-name" required class="w-full border rounded-lg p-2" placeholder="e.g. Ramesh Kumar" />
@@ -217,6 +217,10 @@
             <div>
               <label class="block font-semibold mb-1">Role / Designation</label>
               <input type="text" id="perm-emp-role" class="w-full border rounded-lg p-2" placeholder="e.g. Plant Supervisor" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Monthly Salary ₹ (ਤਨਖ਼ਾਹ)</label>
+              <input type="number" id="perm-emp-salary" required min="0" class="w-full border rounded-lg p-2 font-bold text-slate-900" placeholder="e.g. 18000" />
             </div>
             <div>
               <label class="block font-semibold mb-1">Joining Date (ਸ਼ੁਰੂਆਤੀ ਮਿਤੀ)</label>
@@ -241,6 +245,7 @@
               <thead class="bg-slate-800 text-amber-300 font-bold">
                 <tr>
                   <th class="p-2.5">Employee Name</th>
+                  <th class="p-2.5">Monthly Salary ₹</th>
                   <th class="p-2.5">Joining Date</th>
                   <th class="p-2.5">Premises Stay</th>
                   <th class="p-2.5">Leave Period (From - To)</th>
@@ -1314,7 +1319,7 @@
         { id: 'sd_3', name: 'Chirag Setia', role: 'Staff Operations', salary: 18000 }
       ],
       permanentEmployees: [
-        { id: 'pe_1', name: 'Ramesh Kumar', role: 'Plant Supervisor', joiningDate: '2026-09-20', stayInPlant: true, leaveFrom: '', leaveTo: '', exitDate: '', status: 'Active' }
+        { id: 'pe_1', name: 'Ramesh Kumar', role: 'Plant Supervisor', salary: 18000, joiningDate: '2026-09-20', stayInPlant: true, leaveFrom: '', leaveTo: '', exitDate: '', status: 'Active' }
       ],
       customerDirectory: [
         { id: 'cd_1', name: 'Chifu Agritech', phone: '9658200058', type: 'Billing', vehicle: 'PB 15 XX 0000' },
@@ -1544,6 +1549,7 @@
       e.preventDefault();
       const name = document.getElementById('perm-emp-name').value.trim();
       const role = document.getElementById('perm-emp-role').value.trim() || 'Plant Staff';
+      const salary = Number(document.getElementById('perm-emp-salary').value || 0);
       const joiningDate = document.getElementById('perm-emp-join').value;
       const stayInPlant = document.getElementById('perm-emp-stay').value === 'yes';
 
@@ -1553,6 +1559,7 @@
         id: 'perm_' + Date.now(),
         name,
         role,
+        salary,
         joiningDate,
         stayInPlant,
         leaveFrom: '',
@@ -1561,8 +1568,23 @@
         status: 'Active'
       });
 
+      // Sync to staffDirectory so salary report automatically calculates their earnings
+      if (!APP_DATA.staffDirectory) APP_DATA.staffDirectory = [];
+      const existingDir = APP_DATA.staffDirectory.find(s => s.name.trim().toLowerCase() === name.toLowerCase());
+      if (existingDir) {
+        existingDir.salary = salary;
+        existingDir.role = role;
+      } else {
+        APP_DATA.staffDirectory.push({
+          id: 'sd_' + Date.now(),
+          name,
+          role,
+          salary
+        });
+      }
+
       saveData();
-      alert(`Permanent employee ${name} registered successfully with automatic plant stay attendance!`);
+      alert(`Permanent employee ${name} registered successfully with monthly salary ₹${salary.toLocaleString('en-IN')}!`);
       e.target.reset();
       document.getElementById('perm-emp-join').value = new Date().toISOString().split('T')[0];
       renderPermanentEmployees();
@@ -1575,13 +1597,14 @@
 
       const list = APP_DATA.permanentEmployees || [];
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-gray-400">No permanent resident employees registered yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-gray-400">No permanent resident employees registered yet.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = list.map(emp => `
         <tr class="border-b hover:bg-gray-50">
           <td class="p-2.5 font-bold text-slate-800">${emp.name} <span class="block text-[10px] text-gray-500 font-normal">${emp.role}</span></td>
+          <td class="p-2.5 font-bold text-emerald-800">₹${(emp.salary || 0).toLocaleString('en-IN')} <span class="block text-[10px] text-gray-500 font-normal">₹${Math.round((emp.salary || 0)/30)}/day</span></td>
           <td class="p-2.5 font-medium">${emp.joiningDate}</td>
           <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${emp.stayInPlant ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-700'}">${emp.stayInPlant ? 'Staying in Plant' : 'External'}</span></td>
           <td class="p-2.5 text-xs">
@@ -2043,7 +2066,7 @@
           const effectiveEnd = new Date(Math.min(end, exit));
 
           const staffDirEntry = (APP_DATA.staffDirectory || []).find(d => d.name.trim().toLowerCase() === emp.name.trim().toLowerCase());
-          const monthlySal = staffDirEntry ? staffDirEntry.salary : 18000;
+          const monthlySal = staffDirEntry ? staffDirEntry.salary : (emp.salary || 18000);
           const dailyRate = Math.round(monthlySal / 30);
 
           while (curr <= effectiveEnd) {
@@ -2140,7 +2163,7 @@
             <td class="p-2.5 text-right font-bold text-slate-900">₹${r.amount.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-right font-black text-emerald-700">₹${cumulative.toLocaleString('en-IN')}</td>
             <td class="p-2.5 text-right space-x-2 no-print">
-              ${!isAutoEntry ? `
+              {!isAutoEntry ? `
                 <button onclick="openEditAttendanceModal('${r.id}', '${r.cat}')" class="text-blue-600 font-bold hover:underline">✏️ Edit</button>
                 ${isAdmin ? `<button onclick="deleteAttendance('${r.id}', '${r.cat}')" class="text-red-600 font-bold hover:underline">🗑️ Delete</button>` : `<span class="text-gray-400 text-[10px] italic">Admin Only</span>`}
               ` : `<span class="text-gray-400 text-[10px] italic">Auto Stay</span>`}
