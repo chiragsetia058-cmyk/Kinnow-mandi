@@ -1611,7 +1611,10 @@
       tbody.innerHTML = list.map(emp => `
         <tr class="border-b hover:bg-gray-50">
           <td class="p-2.5 font-bold text-slate-800">${emp.name} <span class="block text-[10px] text-gray-500 font-normal">${emp.role}</span></td>
-          <td class="p-2.5 font-bold text-emerald-800">₹${(emp.salary || 18000).toLocaleString('en-IN')}</td>
+          <td class="p-2.5 font-bold text-emerald-800">
+            ₹${(emp.salary || 18000).toLocaleString('en-IN')}
+            <button onclick="openEditSalaryModal('${emp.id}')" class="text-blue-600 underline text-[10px] ml-1 font-semibold">✏️ Edit</button>
+          </td>
           <td class="p-2.5 font-medium">${emp.joiningDate}</td>
           <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${emp.stayInPlant ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-700'}">${emp.stayInPlant ? 'Staying in Plant' : 'External'}</span></td>
           <td class="p-2.5 text-xs">
@@ -1627,6 +1630,19 @@
           </td>
         </tr>
       `).join('');
+    }
+
+    function openEditSalaryModal(id) {
+      const emp = (APP_DATA.permanentEmployees || []).find(e => e.id === id);
+      if (!emp) return;
+      const newSal = prompt(`Enter new monthly salary for ${emp.name} (₹):`, emp.salary || 18000);
+      if (newSal !== null && !isNaN(newSal)) {
+        emp.salary = Number(newSal);
+        saveData();
+        renderPermanentEmployees();
+        renderAttendanceLedger();
+        alert(`Salary updated to ₹${emp.salary.toLocaleString('en-IN')} successfully.`);
+      }
     }
 
     function markSeasonExit(id) {
