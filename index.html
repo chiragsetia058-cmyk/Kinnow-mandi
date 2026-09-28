@@ -30,7 +30,7 @@
         <div id="login-logo-container"></div>
       </div>
       <h2 class="text-xl font-black text-amber-600 tracking-wider">SETIA WAXING PLANT</h2>
-      <p class="text-[11px] text-gray-500 mb-2 font-medium">Kinnow Mandi & Party Portal</p>
+      <p class="text-[11px] text-gray-500 mb-2 font-medium">Kinnow & Daizy Mandi & Party Portal</p>
       
       <div id="cloud-status-badge" class="mb-5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">
         Connecting to MongoDB Cloud...
@@ -209,7 +209,7 @@
             </div>
           </div>
 
-          <form onsubmit="registerPermanentEmployee(event)" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+          <form onsubmit="registerPermanentEmployee(event)" class="grid grid-cols-1 md:grid-cols-6 gap-3 text-xs">
             <div>
               <label class="block font-semibold mb-1">Employee Name</label>
               <input type="text" id="perm-emp-name" required class="w-full border rounded-lg p-2" placeholder="e.g. Ramesh Kumar" />
@@ -219,13 +219,17 @@
               <input type="text" id="perm-emp-role" class="w-full border rounded-lg p-2" placeholder="e.g. Plant Supervisor" />
             </div>
             <div>
-              <label class="block font-semibold mb-1">Joining Date (ਸ਼ੁਰੂਆਤੀ ਮਿਤੀ)</label>
+              <label class="block font-semibold mb-1">Monthly Salary ₹</label>
+              <input type="number" id="perm-emp-salary" required min="0" value="18000" class="w-full border rounded-lg p-2 font-bold text-slate-900" placeholder="18000" />
+            </div>
+            <div>
+              <label class="block font-semibold mb-1">Joining Date</label>
               <input type="date" id="perm-emp-join" required class="w-full border rounded-lg p-2 font-medium" />
             </div>
             <div>
-              <label class="block font-semibold mb-1">Staying in Plant Premises?</label>
+              <label class="block font-semibold mb-1">Premises Stay?</label>
               <select id="perm-emp-stay" class="w-full border rounded-lg p-2 font-bold text-emerald-700">
-                <option value="yes" selected>✅ Yes (Auto-Attendance)</option>
+                <option value="yes" selected>✅ Yes (Auto)</option>
                 <option value="no">❌ No</option>
               </select>
             </div>
@@ -241,10 +245,11 @@
               <thead class="bg-slate-800 text-amber-300 font-bold">
                 <tr>
                   <th class="p-2.5">Employee Name</th>
+                  <th class="p-2.5">Monthly Salary ₹</th>
                   <th class="p-2.5">Joining Date</th>
                   <th class="p-2.5">Premises Stay</th>
-                  <th class="p-2.5">Leave Period (From - To)</th>
-                  <th class="p-2.5">Season Exit Date</th>
+                  <th class="p-2.5">Leave Period</th>
+                  <th class="p-2.5">Exit Date</th>
                   <th class="p-2.5 text-right">Controls</th>
                 </tr>
               </thead>
@@ -712,7 +717,7 @@
           <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3" id="dash-period-title">Today's Performance</h4>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-              <p class="text-xs text-gray-500 font-medium">Kinnow Inward (Net)</p>
+              <p class="text-xs text-gray-500 font-medium">Fruit Inward (Net)</p>
               <h3 class="text-xl font-bold text-gray-800 mt-1" id="stat-daily-weight">0 Kg</h3>
               <p class="text-[11px] text-gray-400 mt-1" id="stat-daily-cut">0 Kg Cut</p>
             </div>
@@ -961,7 +966,14 @@
       <div id="farmer-section" class="hidden bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h3 class="text-base font-bold text-gray-800 mb-4 pb-2 border-b">Orchard Purchase Agreement (ਬਾਗ਼ ਖ਼ਰੀਦ ਇਕਰਾਰਨਾਮਾ)</h3>
         <form onsubmit="generateFarmerSlip(event)" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Fruit Type (ਫਲ ਦੀ ਕਿਸਮ)</label>
+              <select id="f-fruit" class="w-full border rounded-lg p-2 text-sm font-bold bg-amber-50">
+                <option value="Kinnow">Kinnow (ਕਿੰਨੂ)</option>
+                <option value="Daizy">Daizy (ਡੇਜ਼ੀ)</option>
+              </select>
+            </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name</label>
               <input type="text" id="f-name" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Jatin" />
@@ -1049,7 +1061,14 @@
           <input type="hidden" id="d-orchard-id" value="" />
           <input type="hidden" id="d-village" value="" />
           
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Fruit Type (ਫਲ ਦੀ ਕਿਸਮ)</label>
+              <select id="d-fruit" class="w-full border rounded-lg p-2 text-sm font-bold bg-amber-50">
+                <option value="Kinnow">Kinnow (ਕਿੰਨੂ)</option>
+                <option value="Daizy">Daizy (ਡੇਜ਼ੀ)</option>
+              </select>
+            </div>
             <div>
               <label class="block text-xs font-semibold mb-1">Farmer / Orchard Name</label>
               <input type="text" id="d-farmer" required class="w-full border rounded-lg p-2 text-sm" placeholder="e.g. Jatin" />
@@ -1152,7 +1171,7 @@
 
         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
           <div class="flex justify-between items-center border-b pb-2 mb-4">
-            <h3 class="text-base font-bold text-gray-800">Kinnow Dispatch Slip (ਗ੍ਰਾਹਕ ਨਿਕਾਸੀ ਪਰਚੀ)</h3>
+            <h3 class="text-base font-bold text-gray-800">Dispatch Slip (ਨਿਕਾਸੀ ਪਰਚੀ)</h3>
             <span class="text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full font-bold">
               ⚡ Customer Auto-Fill Active
             </span>
@@ -1167,6 +1186,13 @@
 
           <form onsubmit="generateCustomerSlip(event)" class="space-y-4">
             <div class="bg-amber-50/60 p-3.5 rounded-xl border border-amber-300 flex flex-wrap gap-4 items-center">
+              <div>
+                <label class="block text-xs font-bold text-slate-900 mb-1">Fruit Type</label>
+                <select id="c-fruit" class="border rounded p-1.5 text-xs font-bold bg-white">
+                  <option value="Kinnow">Kinnow</option>
+                  <option value="Daizy">Daizy</option>
+                </select>
+              </div>
               <span class="text-xs font-black text-slate-900 uppercase">Dispatch Type:</span>
               <label class="flex items-center text-xs font-bold gap-2 cursor-pointer">
                 <input type="radio" name="cust-dispatch-type" value="Billing" checked onchange="toggleCustomerType()" />
@@ -1228,7 +1254,7 @@
 
             <div class="mt-4">
               <div class="flex justify-between items-center mb-2">
-                <h4 class="text-xs font-bold uppercase text-slate-700" id="matrix-heading-title">Kinnow Size Matrix (Boxes & Rates)</h4>
+                <h4 class="text-xs font-bold uppercase text-slate-700" id="matrix-heading-title">Size Matrix (Boxes & Rates)</h4>
                 <button type="button" onclick="addCustomSizeRow()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs px-2.5 py-1 rounded font-bold border border-amber-300">
                   + Add Extra Size
                 </button>
@@ -1314,7 +1340,7 @@
         { id: 'sd_3', name: 'Chirag Setia', role: 'Staff Operations', salary: 18000 }
       ],
       permanentEmployees: [
-        { id: 'pe_1', name: 'Ramesh Kumar', role: 'Plant Supervisor', joiningDate: '2026-09-20', stayInPlant: true, leaveFrom: '', leaveTo: '', exitDate: '', status: 'Active' }
+        { id: 'pe_1', name: 'Ramesh Kumar', role: 'Plant Supervisor', salary: 18000, joiningDate: '2026-09-20', stayInPlant: true, leaveFrom: '', leaveTo: '', exitDate: '', status: 'Active' }
       ],
       customerDirectory: [
         { id: 'cd_1', name: 'Chifu Agritech', phone: '9658200058', type: 'Billing', vehicle: 'PB 15 XX 0000' },
@@ -1323,11 +1349,11 @@
       staffAttendance: [],
       groupLabourAttendance: [],
       agreements: [
-        { id: 'orch_1', tokenNo: 'TF-1', type: 'per_kg', name: 'Test Farmer', phone: '9876543210', village: 'Khuian', rate: 26, advance: 0, date: '2026-09-01' }
+        { id: 'orch_1', tokenNo: 'TF-1', fruit: 'Kinnow', type: 'per_kg', name: 'Test Farmer', phone: '9876543210', village: 'Khuian', rate: 26, advance: 0, date: '2026-09-01' }
       ],
       inwards: [],
       dispatches: [
-        { id: 'disp_1', tokenNo: 'TC-1', date: '2026-09-01', custType: 'Billing', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', driverName: '', driverPhone: '', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, grossWt: 0, tareWt: 0, netWt: 0, isSettled: true, sizesBreakdown: { '36': 50 }, sizeRates: { '36': 500 } }
+        { id: 'disp_1', tokenNo: 'TC-1', fruit: 'Kinnow', date: '2026-09-01', custType: 'Billing', name: 'Test Customer', phone: '9658200058', vehicle: 'PB 15 XX 0000', driverName: '', driverPhone: '', lotNo: 'E879', freight: 0, labour: 0, packaging: 0, misc: 0, totalBoxes: 50, grandTotal: 25000, grossWt: 0, tareWt: 0, netWt: 0, isSettled: true, sizesBreakdown: { '36': 50 }, sizeRates: { '36': 500 } }
       ],
       customerPayments: [],
       farmerPayments: [],
@@ -1544,6 +1570,7 @@
       e.preventDefault();
       const name = document.getElementById('perm-emp-name').value.trim();
       const role = document.getElementById('perm-emp-role').value.trim() || 'Plant Staff';
+      const salary = Number(document.getElementById('perm-emp-salary').value || 18000);
       const joiningDate = document.getElementById('perm-emp-join').value;
       const stayInPlant = document.getElementById('perm-emp-stay').value === 'yes';
 
@@ -1553,6 +1580,7 @@
         id: 'perm_' + Date.now(),
         name,
         role,
+        salary,
         joiningDate,
         stayInPlant,
         leaveFrom: '',
@@ -1562,9 +1590,10 @@
       });
 
       saveData();
-      alert(`Permanent employee ${name} registered successfully with automatic plant stay attendance!`);
+      alert(`Permanent employee ${name} registered successfully with monthly salary ₹${salary.toLocaleString('en-IN')}!`);
       e.target.reset();
       document.getElementById('perm-emp-join').value = new Date().toISOString().split('T')[0];
+      document.getElementById('perm-emp-salary').value = 18000;
       renderPermanentEmployees();
       renderAttendanceLedger();
     }
@@ -1575,13 +1604,14 @@
 
       const list = APP_DATA.permanentEmployees || [];
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-gray-400">No permanent resident employees registered yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-center text-gray-400">No permanent resident employees registered yet.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = list.map(emp => `
         <tr class="border-b hover:bg-gray-50">
           <td class="p-2.5 font-bold text-slate-800">${emp.name} <span class="block text-[10px] text-gray-500 font-normal">${emp.role}</span></td>
+          <td class="p-2.5 font-bold text-emerald-800">₹${(emp.salary || 18000).toLocaleString('en-IN')}</td>
           <td class="p-2.5 font-medium">${emp.joiningDate}</td>
           <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${emp.stayInPlant ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-700'}">${emp.stayInPlant ? 'Staying in Plant' : 'External'}</span></td>
           <td class="p-2.5 text-xs">
@@ -1704,12 +1734,12 @@
       const rateInputs = document.querySelectorAll('.size-rate-input');
 
       if (isVikri) {
-        matrixTitle.innerText = "Kinnow Size Matrix (Only Boxes / Sizes - Price Settled Post Sale)";
+        matrixTitle.innerText = "Size Matrix (Only Boxes / Sizes - Price Settled Post Sale)";
         rateInputs.forEach(el => el.classList.add('hidden'));
         if (finSection) finSection.classList.add('hidden');
         if (weightSection) weightSection.classList.remove('hidden');
       } else {
-        matrixTitle.innerText = "Kinnow Size Matrix (Boxes & Rates)";
+        matrixTitle.innerText = "Size Matrix (Boxes & Rates)";
         rateInputs.forEach(el => el.classList.remove('hidden'));
         if (finSection) finSection.classList.remove('hidden');
         if (weightSection) weightSection.classList.add('hidden');
@@ -2042,14 +2072,12 @@
           let curr = new Date(Math.max(start, join));
           const effectiveEnd = new Date(Math.min(end, exit));
 
-          const staffDirEntry = (APP_DATA.staffDirectory || []).find(d => d.name.trim().toLowerCase() === emp.name.trim().toLowerCase());
-          const monthlySal = staffDirEntry ? staffDirEntry.salary : 18000;
+          const monthlySal = emp.salary || 18000;
           const dailyRate = Math.round(monthlySal / 30);
 
           while (curr <= effectiveEnd) {
             const dateStr = curr.toISOString().split('T')[0];
             
-            // Check if date falls in leave range
             let status = 'Present (Plant Resident)';
             let amt = dailyRate;
             if (emp.leaveFrom && emp.leaveTo && dateStr >= emp.leaveFrom && dateStr <= emp.leaveTo) {
@@ -2057,7 +2085,6 @@
               amt = 0;
             }
 
-            // Avoid duplicate manual overrides on the same day
             const existsManual = staffList.some(s => s.name.trim().toLowerCase() === emp.name.trim().toLowerCase() && s.date === dateStr);
             if (!existsManual) {
               staffList.push({
@@ -2619,16 +2646,17 @@
           <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Total Received</span><span class="text-base font-black text-emerald-700">₹${totalPaid.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Cut</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val ₹</th><th class="p-2.5 text-right">Paid Amt ₹</th><th class="p-2.5 text-right">Slip</th></tr>`;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Fruit</th><th class="p-2.5">Token</th><th class="p-2.5">Particulars</th><th class="p-2.5 text-right">Net Wt</th><th class="p-2.5 text-right">Cut</th><th class="p-2.5 text-right">Chargeable Wt</th><th class="p-2.5 text-right">Trip Val ₹</th><th class="p-2.5 text-right">Paid Amt ₹</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
-          ...trips.map(t => ({ id: t.id, type: 'inward', date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, cut: t.cut || 0, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
-          ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, cut: 0, chg: 0, val: 0, paid: p.amount }))
+          ...trips.map(t => ({ id: t.id, fruit: t.fruit || 'Kinnow', type: 'inward', date: t.date, token: t.tokenNo, desc: `Inward (${t.vehicle})`, net: t.net, cut: t.cut || 0, chg: t.chargeable, val: t.totalTripAmt, paid: 0 })),
+          ...payments.map(p => ({ id: p.id, fruit: '-', type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, net: 0, cut: 0, chg: 0, val: 0, paid: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2.5">${h.date}</td>
+            <td class="p-2.5 font-bold text-amber-900">${h.fruit}</td>
             <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
             <td class="p-2.5 font-medium">${h.desc}</td>
             <td class="p-2.5 text-right">${h.net > 0 ? h.net.toFixed(1) + ' Kg' : '-'}</td>
@@ -2659,16 +2687,17 @@
           <div class="p-3 bg-gray-50 rounded-xl border"><span class="text-[10px] text-gray-500 font-bold block">Pending Balance</span><span class="text-base font-black text-red-600">₹${balanceDue.toLocaleString('en-IN')}</span></div>
         `;
 
-        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Token</th><th class="p-2.5">Dispatch / Details</th><th class="p-2.5 text-center">Boxes</th><th class="p-2.5 text-right">Debit (Billed ₹)</th><th class="p-2.5 text-right">Credit (Paid ₹)</th><th class="p-2.5 text-right">Slip</th></tr>`;
+        thead.innerHTML = `<tr><th class="p-2.5">Date</th><th class="p-2.5">Fruit</th><th class="p-2.5">Token</th><th class="p-2.5">Dispatch / Details</th><th class="p-2.5 text-center">Boxes</th><th class="p-2.5 text-right">Debit (Billed ₹)</th><th class="p-2.5 text-right">Credit (Paid ₹)</th><th class="p-2.5 text-right">Slip</th></tr>`;
 
         const history = [
-          ...dispatches.map(d => ({ id: d.id, type: 'invoice', date: d.date, token: d.tokenNo, desc: `Dispatch (${d.vehicle})${d.driverName ? ' - Driver: ' + d.driverName : ''}`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
-          ...payments.map(p => ({ id: p.id, type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
+          ...dispatches.map(d => ({ id: d.id, fruit: d.fruit || 'Kinnow', type: 'invoice', date: d.date, token: d.tokenNo, desc: `Dispatch (${d.vehicle})${d.driverName ? ' - Driver: ' + d.driverName : ''}`, boxes: d.totalBoxes, debit: d.grandTotal, credit: 0 })),
+          ...payments.map(p => ({ id: p.id, fruit: '-', type: 'payment', date: p.date, token: '-', desc: `Bank Deposit: ${p.bank} (${p.ref})`, boxes: '-', debit: 0, credit: p.amount }))
         ].sort((a,b) => new Date(b.date) - new Date(a.date));
 
         tbody.innerHTML = history.map(h => `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-2.5">${h.date}</td>
+            <td class="p-2.5 font-bold text-amber-900">${h.fruit}</td>
             <td class="p-2.5 font-mono font-bold text-amber-900">${h.token}</td>
             <td class="p-2.5 font-medium">${h.desc}</td>
             <td class="p-2.5 text-center font-bold">${h.boxes}</td>
@@ -2750,6 +2779,7 @@
         title.innerText = `Edit Customer Dispatch Invoice (${d.tokenNo})`;
         container.innerHTML = `
           <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-semibold mb-1">Fruit Type</label><select id="ee-cust-fruit" class="w-full border rounded p-1.5"><option value="Kinnow" ${d.fruit==='Kinnow'?'selected':''}>Kinnow</option><option value="Daizy" ${d.fruit==='Daizy'?'selected':''}>Daizy</option></select></div>
             <div><label class="block font-semibold mb-1">Customer Name</label><input type="text" id="ee-cust-name" value="${d.name}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Customer Phone</label><input type="tel" id="ee-cust-phone" value="${d.phone || ''}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Vehicle No.</label><input type="text" id="ee-cust-vehicle" value="${d.vehicle}" class="w-full border rounded p-1.5" required /></div>
@@ -2770,6 +2800,7 @@
         title.innerText = `Edit Harvest Inward Trip (${i.tokenNo})`;
         container.innerHTML = `
           <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-semibold mb-1">Fruit Type</label><select id="ee-inw-fruit" class="w-full border rounded p-1.5"><option value="Kinnow" ${i.fruit==='Kinnow'?'selected':''}>Kinnow</option><option value="Daizy" ${i.fruit==='Daizy'?'selected':''}>Daizy</option></select></div>
             <div><label class="block font-semibold mb-1">Farmer Name</label><input type="text" id="ee-inw-farmer" value="${i.name}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Vehicle No.</label><input type="text" id="ee-inw-vehicle" value="${i.vehicle}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Gross Wt (Kg)</label><input type="number" step="0.1" id="ee-inw-gross" value="${i.gross}" class="w-full border rounded p-1.5" required /></div>
@@ -2792,6 +2823,7 @@
         title.innerText = `Edit Farmer Deal Agreement (${a.tokenNo})`;
         container.innerHTML = `
           <div class="grid grid-cols-2 gap-2">
+            <div><label class="block font-semibold mb-1">Fruit Type</label><select id="ee-agr-fruit" class="w-full border rounded p-1.5"><option value="Kinnow" ${a.fruit==='Kinnow'?'selected':''}>Kinnow</option><option value="Daizy" ${a.fruit==='Daizy'?'selected':''}>Daizy</option></select></div>
             <div><label class="block font-semibold mb-1">Farmer Name</label><input type="text" id="ee-agr-farmer" value="${a.name}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Phone</label><input type="tel" id="ee-agr-phone" value="${a.phone}" class="w-full border rounded p-1.5" required /></div>
             <div><label class="block font-semibold mb-1">Village</label><input type="text" id="ee-agr-village" value="${a.village}" class="w-full border rounded p-1.5" /></div>
@@ -2815,6 +2847,7 @@
       if (type === 'dispatch') {
         const d = (APP_DATA.dispatches || []).find(x => x.id === id);
         if (d) {
+          d.fruit = document.getElementById('ee-cust-fruit').value;
           d.name = document.getElementById('ee-cust-name').value.trim();
           d.phone = document.getElementById('ee-cust-phone').value.trim();
           d.vehicle = document.getElementById('ee-cust-vehicle').value.trim();
@@ -2841,6 +2874,7 @@
       } else if (type === 'inward') {
         const i = (APP_DATA.inwards || []).find(x => x.id === id);
         if (i) {
+          i.fruit = document.getElementById('ee-inw-fruit').value;
           i.name = document.getElementById('ee-inw-farmer').value.trim();
           i.vehicle = document.getElementById('ee-inw-vehicle').value.trim();
           i.gross = Number(document.getElementById('ee-inw-gross').value || 0);
@@ -2859,6 +2893,7 @@
       } else if (type === 'agreement') {
         const a = (APP_DATA.agreements || []).find(x => x.id === id);
         if (a) {
+          a.fruit = document.getElementById('ee-agr-fruit').value;
           a.name = document.getElementById('ee-agr-farmer').value.trim();
           a.phone = document.getElementById('ee-agr-phone').value.trim();
           a.village = document.getElementById('ee-agr-village').value.trim();
@@ -2927,6 +2962,7 @@
               <p class="text-[10px] uppercase font-bold text-gray-700">${isVikri ? 'Vikri Delivery & Dispatch Slip' : 'Official Customer Invoice'}</p>
             </div>
             <div class="text-right text-[11px] font-bold">
+              <div>Fruit: <span class="text-amber-900">${d.fruit || 'Kinnow'}</span></div>
               <div>Token: <span class="font-mono text-amber-900">${d.tokenNo}</span></div>
               <div>Date: ${d.date}</div>
             </div>
@@ -2973,7 +3009,7 @@
         </div>
       `;
 
-      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0AVehicle: ${d.vehicle}${d.driverName ? '%0ADriver: ' + d.driverName + ' (' + (d.driverPhone || '-') + ')' : ''}${d.netWt ? '%0ANet Wt: ' + d.netWt + ' Kg' : ''}%0A${!isVikri ? `Grand Total: Rs. ${d.grandTotal}` : (d.isSettled ? `Net Settled: Rs. ${d.grandTotal} (Fruit Rate: Rs. ${d.netRatePerKg.toFixed(2)}/Kg)` : `Type: Vikri Sizes Slip`)}`);
+      showSlip(slipHTML, d.phone, `*SETIA CUSTOMER DISPATCH SLIP*%0AFruit: ${d.fruit || 'Kinnow'}%0AToken: ${d.tokenNo}%0ACustomer: ${d.name}%0ABoxes: ${d.totalBoxes}%0AVehicle: ${d.vehicle}`);
     }
 
     function reprintInwardSlip(id) {
@@ -2991,6 +3027,7 @@
               <p class="text-[10px] uppercase font-bold text-gray-700">Harvest Inward Slip (ਤੁੜਾਈ ਪਰਚੀ)</p>
             </div>
             <div class="text-right text-[11px] font-bold">
+              <div>Fruit: <span class="text-amber-900">${i.fruit || 'Kinnow'}</span></div>
               <div>Token: <span class="font-mono text-amber-900">${i.tokenNo}</span></div>
               <div>Date: ${i.date}</div>
             </div>
@@ -3020,7 +3057,7 @@
         </div>
       `;
 
-      showSlip(slipHTML, i.phone, `*SETIA HARVEST INWARD SLIP*%0AToken: ${i.tokenNo}%0AFarmer: ${i.name}%0AChargeable: ${i.chargeable.toFixed(1)} Kg%0A1kg Cut: ${hasCut ? 'Yes' : 'No'}%0ARate: Rs. ${i.rate}/Kg`);
+      showSlip(slipHTML, i.phone, `*SETIA HARVEST INWARD SLIP*%0AFruit: ${i.fruit || 'Kinnow'}%0AToken: ${i.tokenNo}%0AFarmer: ${i.name}%0AChargeable: ${i.chargeable.toFixed(1)} Kg`);
     }
 
     function reprintFarmerSlip(id) {
@@ -3034,6 +3071,7 @@
             <div class="w-16">${logoSvg}</div>
             <div class="text-center flex-1"><h1 class="text-xl font-black uppercase text-black">SETIA WAXING PLANT</h1><p class="text-[10px] uppercase font-bold text-gray-700">Orchard Purchase Agreement</p></div>
             <div class="text-right text-[11px] font-bold">
+              <div>Fruit: <span class="text-amber-900">${a.fruit || 'Kinnow'}</span></div>
               <div>Token: <span class="font-mono text-amber-900">${a.tokenNo}</span></div>
               <div>Date: ${a.date}</div>
             </div>
@@ -3049,7 +3087,7 @@
         </div>
       `;
 
-      showSlip(slipHTML, a.phone, `*SETIA ORCHARD AGREEMENT*%0AToken: ${a.tokenNo}%0AFarmer: ${a.name}`);
+      showSlip(slipHTML, a.phone, `*SETIA ORCHARD AGREEMENT*%0AFruit: ${a.fruit || 'Kinnow'}%0AToken: ${a.tokenNo}%0AFarmer: ${a.name}`);
     }
 
     function triggerDirectPrint() {
@@ -3105,7 +3143,7 @@
       const agreements = APP_DATA.agreements || [];
       let orchOptionsHTML = "";
       agreements.forEach((orch) => {
-        orchOptionsHTML += `<option value="${orch.id}">${orch.name} (${orch.village})</option>`;
+        orchOptionsHTML += `<option value="${orch.id}">${orch.name} (${orch.village}) - [${orch.fruit || 'Kinnow'}]</option>`;
       });
 
       if (inwardSelect) {
@@ -3239,6 +3277,7 @@
       const orch = (APP_DATA.agreements || []).find(a => a.id === selId);
       if (orch) {
         document.getElementById('d-orchard-id').value = orch.id;
+        document.getElementById('d-fruit').value = orch.fruit || 'Kinnow';
         document.getElementById('d-farmer').value = orch.name;
         document.getElementById('d-phone').value = (orch.phone || "").toString().trim();
         document.getElementById('d-rate').value = orch.rate || 0;
@@ -3296,6 +3335,7 @@
 
     function generateFarmerSlip(e) {
       e.preventDefault();
+      const fruit = document.getElementById('f-fruit').value;
       const name = document.getElementById('f-name').value.trim();
       const phone = (document.getElementById('f-phone').value || "").toString().trim();
       const village = document.getElementById('f-village').value.trim();
@@ -3307,7 +3347,7 @@
       const tokenNo = generatePartyToken('farmer', name, village);
       const orchId = 'orch_' + Date.now();
 
-      let dealData = { id: orchId, tokenNo, type, name, phone, village, supervisor, advBank, date: dateStr };
+      let dealData = { id: orchId, tokenNo, fruit, type, name, phone, village, supervisor, advBank, date: dateStr };
       let dealHTML = "";
 
       if (type === 'lump_sum') {
@@ -3315,13 +3355,13 @@
         const adv = Number(document.getElementById('f-advance').value || 0);
         dealData.total = total;
         dealData.advance = adv;
-        dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Full Orchard</b></div><div class="flex justify-between py-1"><span>Agreed Value:</span><span>₹${total.toLocaleString('en-IN')}</span></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
+        dealHTML = `<div class="flex justify-between py-1"><span>Fruit:</span><b>${fruit}</b></div><div class="flex justify-between py-1"><span>Deal:</span><b>Full Orchard</b></div><div class="flex justify-between py-1"><span>Agreed Value:</span><span>₹${total.toLocaleString('en-IN')}</span></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
       } else {
         const rate = Number(document.getElementById('f-rate').value || 0);
         const adv = Number(document.getElementById('f-kg-advance').value || 0);
         dealData.rate = rate;
         dealData.advance = adv;
-        dealHTML = `<div class="flex justify-between py-1"><span>Deal:</span><b>Per Kg Basis</b></div><div class="flex justify-between py-1"><span>Agreed Rate:</span><b>₹${rate} / Kg</b></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
+        dealHTML = `<div class="flex justify-between py-1"><span>Fruit:</span><b>${fruit}</b></div><div class="flex justify-between py-1"><span>Deal:</span><b>Per Kg Basis</b></div><div class="flex justify-between py-1"><span>Agreed Rate:</span><b>₹${rate} / Kg</b></div><div class="flex justify-between py-1 text-emerald-800 font-bold"><span>Advance:</span><span>₹${adv.toLocaleString('en-IN')}</span></div>`;
       }
 
       if (!APP_DATA.agreements) APP_DATA.agreements = [];
@@ -3340,13 +3380,14 @@
         </div>
       `;
 
-      showSlip(slipHTML, phone, `*SETIA ORCHARD AGREEMENT*%0AToken: ${tokenNo}%0AFarmer: ${name}`);
+      showSlip(slipHTML, phone, `*SETIA ORCHARD AGREEMENT*%0AFruit: ${fruit}%0AToken: ${tokenNo}%0AFarmer: ${name}`);
       e.target.reset();
     }
 
     function generateDailyInwardSlip(e) {
       e.preventDefault();
       const orchId = document.getElementById('d-orchard-id').value;
+      const fruit = document.getElementById('d-fruit').value;
       const name = document.getElementById('d-farmer').value.trim();
       const phone = (document.getElementById('d-phone').value || "").toString().trim();
       const vehicle = document.getElementById('d-vehicle').value.trim();
@@ -3370,6 +3411,7 @@
       const inwardRecord = { 
         id: 'inw_' + Date.now(), 
         orchardId: orchId, 
+        fruit,
         date: dateStr, 
         tokenNo, 
         name, 
@@ -3402,6 +3444,7 @@
 
     function generateCustomerSlip(e) {
       e.preventDefault();
+      const fruit = document.getElementById('c-fruit').value;
       const custType = document.querySelector('input[name="cust-dispatch-type"]:checked')?.value || 'Billing';
       const isVikri = custType === 'Vikri';
 
@@ -3463,6 +3506,7 @@
       const dispatchRecord = {
         id: 'disp_' + Date.now(),
         tokenNo,
+        fruit,
         date: dateStr,
         custType,
         name,
@@ -3546,7 +3590,7 @@
 
       const combined = [
         ...invoices.map(i => {
-          let breakdownStr = `${i.totalBoxes} Boxes (${i.vehicle})`;
+          let breakdownStr = `[${i.fruit || 'Kinnow'}] ${i.totalBoxes} Boxes (${i.vehicle})`;
           if (i.driverName) breakdownStr += ` [Driver: ${i.driverName}]`;
           if (i.netWt > 0) breakdownStr += ` [Net Wt: ${i.netWt.toLocaleString('en-IN')} Kg]`;
           if (i.sizesBreakdown && Object.keys(i.sizesBreakdown).length > 0) {
@@ -3658,7 +3702,7 @@
       let totalGrossOrchardVal = orch.type === 'lump_sum' ? orch.total : (totChargeable * orch.rate);
       const balDue = totalGrossOrchardVal - totPaid;
 
-      document.getElementById('orch-kpi-name').innerText = orch.name;
+      document.getElementById('orch-kpi-name').innerText = `${orch.name} [${orch.fruit || 'Kinnow'}]`;
       document.getElementById('orch-kpi-village').innerText = orch.village;
       document.getElementById('orch-kpi-crates').innerText = `${pendingCrates} Pending`;
       document.getElementById('orch-kpi-crates-breakdown').innerText = `Sent: ${totSent} | Recv: ${totRecv}`;
@@ -3708,7 +3752,7 @@
       const totalVal = orch.type === 'lump_sum' ? orch.total : (totChargeable * orch.rate);
       const balDue = totalVal - totPaid;
 
-      const waMsg = `*SETIA PLANT - FARMER STATEMENT*%0AFarmer: *${orch.name}* (${orch.village})%0ATotal Picked Weight: ${totChargeable.toFixed(1)} Kg%0A*Balance Due: Rs. ${balDue.toLocaleString('en-IN')}*`;
+      const waMsg = `*SETIA PLANT - FARMER STATEMENT*%0AFarmer: *${orch.name}* (${orch.village})%0AFruit: ${orch.fruit || 'Kinnow'}%0ATotal Picked Weight: ${totChargeable.toFixed(1)} Kg%0A*Balance Due: Rs. ${balDue.toLocaleString('en-IN')}*`;
       window.open(`https://wa.me/91${orch.phone}?text=${waMsg}`, '_blank');
     }
 
